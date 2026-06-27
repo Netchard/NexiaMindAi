@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23 22:45:00
-last_updated: 2026-06-23 22:45:00
+last_updated: 2026-06-27 19:00:00
 project: NexiaMind AI
 project_key: NOKEY
 tracking_system: file-system
@@ -49,20 +49,20 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1: Configuration & Infrastructure
-  epic-1: backlog
-  1-001-configurer-le-projet-next-js: backlog
-  1-002-configurer-supabase: backlog
-  1-003-configurer-les-variables-d-environnement: backlog
-  1-004-mettre-en-place-le-logging: backlog
+  epic-1: done
+  1-001-configurer-le-projet-next-js: done
+  1-002-configurer-supabase: done
+  1-003-configurer-les-variables-d-environnement: done
+  1-004-mettre-en-place-le-logging: done
   epic-1-retrospective: optional
 
   # Epic 2: Pipeline RAG Backend
-  epic-2: backlog
-  2-101-creer-la-structure-api-backend: backlog
-  2-102-implementer-le-service-de-chunking: backlog
-  2-103-implementer-le-service-d-embeddings: backlog
+  epic-2: in-progress
+  2-101-creer-la-structure-api-backend: done
+  2-102-implementer-le-service-de-chunking: done
+  2-103-implementer-le-service-d-embeddings: done
   2-104-implementer-le-service-de-retrieval: backlog
-  2-105-implementer-le-service-de-generation: backlog
+  2-105-implementer-le-service-de-generation: done
   2-106-implementer-le-formatage-des-reponses: backlog
   2-107-implementer-l-endpoint-api-chat-message: backlog
   2-108-implementer-les-endpoints-secondaires: backlog
