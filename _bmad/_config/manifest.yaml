@@ -1,0 +1,60 @@
+installation:
+  version: 6.8.0
+  installDate: 2026-06-20T08:20:25.924Z
+  lastUpdated: 2026-06-21T15:59:16.347Z
+modules:
+  - name: core
+    version: 6.8.0
+    installDate: 2026-06-20T08:20:13.112Z
+    lastUpdated: 2026-06-21T15:59:16.317Z
+    source: built-in
+    npmPackage: null
+    repoUrl: null
+  - name: bmm
+    version: 6.8.0
+    installDate: 2026-06-20T08:20:12.654Z
+    lastUpdated: 2026-06-21T15:59:16.321Z
+    source: built-in
+    npmPackage: null
+    repoUrl: null
+  - name: bmb
+    version: v2.0.0
+    installDate: 2026-06-20T08:20:14.163Z
+    lastUpdated: 2026-06-21T15:59:16.326Z
+    source: external
+    npmPackage: bmad-builder
+    repoUrl: https://github.com/bmad-code-org/bmad-builder
+    channel: stable
+    sha: 41569013c018c100aeabdeb802855e3459e8b9d6
+  - name: cis
+    version: v0.2.1
+    installDate: 2026-06-20T08:20:14.496Z
+    lastUpdated: 2026-06-21T15:59:16.331Z
+    source: external
+    npmPackage: bmad-creative-intelligence-suite
+    repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
+    channel: stable
+    sha: 07a8dd03d196a762f21c241d985293fe5b0f90e7
+  - name: wds
+    version: v0.4.3
+    installDate: 2026-06-20T08:20:19.995Z
+    lastUpdated: 2026-06-21T15:59:16.339Z
+    source: external
+    npmPackage: bmad-wds
+    repoUrl: https://github.com/bmad-code-org/bmad-method-wds-expansion
+    channel: stable
+    sha: cc16f09fcfab26d35635af1491f36a38a8431c8d
+  - name: tea
+    version: v1.19.0
+    installDate: 2026-06-20T08:20:25.408Z
+    lastUpdated: 2026-06-21T15:59:16.347Z
+    source: external
+    npmPackage: bmad-method-test-architecture-enterprise
+    repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise
+    channel: stable
+    sha: 8734d51f24071ddbcb3617390b5fcddb4128ef77
+ides:
+  - mistral-vibe
+  - github-copilot
+  - claude-code
+  - codex

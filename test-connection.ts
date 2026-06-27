@@ -1,6 +1,6 @@
 import { supabase } from './src/lib/supabase/client';
 import 'dotenv/config';
-require('dotenv').config({ path: '.env.local' });
+
 
 async function testConnection() {
   try {

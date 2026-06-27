@@ -1,0 +1,279 @@
+version: '1.0'
+project: NexiaMind AI
+created: '2026-06-23'
+sprints:
+- number: 1
+  start_date: '2026-06-23'
+  end_date: '2026-06-29'
+  status: not-started
+  total_estimation: 39
+  epics:
+  - Frontend (Interface Utilisateur)
+  - Base de Données & Optimisation
+  - Pipeline RAG Backend
+  - Configuration & Infrastructure
+  stories:
+  - id: ST-308
+    title: Implémenter l'Export des Réponses
+    estimation: 3
+    priority: ⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-309
+    title: Optimiser les Performances Frontend
+    estimation: 3
+    priority: ⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-405
+    title: Sauvegarder la Structure de la Base
+    estimation: 2
+    priority: ⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Base de Données & Optimisation
+  - id: ST-108
+    title: Implémenter les Endpoints Secondaires
+    estimation: 6
+    priority: ⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-306
+    title: Implémenter le Mode Conversation
+    estimation: 6
+    priority: ⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-304
+    title: Implémenter les Filtres de Recherche
+    estimation: 5
+    priority: ⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-307
+    title: Ajouter le Support du Markdown
+    estimation: 4
+    priority: ⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-403
+    title: Implémenter le Cache des Embeddings
+    estimation: 4
+    priority: ⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Base de Données & Optimisation
+  - id: ST-004
+    title: Mettre en place le Logging
+    estimation: 3
+    priority: ⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Configuration & Infrastructure
+  - id: ST-106
+    title: Implémenter le Formatage des Réponses
+    estimation: 3
+    priority: ⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Pipeline RAG Backend
+- number: 2
+  start_date: '2026-06-30'
+  end_date: '2026-07-06'
+  status: not-started
+  total_estimation: 38
+  epics:
+  - Intégration des Sources
+  - Base de Données & Optimisation
+  - Pipeline RAG Backend
+  stories:
+  - id: ST-204
+    title: Créer le Script d'Indexation Complète
+    estimation: 2
+    priority: ⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Intégration des Sources
+  - id: ST-205
+    title: Implémenter le Bouton "Rafraîchir" dans l'UI
+    estimation: 2
+    priority: ⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Intégration des Sources
+  - id: ST-404
+    title: Créer les Index Classiques
+    estimation: 2
+    priority: ⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Base de Données & Optimisation
+  - id: ST-104
+    title: Implémenter le Service de Retrieval
+    estimation: 8
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-105
+    title: Implémenter le Service de Generation
+    estimation: 8
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-201
+    title: Intégrer Supabase Storage
+    estimation: 8
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Intégration des Sources
+  - id: ST-202
+    title: Intégrer GitLab API
+    estimation: 8
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Intégration des Sources
+- number: 3
+  start_date: '2026-07-07'
+  end_date: '2026-07-13'
+  status: not-started
+  total_estimation: 36
+  epics:
+  - Frontend (Interface Utilisateur)
+  - Configuration & Infrastructure
+  - Pipeline RAG Backend
+  stories:
+  - id: ST-303
+    title: Créer l'Interface de Chat
+    estimation: 8
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-002
+    title: Configurer Supabase
+    estimation: 6
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Configuration & Infrastructure
+  - id: ST-107
+    title: Implémenter l'Endpoint /api/chat/message
+    estimation: 6
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-302
+    title: Implémenter l'Authentification
+    estimation: 6
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-101
+    title: Créer la Structure API Backend
+    estimation: 5
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-103
+    title: Implémenter le Service d'Embeddings
+    estimation: 5
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Pipeline RAG Backend
+- number: 4
+  start_date: '2026-07-14'
+  end_date: '2026-07-20'
+  status: not-started
+  total_estimation: 36
+  epics:
+  - Intégration des Sources
+  - Frontend (Interface Utilisateur)
+  - Configuration & Infrastructure
+  - Pipeline RAG Backend
+  - Base de Données & Optimisation
+  - DevOps & Déploiement
+  stories:
+  - id: ST-203
+    title: Intégrer Nexia GED API
+    estimation: 5
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Intégration des Sources
+  - id: ST-301
+    title: Créer le Layout Principal
+    estimation: 5
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-001
+    title: Configurer le projet Next.js
+    estimation: 4
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Configuration & Infrastructure
+  - id: ST-102
+    title: Implémenter le Service de Chunking
+    estimation: 4
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Pipeline RAG Backend
+  - id: ST-401
+    title: Configurer les Politiques de Sécurité (RLS)
+    estimation: 4
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Élevée
+    status: not-started
+    epic: Base de Données & Optimisation
+  - id: ST-305
+    title: Afficher les Citations de Sources
+    estimation: 3
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Frontend (Interface Utilisateur)
+  - id: ST-402
+    title: Optimiser l'Index Vectoriel
+    estimation: 3
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: Base de Données & Optimisation
+  - id: ST-501
+    title: Configurer Vercel pour le Frontend
+    estimation: 3
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: DevOps & Déploiement
+  - id: ST-502
+    title: Configurer le Backend (si séparé)
+    estimation: 3
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Moyenne
+    status: not-started
+    epic: DevOps & Déploiement
+  - id: ST-003
+    title: Configurer les Variables d'Environnement
+    estimation: 2
+    priority: ⭐⭐⭐⭐⭐
+    difficulty: Faible
+    status: not-started
+    epic: Configuration & Infrastructure

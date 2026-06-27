@@ -1,0 +1,106 @@
+# generated: 2026-06-23 22:45:00
+# last_updated: 2026-06-23 22:45:00
+# project: NexiaMind AI
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog -> in-progress: Automatically when first story is created (via create-story)
+#   - in-progress -> done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; sprint-status surfaces open ones
+
+generated: 2026-06-23 22:45:00
+last_updated: 2026-06-23 22:45:00
+project: NexiaMind AI
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Configuration & Infrastructure
+  epic-1: backlog
+  1-001-configurer-le-projet-next-js: backlog
+  1-002-configurer-supabase: backlog
+  1-003-configurer-les-variables-d-environnement: backlog
+  1-004-mettre-en-place-le-logging: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Pipeline RAG Backend
+  epic-2: backlog
+  2-101-creer-la-structure-api-backend: backlog
+  2-102-implementer-le-service-de-chunking: backlog
+  2-103-implementer-le-service-d-embeddings: backlog
+  2-104-implementer-le-service-de-retrieval: backlog
+  2-105-implementer-le-service-de-generation: backlog
+  2-106-implementer-le-formatage-des-reponses: backlog
+  2-107-implementer-l-endpoint-api-chat-message: backlog
+  2-108-implementer-les-endpoints-secondaires: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Integration des Sources
+  epic-3: backlog
+  3-201-integrer-supabase-storage: backlog
+  3-202-integrer-gitlab-api: backlog
+  3-203-integrer-nexia-ged-api: backlog
+  3-204-creer-le-script-d-indexation-complete: backlog
+  3-205-implementer-le-bouton-rafraichir-dans-l-ui: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Frontend (Interface Utilisateur)
+  epic-4: backlog
+  4-301-creer-le-layout-principal: backlog
+  4-302-implementer-l-authentification: backlog
+  4-303-creer-l-interface-de-chat: backlog
+  4-304-implementer-les-filtres-de-recherche: backlog
+  4-305-afficher-les-citations-de-sources: backlog
+  4-306-implementer-le-mode-conversation: backlog
+  4-307-ajouter-le-support-du-markdown: backlog
+  4-308-implementer-l-export-des-reponses: backlog
+  4-309-optimiser-les-performances-frontend: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Base de Donnees & Optimisation
+  epic-5: backlog
+  5-401-configurer-les-politiques-de-securite-rls: backlog
+  5-402-optimiser-l-index-vectoriel: backlog
+  5-403-implementer-le-cache-des-embeddings: backlog
+  5-404-creer-les-index-classiques: backlog
+  5-405-sauvegarder-la-structure-de-la-base: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: DevOps & Deployment
+  epic-6: backlog
+  6-501-configurer-vercel-pour-le-frontend: backlog
+  6-502-configurer-le-backend-si-separe: backlog
+  epic-6-retrospective: optional

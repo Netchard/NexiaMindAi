@@ -14,3 +14,7 @@ export * from './chunker';
 
 // Export du service d'embeddings
 export * from './embeddings';
+
+// Export du service de génération
+export * from './generator';
+export * from './prompts';
