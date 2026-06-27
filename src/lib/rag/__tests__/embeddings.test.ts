@@ -71,8 +71,15 @@ describe('EmbeddingService', () => {
     });
 
     it('devrait détecter si non configuré', () => {
+      // Sauvegarder et nettoyer l'env
+      const originalEnv = process.env.MISTRAL_API_KEY;
+      delete process.env.MISTRAL_API_KEY;
+      
       const unconfiguredService = new EmbeddingService({ apiKey: '' });
       expect(unconfiguredService.isConfigured()).toBe(false);
+      
+      // Restaurer l'env
+      process.env.MISTRAL_API_KEY = originalEnv;
     });
   });
 
@@ -258,16 +265,16 @@ describe('EmbeddingService', () => {
     });
 
     it('devrait gérer les erreurs 429 (rate limit)', async () => {
-      const mockPost = vi.fn().mockRejectedValue({
-        response: {
+      const mockPost = vi.fn().mockRejectedValue(
+        new MockAxiosError('Rate limit exceeded', {
           status: 429,
           data: {
             object: 'error',
             message: 'Rate limit exceeded',
             type: 'RateLimitError',
           }
-        }
-      });
+        })
+      );
       (service as any).client.post = mockPost;
 
       try {
@@ -281,16 +288,16 @@ describe('EmbeddingService', () => {
     });
 
     it('devrait gérer les erreurs serveur 500', async () => {
-      const mockPost = vi.fn().mockRejectedValue({
-        response: {
+      const mockPost = vi.fn().mockRejectedValue(
+        new MockAxiosError('Internal server error', {
           status: 500,
           data: {
             object: 'error',
             message: 'Internal server error',
             type: 'InternalServerError',
           }
-        }
-      });
+        })
+      );
       (service as any).client.post = mockPost;
 
       try {
@@ -305,36 +312,54 @@ describe('EmbeddingService', () => {
 
   describe('Fonctions exportées', () => {
     it('devrait exporter generateEmbedding', async () => {
-      const mockPost = vi.fn().mockResolvedValue({
-        data: {
-          data: [{ embedding: new Array(1536).fill(0.1) }]
-        }
-      });
-      (service as any).client.post = mockPost;
+      // Créer un mock du service directement pour éviter les problèmes de singleton
+      const mockClient = {
+        post: vi.fn().mockResolvedValue({
+          data: {
+            data: [{ embedding: new Array(1536).fill(0.1) }]
+          }
+        })
+      };
+      
+      // Créer une instance temporaire avec le client mocké
+      const tempService = new EmbeddingService();
+      (tempService as any).client = mockClient;
+      
+      // Remplacer temporairement le client du singleton
+      const { embeddingService } = await import('../embeddings');
+      (embeddingService as any).client = mockClient;
 
       const result = await generateEmbedding('test');
       expect(result).toBeDefined();
     });
 
     it('devrait exporter generateEmbeddings', async () => {
-      const mockPost = vi.fn().mockResolvedValue({
-        data: {
-          data: [{ embedding: new Array(1536).fill(0.1) }]
-        }
-      });
-      (service as any).client.post = mockPost;
+      const mockClient = {
+        post: vi.fn().mockResolvedValue({
+          data: {
+            data: [{ embedding: new Array(1536).fill(0.1) }]
+          }
+        })
+      };
+      
+      const { embeddingService } = await import('../embeddings');
+      (embeddingService as any).client = mockClient;
 
       const result = await generateEmbeddings(['test']);
       expect(result).toBeDefined();
     });
 
     it('devrait exporter embedChunks', async () => {
-      const mockPost = vi.fn().mockResolvedValue({
-        data: {
-          data: [{ embedding: new Array(1536).fill(0.1) }]
-        }
-      });
-      (service as any).client.post = mockPost;
+      const mockClient = {
+        post: vi.fn().mockResolvedValue({
+          data: {
+            data: [{ embedding: new Array(1536).fill(0.1) }]
+          }
+        })
+      };
+      
+      const { embeddingService } = await import('../embeddings');
+      (embeddingService as any).client = mockClient;
 
       const chunks: Chunk[] = [{
         content: 'test',
