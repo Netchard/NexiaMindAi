@@ -6,15 +6,8 @@ import { CodeLanguage, ContentType } from './types';
  * Note: 1 token ≈ 4 caractères en moyenne pour les modèles Mistral
  */
 export function estimateTokenCount(text: string): number {
-  // Supprimer les espaces multiples
   const cleanedText = text.replace(/\s+/g, ' ').trim();
-  
-  // Estimation simple: environ 4 caractères = 1 token
-  // C'est une approximation, pour une estimation précise il faudrait utiliser
-  // un tokenizer comme celui de Mistral
   const charCount = cleanedText.length;
-  
-  // Approximation: 1 token ≈ 4 caractères (basé sur les modèles Mistral)
   return Math.ceil(charCount / 4);
 }
 
@@ -24,7 +17,6 @@ export function estimateTokenCount(text: string): number {
 export function detectContentType(content: string): ContentType {
   const trimmed = content.trim();
   
-  // Détecter le markdown
   if (trimmed.startsWith('# ') || 
       trimmed.startsWith('## ') || 
       trimmed.startsWith('### ') ||
@@ -36,7 +28,6 @@ export function detectContentType(content: string): ContentType {
     return 'markdown';
   }
   
-  // Détecter le HTML
   if (trimmed.startsWith('<!DOCTYPE') || 
       trimmed.startsWith('<html') ||
       trimmed.includes('<div') ||
@@ -46,7 +37,6 @@ export function detectContentType(content: string): ContentType {
     return 'html';
   }
   
-  // Détecter le code (par les mots-clés communs)
   const codeKeywords = [
     'function', 'const', 'let', 'var', 'return', 'class',
     'import', 'export', 'from', 'require', 'module',
@@ -71,27 +61,39 @@ export function detectContentType(content: string): ContentType {
 }
 
 /**
- * Détection du langage de code
+ * Détection du langage de code - version améliorée
  */
 export function detectCodeLanguage(content: string): CodeLanguage {
   const trimmed = content.trim();
   
   // JavaScript/TypeScript
-  if (trimmed.includes('=>') || 
-      trimmed.includes('import ') && trimmed.includes('from ') || 
-      trimmed.includes('export ')) {
-    if (trimmed.includes('interface ') || 
-        trimmed.includes(': ') && trimmed.includes('{') ||
-        trimmed.includes('type ') && trimmed.includes('=')) {
+  if (trimmed.includes('function ') ||
+      trimmed.includes('const ') ||
+      trimmed.includes('let ') ||
+      trimmed.includes('var ') ||
+      trimmed.includes('return ') ||
+      trimmed.includes('=>') ||
+      trimmed.includes('class ') ||
+      (trimmed.includes('import ') && trimmed.includes('from ')) ||
+      trimmed.includes('export ') ||
+      trimmed.includes('async ') ||
+      trimmed.includes('await ') ||
+      trimmed.includes('new ')) {
+    
+    if (trimmed.includes('interface ') ||
+        (trimmed.includes(': ') && trimmed.includes('{') && !trimmed.includes('def ')) ||
+        (trimmed.includes('type ') && trimmed.includes('=')) ||
+        (trimmed.includes('<') && trimmed.includes('>') && !trimmed.includes('<?'))) {
       return 'typescript';
     }
+    
     return 'javascript';
   }
   
   // Python
   if (trimmed.includes('def ') || 
-      trimmed.includes('class ') && !trimmed.includes('{') ||
-      trimmed.includes('import ') && !trimmed.includes('from ') ||
+      (trimmed.includes('class ') && !trimmed.includes('{')) ||
+      (trimmed.includes('import ') && !trimmed.includes('from ') && !trimmed.includes(';')) ||
       trimmed.includes('print(') ||
       trimmed.includes('self.') ||
       trimmed.includes('lambda ')) {
@@ -122,8 +124,8 @@ export function detectCodeLanguage(content: string): CodeLanguage {
   
   // Go
   if (trimmed.includes('package ') && trimmed.includes('import (') ||
-      trimmed.includes('func ') && trimmed.includes('(') ||
-      trimmed.includes('var ') && trimmed.includes('=')) {
+      (trimmed.includes('func ') && trimmed.includes('(') && !trimmed.includes('=>')) ||
+      (trimmed.includes('var ') && trimmed.includes('=') && !trimmed.includes('const'))) {
     return 'go';
   }
   
@@ -148,7 +150,7 @@ export function detectCodeLanguage(content: string): CodeLanguage {
   // Bash
   if (trimmed.startsWith('#!/bin/bash') || 
       trimmed.startsWith('#!/bin/sh') ||
-      trimmed.includes('echo ') && !trimmed.includes('"') ||
+      (trimmed.includes('echo ') && !trimmed.includes('"') && !trimmed.includes("'")) ||
       trimmed.includes('cd ') ||
       trimmed.includes('mkdir ') ||
       trimmed.includes('rm ') ||
@@ -187,7 +189,7 @@ export function extractLines(text: string): string[] {
  */
 export function cleanText(text: string): string {
   return text
-    .replace(/[ \t]+/g, ' ')  // Remplacer les espaces multiples par un seul
-    .replace(/\n\n+/g, '\n\n')  // Remplacer les sauts de ligne multiples
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n\n+/g, '\n\n')
     .trim();
 }
