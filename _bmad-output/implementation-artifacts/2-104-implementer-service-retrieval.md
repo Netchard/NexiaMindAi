@@ -8,9 +8,9 @@ priority: ⭐⭐⭐⭐⭐
 estimation: 8 heures
 assigned_to: Dday
 start_date: 2026-06-27 20:30:00
-end_date: "2026-06-27 20:00:00"
+end_date: "2026-06-27 19:45:00"
 user_skill_level: intermediate
-baseline_commit: ""
+baseline_commit: c4d0ef1
 workflow: dev-story
 
 # BMAD Metadata
