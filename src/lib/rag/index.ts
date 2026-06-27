@@ -18,3 +18,6 @@ export * from './embeddings';
 // Export du service de génération
 export * from './generator';
 export * from './prompts';
+
+// Export du service de retrieval
+export * from './retriever';
