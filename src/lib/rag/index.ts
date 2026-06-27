@@ -11,3 +11,6 @@ export * from './utils';
 
 // Export du service de chunking
 export * from './chunker';
+
+// Export du service d'embeddings
+export * from './embeddings';
