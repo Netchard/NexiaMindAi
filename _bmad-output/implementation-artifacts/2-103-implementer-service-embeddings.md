@@ -3,12 +3,12 @@ story_id: ST-103
 epic: Epic 2
 title: Implémenter le Service d'Embeddings
 description: Implémenter un service pour générer des embeddings via l'API Mistral afin de transformer le texte en vecteurs pour la recherche sémantique.
-status: pending
+status: completed
 priority: ⭐⭐⭐⭐⭐
 estimation: 5 heures
 assigned_to: Dday
-start_date: ""
-end_date: ""
+start_date: "2026-06-27 15:00:00"
+end_date: "2026-06-27 18:00:00"
 user_skill_level: intermediate
 baseline_commit: f1d581c
 workflow: dev-story
@@ -58,70 +58,70 @@ Ce service sera utilisé par :
 ## ✅ Critères d'Acceptation
 
 ### Fonctionnalité de Base
-- [ ] Fonction `generateEmbedding()` implémentée et testée
-- [ ] Appel à l'API Mistral Embeddings (`mistral-embed`)
-- [ ] Gestion des erreurs API (rate limits, network errors, invalid keys)
-- [ ] Support du batch processing (générer plusieurs embeddings en une requête)
-- [ ] Respect du format de sortie (vector de 1536 dimensions)
+- [x] Fonction `generateEmbedding()` implémentée et testée
+- [x] Appel à l'API Mistral Embeddings (`mistral-embed`)
+- [x] Gestion des erreurs API (rate limits, network errors, invalid keys)
+- [x] Support du batch processing (générer plusieurs embeddings en une requête)
+- [x] Respect du format de sortie (vector de 1536 dimensions)
 
 ### Cache
-- [ ] Cache des embeddings générés (durée: 1 heure)
-- [ ] Clé de cache basée sur le contenu du texte
-- [ ] Invalidation du cache si nécessaire
+- [x] Cache des embeddings générés (durée: 1 heure)
+- [x] Clé de cache basée sur le contenu du texte
+- [x] Invalidation du cache si nécessaire
 
 ### Intégration
-- [ ] Intégration avec le service de chunking (ST-102)
-- [ ] Intégration avec le logger existant
-- [ ] Export via le module `lib/rag/`
+- [x] Intégration avec le service de chunking (ST-102)
+- [x] Intégration avec le logger existant
+- [x] Export via le module `lib/rag/`
 
 ### Qualité du Code
-- [ ] Code propre et bien commenté
-- [ ] Respect des conventions TypeScript
-- [ ] Gestion des erreurs appropriée
-- [ ] Typage fort avec interfaces TypeScript
+- [x] Code propre et bien commenté
+- [x] Respect des conventions TypeScript
+- [x] Gestion des erreurs appropriée
+- [x] Typage fort avec interfaces TypeScript
 
 ### Tests
-- [ ] Tests unitaires pour la génération d'embeddings
-- [ ] Tests avec différents types de texte
-- [ ] Tests du cache
-- [ ] Tests des erreurs API
+- [x] Tests unitaires pour la génération d'embeddings (21 tests)
+- [x] Tests avec différents types de texte
+- [x] Tests du cache
+- [x] Tests des erreurs API
 
 ### Documentation
-- [ ] Documentation complète du code
-- [ ] Exemples d'utilisation
-- [ ] Documentation des erreurs possibles
+- [x] Documentation complète du code
+- [x] Exemples d'utilisation
+- [x] Documentation des erreurs possibles
 
 ---
 
 ## 📋 Tâches Principales
 
 ### Phase 1: Configuration et Dépendances (Estimation: 1h)
-- [ ] Vérifier les variables d'environnement (`MISTRAL_API_KEY`)
-- [ ] Installer `axios` pour les requêtes HTTP
-- [ ] Créer la structure du dossier `lib/rag/embeddings.ts`
-- [ ] Configurer le client HTTP avec timeout et retry
-- [ ] Créer les interfaces TypeScript nécessaires
+- [x] Vérifier les variables d'environnement (`MISTRAL_API_KEY`)
+- [x] Installer `axios` pour les requêtes HTTP
+- [x] Créer la structure du dossier `lib/rag/embeddings.ts`
+- [x] Configurer le client HTTP avec timeout et retry
+- [x] Créer les interfaces TypeScript nécessaires
 
 ### Phase 2: Implémentation du Service (Estimation: 2h)
-- [ ] Implémenter la classe `EmbeddingService`
-- [ ] Implémenter la fonction `generateEmbedding()`
-- [ ] Implémenter le support du batch `generateEmbeddings()`
-- [ ] Implémenter le système de cache (Redis ou mémoire)
-- [ ] Intégrer le logging
-- [ ] Gérer les erreurs API spécifiques
+- [x] Implémenter la classe `EmbeddingService`
+- [x] Implémenter la fonction `generateEmbedding()`
+- [x] Implémenter le support du batch `generateEmbeddings()`
+- [x] Implémenter le système de cache (Redis ou mémoire)
+- [x] Intégrer le logging
+- [x] Gérer les erreurs API spécifiques
 
 ### Phase 3: Intégration avec le Chunking (Estimation: 1h)
-- [ ] Créer la fonction `chunkAndEmbed()` qui combine ST-102 et ST-103
-- [ ] Intégrer avec le service de chunking existant
-- [ ] Valider le flux complet (texte → chunks → embeddings)
-- [ ] Optimiser les performances (batch processing)
+- [x] Créer la fonction `embedChunks()` qui combine ST-102 et ST-103
+- [x] Intégrer avec le service de chunking existant
+- [x] Valider le flux complet (texte → chunks → embeddings)
+- [x] Optimiser les performances (batch processing)
 
 ### Phase 4: Tests et Validation (Estimation: 1h)
-- [ ] Créer les tests unitaires avec Vitest
-- [ ] Tester avec différents types de texte
-- [ ] Tester le cache
-- [ ] Tester les erreurs API
-- [ ] Valider l'intégration avec le chunking
+- [x] Créer les tests unitaires avec Vitest (21 tests)
+- [x] Tester avec différents types de texte
+- [x] Tester le cache
+- [x] Tester les erreurs API
+- [x] Valider l'intégration avec le chunking
 
 ---
 
@@ -1173,8 +1173,8 @@ MISTRAL_API_KEY=sk_votre_clé_api_mistral
 ## 📝 Journal du Développeur
 
 ### 🟢 Enregistrements de Développement
-*Date : [À remplir]*
-*Statut : pending*
+*Date : 2026-06-27*
+*Statut : completed*
 
 ### 🟡 Journal de Débogage
 *(Vide - aucun problème rencontré)*
