@@ -3,7 +3,7 @@ story_id: ST-201
 epic: Epic 3
 title: Intégrer Supabase Storage
 description: Pouvoir indexer et rechercher les documents de Supabase Storage afin d'offrir l'accès à la base documentaire centrale.
-status: in-progress
+status: review
 priority: ⭐⭐⭐⭐⭐
 estimation: 8 heures
 assigned_to: Dday
