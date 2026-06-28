@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23 22:45:00
-last_updated: 2026-06-28 11:55:00
+last_updated: 2026-06-28 12:00:00
 project: NexiaMind AI
 project_key: NOKEY
 tracking_system: file-system
@@ -63,7 +63,7 @@ development_status:
   2-103-implementer-le-service-d-embeddings: done
   2-104-implementer-le-service-de-retrieval: done
   2-105-implementer-le-service-de-generation: done
-  2-106-implementer-le-formatage-des-reponses: backlog
+  2-106-implementer-le-formatage-des-reponses: done
   2-107-implementer-l-endpoint-api-chat-message: backlog
   2-108-implementer-les-endpoints-secondaires: backlog
   epic-2-retrospective: optional
