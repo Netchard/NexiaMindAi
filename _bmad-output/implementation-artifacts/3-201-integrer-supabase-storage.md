@@ -117,10 +117,10 @@ Supabase Storage (bucket documents) → Récupération fichiers → Extraction t
 - [x] Ajouter le logging
 
 #### Sous-tâche 2.2: Configuration et tests du client
-- [ ] Tester la connexion avec les credentials existants
-- [ ] Vérifier l'accès au bucket `documents`
-- [ ] Tester le téléchargement de fichiers
-- [ ] Valider la gestion des erreurs
+- [x] Tester la connexion avec les credentials existants
+- [x] Vérifier l'accès au bucket `documents`
+- [x] Tester le téléchargement de fichiers
+- [x] Valider la gestion des erreurs
 
 ### Phase 3: Service d'Extraction de Texte (Estimation: 2h)
 
@@ -133,43 +133,43 @@ Supabase Storage (bucket documents) → Récupération fichiers → Extraction t
 - [x] Gérer les fichiers texte brut
 
 #### Sous-tâche 3.2: Tests du service OCR
-- [ ] Tester l'extraction de texte PDF
-- [ ] Tester l'extraction de texte images
-- [ ] Tester l'extraction de texte brut
-- [ ] Tester la gestion des erreurs (fichiers corrompus)
+- [x] Tester l'extraction de texte PDF
+- [x] Tester l'extraction de texte images
+- [x] Tester l'extraction de texte brut
+- [x] Tester la gestion des erreurs (fichiers corrompus)
 
 ### Phase 4: Service d'Indexation (Estimation: 2h)
 
 #### Sous-tâche 4.1: Service principal
 - [x] Créer `src/lib/supabase/storage/indexer.ts`
 - [x] Implémenter la récupération des fichiers depuis Storage
-- [ ] Intégrer l'extraction de texte (OCR)
-- [ ] Intégrer le chunking (appel à ST-102)
-- [ ] Intégrer les embeddings (appel à ST-103)
-- [ ] Intégrer l'indexation dans Supabase (appel à ST-104 reindexSource)
-- [ ] Gérer les métadonnées (nom, type, taille, date, source)
+- [x] Intégrer l'extraction de texte (OCR)
+- [x] Intégrer le chunking (appel à ST-102)
+- [x] Intégrer les embeddings (appel à ST-103)
+- [x] Intégrer l'indexation dans Supabase (appel à ST-104 reindexSource)
+- [x] Gérer les métadonnées (nom, type, taille, date, source)
 
 #### Sous-tâche 4.2: Script d'indexation
-- [ ] Créer `scripts/index-supabase.js`
-- [ ] Implémenter l'indexation complète de tous les fichiers
-- [ ] Ajouter les options CLI (bucket, client, dry-run)
-- [ ] Ajouter le logging détaillé
-- [ ] Gérer les erreurs et rapports
+- [x] Créer `scripts/index-supabase.js`
+- [x] Implémenter l'indexation complète de tous les fichiers
+- [x] Ajouter les options CLI (bucket, client, dry-run)
+- [x] Ajouter le logging détaillé
+- [x] Gérer les erreurs et rapports
 
 ### Phase 5: Endpoint API et Intégration (Estimation: 1h)
 
 #### Sous-tâche 5.1: Endpoint de synchronisation
-- [ ] Créer `app/api/sources/supabase/sync/route.ts`
-- [ ] Implémenter la validation JWT (admin uniquement)
-- [ ] Implémenter la validation de la requête
-- [ ] Appeler le service d'indexation
-- [ ] Retourner le statut et rapport
+- [x] Créer `app/api/sources/supabase/sync/route.ts`
+- [x] Implémenter la validation JWT (admin uniquement)
+- [x] Implémenter la validation de la requête
+- [x] Appeler le service d'indexation
+- [x] Retourner le statut et rapport
 
 #### Sous-tâche 5.2: Tests d'intégration
-- [ ] Créer les tests pour l'endpoint API
-- [ ] Tester l'authentification
-- [ ] Tester la synchronisation
-- [ ] Tester les cas d'erreur
+- [x] Créer les tests pour l'endpoint API
+- [x] Tester l'authentification
+- [x] Tester la synchronisation
+- [x] Tester les cas d'erreur
 
 ---
 
