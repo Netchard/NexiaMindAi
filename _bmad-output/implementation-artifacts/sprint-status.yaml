@@ -64,7 +64,7 @@ development_status:
   2-104-implementer-le-service-de-retrieval: done
   2-105-implementer-le-service-de-generation: done
   2-106-implementer-le-formatage-des-reponses: done
-  2-107-implementer-l-endpoint-api-chat-message: backlog
+  2-107-implementer-l-endpoint-api-chat-message: done
   2-108-implementer-les-endpoints-secondaires: backlog
   epic-2-retrospective: optional
 
