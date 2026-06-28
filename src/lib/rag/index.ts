@@ -19,5 +19,8 @@ export * from './embeddings';
 export * from './generator';
 export * from './prompts';
 
+// Export du service de formatage
+export * from './formatter';
+
 // Export du service de retrieval
 export * from './retriever';
