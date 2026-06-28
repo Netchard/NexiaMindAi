@@ -17,9 +17,8 @@
  */
 
 // Charger les dépendances - note: chemin relatif depuis la racine du projet
-const path = require('path');
-const { logger } = require('../src/lib/logger');
-const { storageIndexer, SupabaseStorageIndexer } = require('../src/lib/supabase/storage/indexer');
+const { logger } = require('./src/lib/logger');
+const { storageIndexer, SupabaseStorageIndexer } = require('./src/lib/supabase/storage/indexer');
 
 /**
  * Parse les arguments de la ligne de commande

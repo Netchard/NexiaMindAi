@@ -5,7 +5,7 @@
 
 import { POST, GET, PUT, DELETE } from '../route';
 import { NextRequest } from 'next/server';
-import { storageIndexer } from '@/lib/supabase/storage/indexer';
+import { storageIndexer } from '@/lib/supabase/storage';
 import { AuthService } from '@/lib/api/auth/service';
 
 // Mock des dépendances

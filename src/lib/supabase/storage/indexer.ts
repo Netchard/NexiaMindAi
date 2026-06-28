@@ -6,8 +6,8 @@
 import { logger } from '@/lib/logger';
 import { storageClient } from './client';
 import { ocrService } from './ocr';
-import { chunkDocument } from '@/lib/rag/chunker';
-import { generateEmbedding } from '@/lib/rag/embeddings';
+import { chunkDocument, ChunkingResult } from '@/lib/rag/chunker';
+import { generateEmbeddings, EmbeddingResult, BatchEmbeddingResult } from '@/lib/rag/embeddings';
 import { reindexSource } from '@/lib/rag/retriever';
 import { createClient } from '@/lib/supabase/server';
 import { StorageFileInfo, IndexationOptions, IndexationResult } from './types';
@@ -151,7 +151,7 @@ export class SupabaseStorageIndexer {
       }
 
       // 3. Chunking du document
-      const chunks: Chunk[] = (await chunkDocument({
+      const chunkResult: ChunkingResult = await chunkDocument({
         content: extractedText.text,
         metadata: {
           source: fileInfo.path,
@@ -164,7 +164,8 @@ export class SupabaseStorageIndexer {
           fileContentType: fileInfo.contentType,
           extractionMethod: extractedText.contentType,
         },
-      })).chunks;
+      });
+      const chunks: Chunk[] = chunkResult.chunks;
 
       chunksCreated = chunks.length;
 
@@ -197,7 +198,8 @@ export class SupabaseStorageIndexer {
             }
 
             // 5. Générer l'embedding pour ce chunk
-            const embedding = await generateEmbedding(chunk.content);
+            const embeddingsResult: BatchEmbeddingResult = await generateEmbeddings([chunk.content]);
+            const embedding: EmbeddingResult = embeddingsResult.embeddings[0];
             embeddingsGenerated++;
 
             // 6. Sauvegarder l'embedding
