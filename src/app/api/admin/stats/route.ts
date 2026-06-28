@@ -1,48 +1,250 @@
-import { NextResponse } from 'next/server';
+/**
+ * Endpoint GET /api/admin/stats
+ * Récupère les statistiques d'utilisation pour l'administration
+ * Fait partie du pipeline RAG de NexiaMind AI
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
-export async function GET(request: Request) {
+// Types pour les réponses
+interface UsageStats {
+  conversations: number;
+  messages: number;
+  tokensUsed: number;
+}
+
+interface StatsResponse {
+  general: {
+    totalUsers: number;
+    totalConversations: number;
+    totalMessages: number;
+    totalTokensUsed: number;
+  };
+  byPeriod: {
+    today: UsageStats;
+    last7Days: UsageStats;
+    last30Days: UsageStats;
+  };
+  byClient?: Record<string, UsageStats>;
+}
+
+// Initialiser Supabase
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
+
+if (!supabaseUrl || !supabaseKey) {
+  logger.error('SUPABASE_URL and SUPABASE_ANON_KEY must be defined');
+  throw new Error('Supabase configuration missing');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+/**
+ * Vérifie si l'utilisateur est admin
+ * À implémenter: Vérifier le rôle via Supabase ou JWT custom claims
+ */
+async function isUserAdmin(userId: string): Promise<boolean> {
+  // TODO: Implémenter la vérification du rôle admin
+  // Pour l'instant, retourner false par défaut
+  // En production: vérifier via Supabase auth ou JWT claims
+  logger.warn('Vérification admin non implémentée - tous les utilisateurs sont refusés');
+  return false;
+}
+
+/**
+ * Récupère les statistiques pour une période donnée
+ */
+async function getPeriodStats(startDate: string, endDate: string): Promise<UsageStats> {
+  const [conversations, messages, tokens] = await Promise.all([
+    supabase
+      .from('conversations')
+      .select('id', { head: true, count: 'exact' })
+      .gte('created_at', startDate)
+      .lte('created_at', endDate),
+    supabase
+      .from('messages')
+      .select('id', { head: true, count: 'exact' })
+      .gte('created_at', startDate)
+      .lte('created_at', endDate),
+    supabase
+      .from('messages')
+      .select('metadata->>tokensUsed')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate),
+  ]);
+
+  const tokensUsed = (tokens.data as any[])?.reduce((sum, m) => {
+    return sum + (parseInt(m.tokensUsed || '0') || 0);
+  }, 0) || 0;
+
+  return {
+    conversations: conversations.count || 0,
+    messages: messages.count || 0,
+    tokensUsed,
+  };
+}
+
+/**
+ * Endpoint GET /api/admin/stats
+ * Récupère les statistiques d'utilisation
+ */
+export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+
   try {
-    // Get access token from headers (Bearer token)
-    const authHeader = request.headers.get('authorization');
-    const access_token = authHeader?.replace('Bearer ', '');
-    
-    if (!access_token) {
-      logger.warn('access_token manquant pour stats');
+    // 1. Vérification de l'utilisateur (déjà authentifié par le middleware)
+    const userId = request.headers.get('x-user-id');
+
+    if (!userId) {
+      logger.warn('Accès non autorisé - utilisateur non authentifié', {
+        path: request.nextUrl.pathname,
+        method: request.method,
+      });
+
       return NextResponse.json(
-        { error: 'Access token required' },
+        { error: 'Non autorisé - utilisateur non authentifié' },
         { status: 401 }
       );
     }
+
+    // 2. Vérification autorisation (admin uniquement)
+    const isAdmin = await isUserAdmin(userId);
     
-    // Vérifier que l'utilisateur est admin
-    // TODO: Intégrer avec la vérification des rôles
-    // Pour l'instant, on suppose que le middleware d'auth a déjà vérifié
-    logger.info('Récupération des statistiques admin');
-    
-    // Statistiques simulées
-    const stats = {
-      totalUsers: 42,
-      totalConversations: 156,
-      totalMessages: 892,
-      totalDocuments: 234,
-      totalChunks: 12450,
-      totalEmbeddings: 12450,
-      storageUsed: '2.4 GB',
-      lastSync: new Date().toISOString(),
-    };
-    
-    logger.info('Statistiques admin retournées');
-    
-    return NextResponse.json(stats, { status: 200 });
+    if (!isAdmin) {
+      logger.warn('Accès refusé - droits administrateur requis', {
+        userId,
+        path: request.nextUrl.pathname,
+      });
+
+      return NextResponse.json(
+        { error: 'Accès refusé - droits administrateur requis' },
+        { status: 403 }
+      );
+    }
+
+    logger.info(`Récupération des statistiques par ${userId}`);
+
+    // 3. Calcul des statistiques
+    try {
+      // Stats générales
+      const [
+        usersResult,
+        conversationsResult,
+        messagesResult,
+        tokensResult,
+      ] = await Promise.all([
+        supabase.from('profiles').select('id', { head: true, count: 'exact' }),
+        supabase.from('conversations').select('id', { head: true, count: 'exact' }),
+        supabase.from('messages').select('id', { head: true, count: 'exact' }),
+        supabase.from('messages').select('metadata->>tokensUsed', { head: true, count: 'exact' }),
+      ]);
+
+      const totalUsers = usersResult.count || 0;
+      const totalConversations = conversationsResult.count || 0;
+      const totalMessages = messagesResult.count || 0;
+      const totalTokensUsed = (tokensResult.data as any[])?.reduce((sum, m) => {
+        return sum + (parseInt(m.tokensUsed || '0') || 0);
+      }, 0) || 0;
+
+      // Stats par période
+      const today = new Date().toISOString().split('T')[0];
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+      const [todayStats, last7DaysStats, last30DaysStats] = await Promise.all([
+        getPeriodStats(today, today),
+        getPeriodStats(sevenDaysAgo, today),
+        getPeriodStats(thirtyDaysAgo, today),
+      ]);
+
+      // Stats par client (optionnel)
+      const byClientStats: Record<string, UsageStats> = {};
+
+      const { data: clientMessages, error: clientError } = await supabase
+        .from('messages')
+        .select('metadata->>client, id', { head: true, count: 'exact' })
+        .group('metadata->>client');
+
+      if (!clientError && clientMessages) {
+        for (const cm of clientMessages as any[]) {
+          const client = cm.client || 'unknown';
+          if (!byClientStats[client]) {
+            byClientStats[client] = { conversations: 0, messages: 0, tokensUsed: 0 };
+          }
+          byClientStats[client].messages = cm.count || 0;
+        }
+      }
+
+      // 4. Formattage de la réponse
+      const response: StatsResponse = {
+        general: {
+          totalUsers,
+          totalConversations,
+          totalMessages,
+          totalTokensUsed,
+        },
+        byPeriod: {
+          today: todayStats,
+          last7Days: last7DaysStats,
+          last30Days: last30DaysStats,
+        },
+        byClient: Object.keys(byClientStats).length > 0 ? byClientStats : undefined,
+      };
+
+      logger.info('Statistiques récupérées avec succès', {
+        userId,
+        processingTime: `${Date.now() - startTime}ms`,
+      });
+
+      return NextResponse.json(response, { status: 200 });
+
+    } catch (statsError: any) {
+      logger.error('Échec du calcul des statistiques', {
+        error: statsError.message,
+        stack: statsError.stack,
+        userId,
+      });
+
+      return NextResponse.json(
+        { error: 'Échec du calcul des statistiques', details: statsError.message },
+        { status: 500 }
+      );
+    }
+
   } catch (error: any) {
-    logger.error('Erreur dans admin/stats', {
+    logger.error('Échec du traitement de la requête de statistiques', {
       error: error.message,
       stack: error.stack,
+      userId: request.headers.get('x-user-id') || 'unknown',
+      path: request.nextUrl.pathname,
     });
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erreur serveur interne', details: error.message },
       { status: 500 }
     );
   }
+}
+
+// Fonction utilitaire pour appeler l'endpoint depuis le frontend
+export async function getAdminStats(): Promise<StatsResponse> {
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+  const url = new URL('/api/admin/stats', baseUrl);
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      `Erreur ${response.status}: ${errorData.error || response.statusText}`
+    );
+  }
+
+  return response.json();
 }

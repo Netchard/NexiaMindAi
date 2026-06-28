@@ -65,7 +65,7 @@ development_status:
   2-105-implementer-le-service-de-generation: done
   2-106-implementer-le-formatage-des-reponses: done
   2-107-implementer-l-endpoint-api-chat-message: done
-  2-108-implementer-les-endpoints-secondaires: backlog
+  2-108-implementer-les-endpoints-secondaires: in-progress
   epic-2-retrospective: optional
 
   # Epic 3: Integration des Sources
