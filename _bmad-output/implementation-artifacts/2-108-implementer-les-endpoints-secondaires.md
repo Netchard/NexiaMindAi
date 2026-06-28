@@ -3,12 +3,12 @@ story_id: ST-108
 epic: Epic 2
 title: Implémenter les Endpoints Secondaires
 description: Implémenter les endpoints de support (historique, rafraîchissement, statistiques) pour compléter les fonctionnalités principales de NexiaMind AI.
-status: ready-for-review
+status: done
 priority: ⭐⭐⭐⭐
 estimation: 6 heures
 assigned_to: Dday
 start_date: 2026-06-28 13:00:00
-end_date: ""
+end_date: "2026-06-28 16:00:00"
 user_skill_level: intermediate
 baseline_commit: e88d854
 workflow: dev-story
