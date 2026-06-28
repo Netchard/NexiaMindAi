@@ -5,7 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { AuthService } from '@/lib/api/auth/service';
+import { reindexSource, RetrievalError } from '@/lib/rag/retriever';
 import { logger } from '@/lib/logger';
 
 // Types pour les requêtes et réponses
@@ -23,44 +24,43 @@ interface RefreshResponse {
   errors?: string[];
 }
 
-// Initialiser Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  logger.error('SUPABASE_URL and SUPABASE_ANON_KEY must be defined');
-  throw new Error('Supabase configuration missing');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-/**
- * Vérifie si l'utilisateur est admin
- * À implémenter: Vérifier le rôle via Supabase ou JWT custom claims
- */
-async function isUserAdmin(userId: string): Promise<boolean> {
-  // TODO: Implémenter la vérification du rôle admin
-  // Pour l'instant, retourner false par défaut
-  // En production: vérifier via Supabase auth ou JWT claims
-  logger.warn('Vérification admin non implémentée - tous les utilisateurs sont refusés');
-  return false;
-}
-
 /**
  * Déclenche la re-indexation d'une source
  * Appel asynchrone via ST-104 (retriever.ts)
  */
 async function triggerReindexing(sourceId: string, options: { client?: string; documentType?: string; userId: string }): Promise<void> {
-  // TODO: Intégrer avec ST-104 reindexSource()
-  // Pour l'instant, simuler l'appel
-  logger.info(`Rafraîchissement déclenché pour source: ${sourceId}`, {
-    client: options.client,
-    documentType: options.documentType,
-    userId: options.userId,
-  });
-  
-  // Simulation de travail asynchrone
-  await new Promise(resolve => setTimeout(resolve, 100));
+  try {
+    logger.info(`Rafraîchissement déclenché pour source: ${sourceId}`, {
+      client: options.client,
+      documentType: options.documentType,
+      userId: options.userId,
+    });
+    
+    // Appeler la fonction de re-indexation de ST-104
+    const result = await reindexSource(sourceId, options);
+    
+    logger.info(`Re-indexation terminée pour source: ${sourceId}`, {
+      documentsProcessed: result.documentsProcessed,
+      errorsCount: result.errors.length,
+      userId: options.userId,
+    });
+    
+  } catch (error: any) {
+    if (error instanceof RetrievalError) {
+      logger.error(`Échec de la re-indexation: ${error.message}`, {
+        sourceId,
+        userId: options.userId,
+        errorType: error.errorType,
+      });
+    } else {
+      logger.error(`Échec de la re-indexation: ${error.message}`, {
+        sourceId,
+        userId: options.userId,
+        stack: error.stack,
+      });
+    }
+    throw error;
+  }
 }
 
 /**
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Vérification autorisation (admin ou rôle autorisé)
-    const isAdmin = await isUserAdmin(userId);
+    const isAdmin = await AuthService.isAdminByUserId(userId);
     
     if (!isAdmin) {
       logger.warn('Accès refusé - droits insuffisants', {

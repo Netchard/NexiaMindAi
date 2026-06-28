@@ -448,6 +448,118 @@ export class RetrievalService {
       return false;
     }
   }
+
+  /**
+   * Re-indexer une source spécifique
+   * @param sourceId ID de la source à re-indexer
+   * @param options Options de re-indexation (client, documentType)
+   * @returns Nombre de documents traités
+   */
+  async reindexSource(
+    sourceId: string,
+    options: { client?: string; documentType?: string; userId?: string } = {}
+  ): Promise<{ documentsProcessed: number; errors: string[] }> {
+    const startTime = Date.now();
+    const errors: string[] = [];
+    let documentsProcessed = 0;
+
+    logger.info(`Début de la re-indexation de la source: ${sourceId}`, {
+      client: options.client,
+      documentType: options.documentType,
+      userId: options.userId,
+    });
+
+    try {
+      // 1. Récupérer les documents de la source depuis Supabase Storage
+      // TODO: Implémenter la connexion à Supabase Storage
+      // Pour l'instant, simuler avec la table documents
+      
+      let query = this.supabase
+        .from('documents')
+        .select('id, path, name, metadata, created_at, updated_at')
+        .eq('source', sourceId);
+
+      // Filtrer par client si fourni
+      if (options.client) {
+        query = query.eq('metadata->>client', options.client);
+      }
+
+      // Filtrer par documentType si fourni
+      if (options.documentType) {
+        query = query.eq('metadata->>documentType', options.documentType);
+      }
+
+      const { data: documents, error: docError } = await query;
+
+      if (docError) {
+        throw new RetrievalError(
+          `Échec de récupération des documents: ${docError.message}`,
+          500,
+          'document_retrieval_error',
+          true
+        );
+      }
+
+      if (!documents || documents.length === 0) {
+        logger.warn(`Aucun document trouvé pour la source: ${sourceId}`);
+        return { documentsProcessed: 0, errors: [] };
+      }
+
+      // 2. Pour chaque document, extraire le texte, chunker, embedder, stocker
+      for (const doc of documents) {
+        try {
+          // TODO: Implémenter:
+          // 1. Récupérer le contenu du document depuis Storage
+          // 2. Extraire le texte (OCR si nécessaire)
+          // 3. Chunk le texte
+          // 4. Générer les embeddings
+          // 5. Stocker dans la table embeddings
+          
+          // Simulation pour l'instant
+          logger.info(`Traitement du document: ${doc.name}`, {
+            documentId: doc.id,
+            path: doc.path,
+          });
+          
+          // Incrementer le compteur
+          documentsProcessed++;
+          
+          // Simuler un petit délai
+          await new Promise(resolve => setTimeout(resolve, 10));
+          
+        } catch (docError: any) {
+          logger.error(`Échec du traitement du document: ${doc.name}`, {
+            error: docError.message,
+            documentId: doc.id,
+          });
+          errors.push(`Document ${doc.name} (${doc.id}): ${docError.message}`);
+        }
+      }
+
+      const processingTime = Date.now() - startTime;
+      
+      logger.info(`Re-indexation terminée pour la source: ${sourceId}`, {
+        documentsProcessed,
+        errorsCount: errors.length,
+        processingTime: `${processingTime}ms`,
+      });
+
+      return { documentsProcessed, errors };
+      
+    } catch (error: any) {
+      logger.error(`Échec global de la re-indexation pour source: ${sourceId}`, {
+        error: error.message,
+        stack: error.stack,
+      });
+      
+      throw new RetrievalError(
+        `Échec de la re-indexation: ${error.message}`,
+        500,
+        'reindex_failed',
+        true
+      );
+    }
+  }
 }
 
 // Instance singleton par défaut
@@ -477,4 +589,17 @@ export async function retrieveSimilarChunks(
   filters: RetrievalFilters = {}
 ): Promise<RetrievalResult> {
   return retrievalService.retrieveSimilarChunks(embedding, filters);
+}
+
+/**
+ * Re-indexer une source spécifique (wrapper)
+ * @param sourceId ID de la source à re-indexer
+ * @param options Options de re-indexation
+ * @returns Résultat de la re-indexation
+ */
+export async function reindexSource(
+  sourceId: string,
+  options: { client?: string; documentType?: string; userId?: string } = {}
+): Promise<{ documentsProcessed: number; errors: string[] }> {
+  return retrievalService.reindexSource(sourceId, options);
 }

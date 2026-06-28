@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { AuthService } from '@/lib/api/auth/service';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
@@ -40,18 +41,6 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-/**
- * Vérifie si l'utilisateur est admin
- * À implémenter: Vérifier le rôle via Supabase ou JWT custom claims
- */
-async function isUserAdmin(userId: string): Promise<boolean> {
-  // TODO: Implémenter la vérification du rôle admin
-  // Pour l'instant, retourner false par défaut
-  // En production: vérifier via Supabase auth ou JWT claims
-  logger.warn('Vérification admin non implémentée - tous les utilisateurs sont refusés');
-  return false;
-}
 
 /**
  * Récupère les statistiques pour une période donnée
@@ -110,7 +99,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Vérification autorisation (admin uniquement)
-    const isAdmin = await isUserAdmin(userId);
+    const isAdmin = await AuthService.isAdminByUserId(userId);
     
     if (!isAdmin) {
       logger.warn('Accès refusé - droits administrateur requis', {

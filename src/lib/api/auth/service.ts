@@ -84,7 +84,7 @@ export class AuthService {
   }
   
   /**
-   * Vérifier si l'utilisateur a le rôle admin
+   * Vérifier si l'utilisateur a le rôle admin (via accessToken)
    */
   static async isAdmin(accessToken: string): Promise<boolean> {
     try {
@@ -94,12 +94,62 @@ export class AuthService {
         return false;
       }
       
-      // TODO: Vérifier le rôle depuis la table profiles
-      // Pour l'instant, retourner false par défaut
-      logger.info(`Vérification rôle admin pour: ${user.email}`);
-      return false;
+      return await this.checkUserRole(user.id);
     } catch (error: any) {
       logger.error('Erreur vérification rôle admin', { error: error.message });
+      return false;
+    }
+  }
+
+  /**
+   * Vérifier si l'utilisateur a le rôle admin (via userId)
+   * Utilisé par les endpoints qui reçoivent userId via middleware
+   */
+  static async isAdminByUserId(userId: string): Promise<boolean> {
+    try {
+      logger.info(`Vérification rôle admin pour userId: ${userId}`);
+      return await this.checkUserRole(userId);
+    } catch (error: any) {
+      logger.error('Erreur vérification rôle admin', { error: error.message });
+      return false;
+    }
+  }
+
+  /**
+   * Vérifier le rôle de l'utilisateur depuis la table profiles
+   * @param userId ID de l'utilisateur
+   * @returns true si admin, false sinon
+   */
+  private static async checkUserRole(userId: string): Promise<boolean> {
+    try {
+      // Vérifier dans la table profiles si l'utilisateur a le rôle admin
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      
+      if (error || !profile) {
+        logger.warn(`Profil non trouvé pour userId: ${userId}`);
+        return false;
+      }
+      
+      // Vérifier si le rôle est admin
+      const adminRoles = ['admin', 'super_admin', 'administrator'];
+      const userRole = profile.role?.toLowerCase() || '';
+      
+      if (adminRoles.includes(userRole)) {
+        logger.info(`Utilisateur ${userId} a le rôle admin: ${profile.role}`);
+        return true;
+      }
+      
+      logger.warn(`Utilisateur ${userId} n'a pas le rôle admin (rôle: ${profile.role})`);
+      return false;
+    } catch (error: any) {
+      logger.error('Erreur vérification rôle utilisateur', {
+        error: error.message,
+        userId,
+      });
       return false;
     }
   }
