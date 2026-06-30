@@ -3,7 +3,7 @@
  * Fait partie de ST-201 - Intégrer Supabase Storage
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '../../logger';
 import { ExtractedText } from './types';
 
 /**

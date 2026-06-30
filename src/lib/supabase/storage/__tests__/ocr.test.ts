@@ -20,7 +20,7 @@ const mockLogger = {
   warn: jest.fn(),
 };
 
-jest.mock('@/lib/logger', () => ({ logger: mockLogger }));
+jest.mock('../../../logger', () => ({ logger: mockLogger }));
 
 jest.mock('pdf-parse', () => mockPdfParse);
 
@@ -271,6 +271,227 @@ describe('OCRService', () => {
       }
 
       expect(mockLogger.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('Contenu texte avancé', () => {
+    it('Devrait gérer les fichiers texte avec des sauts de ligne', async () => {
+      const textContent = 'Line 1\nLine 2\nLine 3';
+      const buffer = Buffer.from(textContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'multiline.txt');
+
+      expect(result.text).toBe(textContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait gérer les fichiers texte avec des caractères Unicode', async () => {
+      const textContent = 'Bonjour le monde 🌍';
+      const buffer = Buffer.from(textContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'unicode.txt');
+
+      expect(result.text).toBe(textContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait gérer les fichiers Markdown avec syntaxe complexe', async () => {
+      const markdownContent = `# Title\n\n## Subtitle\n\n- List item 1\n- List item 2\n\n\`code\``;
+      const buffer = Buffer.from(markdownContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'complex.md');
+
+      expect(result.text).toBe(markdownContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait gérer les fichiers JSON avec structure complexe', async () => {
+      const jsonContent = `{
+        "name": "Test",
+        "values": [1, 2, 3],
+        "nested": {
+          "key": "value"
+        }
+      }`;
+      const buffer = Buffer.from(jsonContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'complex.json');
+
+      expect(result.text).toBe(jsonContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait gérer les PDF avec nombre de pages variable', async () => {
+      mockPdfParse.default.mockResolvedValueOnce({
+        text: 'Single page PDF',
+        numpages: 1,
+      });
+
+      const pdfBuffer = Buffer.from('PDF content');
+      const result = await service.extractText(pdfBuffer, 'single.pdf');
+
+      expect(result.text).toBe('Single page PDF');
+      expect(result.pageCount).toBe(1);
+    });
+
+    it('Devrait gérer les PDF avec beaucoup de pages', async () => {
+      mockPdfParse.default.mockResolvedValueOnce({
+        text: 'Large document text'.repeat(100),
+        numpages: 200,
+      });
+
+      const pdfBuffer = Buffer.from('Large PDF content');
+      const result = await service.extractText(pdfBuffer, 'large.pdf');
+
+      expect(result.pageCount).toBe(200);
+      expect(result.text.length).toBeGreaterThan(1000);
+    });
+  });
+
+  describe('Types de fichiers supplémentaires', () => {
+    it('Devrait détecter .csv comme texte', async () => {
+      const csvContent = 'col1,col2,col3\nval1,val2,val3';
+      const buffer = Buffer.from(csvContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'data.csv');
+
+      expect(result.text).toBe(csvContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait détecter .html comme texte', async () => {
+      const htmlContent = '<html><body><h1>Test</h1></body></html>';
+      const buffer = Buffer.from(htmlContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'page.html');
+
+      expect(result.text).toBe(htmlContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait détecter .xml comme texte', async () => {
+      const xmlContent = '<?xml version="1.0"?><root><item>Test</item></root>';
+      const buffer = Buffer.from(xmlContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'data.xml');
+
+      expect(result.text).toBe(xmlContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait détecter .yaml comme texte', async () => {
+      const yamlContent = 'key: value\nlist:\n  - item1\n  - item2';
+      const buffer = Buffer.from(yamlContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'config.yaml');
+
+      expect(result.text).toBe(yamlContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait détecter .yml comme texte', async () => {
+      const yamlContent = 'key: value';
+      const buffer = Buffer.from(yamlContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'config.yml');
+
+      expect(result.text).toBe(yamlContent);
+      expect(result.contentType).toBe('text');
+    });
+  });
+
+  describe('Gestion des erreurs avancée', () => {
+    it('Devrait gérer les erreurs de parsing PDF avec message détaillé', async () => {
+      mockPdfParse.default.mockRejectedValue(new Error('PDF is encrypted or corrupted'));
+      const pdfBuffer = Buffer.from('corrupted pdf');
+
+      try {
+        await service.extractText(pdfBuffer, 'corrupted.pdf');
+        fail('Should have thrown an error');
+      } catch (error: any) {
+        expect(error.message).toContain('Échec de l\'extraction PDF');
+        expect(error.message).toContain('PDF is encrypted or corrupted');
+      }
+    });
+
+    it('Devrait gérer les PDF avec du texte vide', async () => {
+      mockPdfParse.default.mockResolvedValueOnce({
+        text: '',
+        numpages: 0,
+      });
+
+      const pdfBuffer = Buffer.from('empty pdf');
+      const result = await service.extractText(pdfBuffer, 'empty.pdf');
+
+      expect(result.text).toBe('');
+      expect(result.pageCount).toBe(0);
+    });
+
+    it('Devrait gérer les fichiers texte avec du contenu binaire qui ne peut pas être décodé', async () => {
+      // Buffer avec du contenu binaire qui va échouer en UTF-8
+      const binaryBuffer = Buffer.from([0xFF, 0xFE, 0x00, 0x01]);
+
+      const result = await service.extractText(binaryBuffer, 'binary.dat');
+
+      // Devrait retourner un texte vide car le type est 'other' et le décodage échoue
+      expect(result.contentType).toBe('other');
+    });
+  });
+
+  describe('Performances et optimisations', () => {
+    it('Devrait gérer les gros fichiers texte', async () => {
+      const largeText = 'A'.repeat(10000); // 10KB de texte
+      const buffer = Buffer.from(largeText, 'utf-8');
+
+      const startTime = Date.now();
+      const result = await service.extractText(buffer, 'large.txt');
+      const processingTime = Date.now() - startTime;
+
+      expect(result.text).toBe(largeText);
+      expect(result.contentType).toBe('text');
+      expect(processingTime).toBeLessThan(100); // Devrait être rapide
+    });
+
+    it('Devrait gérer les fichiers avec des extensions en majuscules', async () => {
+      const textContent = 'Test content';
+      const buffer = Buffer.from(textContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'DOCUMENT.TXT');
+
+      expect(result.text).toBe(textContent);
+      expect(result.contentType).toBe('text');
+    });
+
+    it('Devrait gérer les fichiers avec des extensions mixtes', async () => {
+      const textContent = 'Test content';
+      const buffer = Buffer.from(textContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'Document.TxT');
+
+      expect(result.text).toBe(textContent);
+      expect(result.contentType).toBe('text');
+    });
+  });
+
+  describe('Résultats de détection de contenu', () => {
+    it('Devrait retourner pageCount=0 pour les fichiers non-PDF', async () => {
+      const textContent = 'Simple text';
+      const buffer = Buffer.from(textContent, 'utf-8');
+
+      const result = await service.extractText(buffer, 'simple.txt');
+
+      expect(result.pageCount).toBe(0);
+    });
+
+    it('Devrait retourner pageCount=0 pour les images', async () => {
+      const imageBuffer = Buffer.from('image data');
+
+      try {
+        await service.extractText(imageBuffer, 'image.png');
+        fail('Should have thrown an error for images');
+      } catch (error: any) {
+        expect(error.message).toContain('OCR pour images non implémenté');
+      }
     });
   });
 });

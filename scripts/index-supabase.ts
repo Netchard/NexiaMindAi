@@ -1,38 +1,56 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 /**
  * Script CLI pour l'indexation des fichiers Supabase Storage
- * Fait partie de ST-201 - Intégrer Supabase Storage
+ * Fait partie de ST-201 - Integrer Supabase Storage
  * 
  * Usage:
- *   node scripts/index-supabase.js [options]
+ *   npx ts-node scripts/index-supabase.ts [options]
  * 
  * Options:
- *   --prefix=<path>       Prefix du bucket à indexer
- *   --client=<name>       Client spécifique
+ *   --prefix=<path>       Prefix du bucket a indexer
+ *   --client=<name>       Client specifique
  *   --type=<type>         Type de document
  *   --dry-run            Mode test (ne pas sauvegarder)
- *   --limit=<n>           Limite de fichiers à traiter
- *   --bucket=<name>       Nom du bucket (par défaut: documents)
+ *   --limit=<n>           Limite de fichiers a traiter
+ *   --bucket=<name>       Nom du bucket (par defaut: documents)
  *   --help, -h            Afficher cette aide
  */
 
-// Charger les dépendances - note: chemin relatif depuis la racine du projet
-const { logger } = require('./src/lib/logger');
-const { storageIndexer, SupabaseStorageIndexer } = require('./src/lib/supabase/storage/indexer');
+import { logger } from '../src/lib/logger';
+import { storageIndexer, SupabaseStorageIndexer } from '../src/lib/supabase/storage/indexer';
+import { IndexationOptions } from '../src/lib/supabase/storage/types';
 
 /**
  * Parse les arguments de la ligne de commande
  * @returns Objet avec les options
  */
-function parseArgs() {
+function parseArgs(): {
+  prefix: string | undefined;
+  client: string | undefined;
+  type: string | undefined;
+  documentType: string | undefined;
+  dryRun: boolean;
+  limit: number | undefined;
+  bucket: string;
+  help: boolean;
+} {
   const args = process.argv.slice(2);
-  const options = {
-    prefix: null,
-    client: null,
-    type: null,
-    documentType: null,
+  const options: {
+    prefix: string | undefined;
+    client: string | undefined;
+    type: string | undefined;
+    documentType: string | undefined;
+    dryRun: boolean;
+    limit: number | undefined;
+    bucket: string;
+    help: boolean;
+  } = {
+    prefix: undefined,
+    client: undefined,
+    type: undefined,
+    documentType: undefined,
     dryRun: false,
-    limit: null,
+    limit: undefined,
     bucket: 'documents',
     help: false,
   };
@@ -73,7 +91,7 @@ function parseArgs() {
       const limitStr = arg.substring('--limit='.length);
       options.limit = parseInt(limitStr, 10);
       if (isNaN(options.limit) || options.limit <= 0) {
-        console.error(`Erreur: La limite doit être un nombre positif: ${limitStr}`);
+        console.error(`Erreur: La limite doit etre un nombre positif: ${limitStr}`);
         process.exit(1);
       }
       continue;
@@ -96,52 +114,52 @@ function parseArgs() {
 /**
  * Affiche l'aide
  */
-function showHelp() {
+function showHelp(): void {
   console.log(`
-Usage: node scripts/index-supabase.js [options]
+Usage: npx ts-node scripts/index-supabase.ts [options]
 
 Options:
-  --prefix=<path>       Prefix du bucket à indexer
+  --prefix=<path>       Prefix du bucket a indexer
                          Exemple: --prefix=clients/nexia
   
-  --client=<name>       Client spécifique pour les métadonnées
+  --client=<name>       Client specifique pour les metadonnees
                          Exemple: --client=nexia
   
-  --type=<type>         Type de document pour les métadonnées
+  --type=<type>         Type de document pour les metadonnees
   --documentType=<type> (alias de --type)
                          Exemple: --type=contract
   
   --dry-run            Mode test - ne pas sauvegarder en base
                          Utile pour tester l'extraction sans modifier la base
   
-  --limit=<n>           Limite de fichiers à traiter
+  --limit=<n>           Limite de fichiers a traiter
                          Exemple: --limit=10 (pour tester avec 10 fichiers)
   
-  --bucket=<name>       Nom du bucket à indexer
-                         Par défaut: documents
+  --bucket=<name>       Nom du bucket a indexer
+                         Par defaut: documents
                          Exemple: --bucket=contracts
   
   --help, -h            Afficher cette aide
 
 Exemples:
-  # Indexation complète du bucket documents
-  node scripts/index-supabase.js
+  # Indexation complete du bucket documents
+  npx ts-node scripts/index-supabase.ts
 
   # Indexation des contrats Nexia
-  node scripts/index-supabase.js --prefix=clients/nexia --client=nexia --type=contract
+  npx ts-node scripts/index-supabase.ts --prefix=clients/nexia --client=nexia --type=contract
 
   # Test avec 5 fichiers maximum
-  node scripts/index-supabase.js --limit=5 --dry-run
+  npx ts-node scripts/index-supabase.ts --limit=5 --dry-run
 
-  # Indexation d'un bucket différent
-  node scripts/index-supabase.js --bucket=contracts --type=legal
+  # Indexation d'un bucket different
+  npx ts-node scripts/index-supabase.ts --bucket=contracts --type=legal
 `);
 }
 
 /**
  * Fonction principale
  */
-async function main() {
+async function main(): Promise<void> {
   const options = parseArgs();
 
   if (options.help) {
@@ -162,56 +180,58 @@ async function main() {
     console.log(`  Client:      ${options.client || '(aucun)'}`);
     console.log(`  Type:        ${options.documentType || '(aucun)'}`);
     console.log(`  Dry Run:     ${options.dryRun ? 'OUI' : 'NON'}`);
-    console.log(`  Limite:      ${options.limit || '(illimitée)'}`);
+    console.log(`  Limite:      ${options.limit || '(illimitee)'}`);
 
-    // Si un bucket différent est spécifié, créer une nouvelle instance
+    // Si un bucket different est specifie, creer une nouvelle instance
     const indexer = options.bucket !== 'documents'
       ? new SupabaseStorageIndexer(options.bucket)
       : storageIndexer;
 
-    logger.info(`\nDébut de l'indexation...`);
+    logger.info(`\nDebut de l'indexation...`);
 
     // Appeler l'indexation
-    const result = await indexer.indexAll({
+    const indexationOptions: IndexationOptions = {
       prefix: options.prefix,
       client: options.client,
       documentType: options.documentType,
       dryRun: options.dryRun,
       limit: options.limit,
-    });
+    };
+
+    const result = await indexer.indexAll(indexationOptions);
 
     // Afficher le rapport
     console.log('\n' + '='.repeat(60));
     console.log('Rapport d\'indexation');
     console.log('='.repeat(60));
-    console.log(`Fichiers traités:     ${result.processed}`);
-    console.log(`  → Réussis:          ${result.succeeded}`);
-    console.log(`  → Échoués:          ${result.failed}`);
-    console.log(`Chunks créés:        ${result.chunksCreated}`);
-    console.log(`Embeddings générés:  ${result.embeddingsGenerated}`);
+    console.log(`Fichiers traites:     ${result.processed}`);
+    console.log(`  -> Reussis:          ${result.succeeded}`);
+    console.log(`  -> Echoues:          ${result.failed}`);
+    console.log(`Chunks crees:        ${result.chunksCreated}`);
+    console.log(`Embeddings generes:  ${result.embeddingsGenerated}`);
 
     if (result.errors.length > 0) {
       console.log(`\nErreurs (${result.errors.length}):`);
       result.errors.forEach((err, index) => {
         console.log(`  ${index + 1}. ${err.file}`);
-        console.log(`     → ${err.error}`);
+        console.log(`     -> ${err.error}`);
       });
     }
 
     // Mode dry-run
     if (options.dryRun) {
-      console.log('\n[DRY RUN] Aucune modification n\'a été apportée à la base de données');
+      console.log('\n[DRY RUN] Aucune modification n\'a ete apportee a la base de donnees');
     }
 
     console.log('\n' + '='.repeat(60));
-    console.log('Indexation terminée');
+    console.log('Indexation terminee');
     console.log('='.repeat(60));
 
     // Terminer avec le bon code de sortie
     process.exit(result.failed > 0 ? 1 : 0);
 
   } catch (error: any) {
-    logger.error('Échec du script d\'indexation', {
+    logger.error('Echec du script d\'indexation', {
       error: error.message,
       stack: error.stack,
     });
@@ -224,5 +244,8 @@ async function main() {
   }
 }
 
-// Démarrer le script
-main();
+// Demarrer le script
+main().catch((error) => {
+  console.error('Erreur non capturee:', error);
+  process.exit(1);
+});

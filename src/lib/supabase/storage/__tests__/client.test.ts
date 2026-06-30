@@ -4,7 +4,7 @@
  */
 
 import { SupabaseStorageClient, storageClient } from '../client';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '../../server';
 
 // Mock de Supabase
 const mockSupabase = {
@@ -48,11 +48,11 @@ const mockDownloadResult = {
   error: null,
 };
 
-jest.mock('@/lib/supabase/server', () => ({
+jest.mock('../../server', () => ({
   createClient: jest.fn(() => mockSupabase),
 }));
 
-jest.mock('@/lib/logger', () => ({
+jest.mock('../../../logger', () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),
@@ -145,6 +145,52 @@ describe('SupabaseStorageClient', () => {
 
       await client.listFiles();
     });
+
+    it('Devrait gérer les fichiers avec des métadonnées manquantes', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        list: jest.fn().mockResolvedValue({
+          data: [
+            {
+              name: 'file-without-metadata.txt',
+              id: 'file-3',
+              updated_at: '2026-06-28T12:00:00Z',
+              metadata: null,
+            },
+          ],
+          error: null,
+        }),
+      });
+
+      const files = await client.listFiles();
+      expect(files).toHaveLength(1);
+      expect(files[0].name).toBe('file-without-metadata.txt');
+      expect(files[0].path).toBe('file-without-metadata.txt');
+      expect(files[0].contentType).toBe('');
+      expect(files[0].size).toBe(0);
+    });
+
+    it('Devrait gérer les fichiers avec des métadonnées partielles', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        list: jest.fn().mockResolvedValue({
+          data: [
+            {
+              name: 'partial-metadata.txt',
+              id: 'file-4',
+              metadata: {
+                size: 256,
+                // full_path et mimetype manquants
+              },
+            },
+          ],
+          error: null,
+        }),
+      });
+
+      const files = await client.listFiles();
+      expect(files[0].size).toBe(256);
+      expect(files[0].contentType).toBe('');
+      expect(files[0].path).toBe('partial-metadata.txt');
+    });
   });
 
   describe('getFileInfo()', () => {
@@ -208,6 +254,111 @@ describe('SupabaseStorageClient', () => {
     it('Devrait retourner un client Supabase', () => {
       const supabaseClient = client.getSupabaseClient();
       expect(supabaseClient).toBeDefined();
+    });
+  });
+
+  describe('downloadFile()', () => {
+    it('Devrait télécharger un fichier avec succès', async () => {
+      const mockBlob = new Blob(['test file content']);
+      mockSupabase.storage.from.mockReturnValue({
+        download: jest.fn().mockResolvedValue({ data: mockBlob, error: null }),
+        list: jest.fn().mockResolvedValue(mockListResult),
+      });
+
+      const result = await client.downloadFile('documents/test-file.pdf');
+
+      expect(result.data).toBeInstanceOf(Buffer);
+      expect(result.data.toString()).toBe('test file content');
+      expect(result.fileInfo.name).toBe('test-file.pdf');
+    });
+
+    it('Devrait gérer les erreurs de téléchargement', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        download: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'File not found' },
+        }),
+      });
+
+      await expect(client.downloadFile('documents/nonexistent.pdf')).rejects.toThrow(
+        'Échec du téléchargement: File not found'
+      );
+    });
+
+    it('Devrait gérer les erreurs de récupération des métadonnées après téléchargement', async () => {
+      const mockBlob = new Blob(['test content']);
+      mockSupabase.storage.from.mockReturnValue({
+        download: jest.fn().mockResolvedValue({ data: mockBlob, error: null }),
+        list: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Metadata error' },
+        }),
+      });
+
+      await expect(client.downloadFile('documents/file-with-error.pdf')).rejects.toThrow(
+        'Échec de la récupération des métadonnées: Metadata error'
+      );
+    });
+  });
+
+  describe('fileExists()', () => {
+    it('Devrait retourner false en cas d\'erreur lors de la vérification', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        list: jest.fn().mockResolvedValue({
+          data: null,
+          error: { message: 'Access denied' },
+        }),
+      });
+
+      const exists = await client.fileExists('documents/restricted-file.pdf');
+      expect(exists).toBe(false);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('Devrait gérer les noms de fichiers avec des caractères spéciaux', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        list: jest.fn().mockResolvedValue({
+          data: [
+            {
+              name: 'file with spaces & special chars.txt',
+              id: 'file-5',
+              metadata: {
+                full_path: 'documents/file with spaces & special chars.txt',
+                mimetype: 'text/plain',
+                size: 100,
+              },
+            },
+          ],
+          error: null,
+        }),
+      });
+
+      const files = await client.listFiles();
+      expect(files[0].name).toBe('file with spaces & special chars.txt');
+      expect(files[0].path).toBe('documents/file with spaces & special chars.txt');
+    });
+
+    it('Devrait gérer les chemins avec des sous-dossiers imbriqués', async () => {
+      mockSupabase.storage.from.mockReturnValue({
+        list: jest.fn().mockResolvedValue({
+          data: [
+            {
+              name: 'deep-file.txt',
+              id: 'file-6',
+              metadata: {
+                full_path: 'documents/sub1/sub2/sub3/deep-file.txt',
+                mimetype: 'text/plain',
+                size: 500,
+              },
+            },
+          ],
+          error: null,
+        }),
+      });
+
+      const files = await client.listFiles('documents/sub1/sub2/sub3');
+      expect(files[0].path).toBe('documents/sub1/sub2/sub3/deep-file.txt');
     });
   });
 });

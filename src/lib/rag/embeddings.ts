@@ -4,7 +4,7 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import { Chunk } from './types';
 
 /**

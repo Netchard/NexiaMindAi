@@ -14,7 +14,7 @@ const mockLogger = {
   warn: jest.fn(),
 };
 
-jest.mock('@/lib/logger', () => ({ logger: mockLogger }));
+jest.mock('../../../logger', () => ({ logger: mockLogger }));
 
 // Mock des services
 jest.mock('../client');
@@ -45,15 +45,15 @@ const mockReindexSource = jest.fn().mockResolvedValue({
   errors: [],
 });
 
-jest.mock('@/lib/rag/chunker', () => ({
+jest.mock('../../../rag/chunker', () => ({
   chunkDocument: mockChunkDocument,
 }));
 
-jest.mock('@/lib/rag/embeddings', () => ({
+jest.mock('../../../rag/embeddings', () => ({
   generateEmbeddings: mockGenerateEmbeddings,
 }));
 
-jest.mock('@/lib/rag/retriever', () => ({
+jest.mock('../../../rag/retriever', () => ({
   reindexSource: mockReindexSource,
 }));
 
@@ -89,7 +89,7 @@ mockSupabase.from.mockImplementation((table: string) => ({
   single: jest.fn(),
 }));
 
-jest.mock('@/lib/supabase/server', () => ({
+jest.mock('../../server', () => ({
   createClient: jest.fn(() => mockSupabase),
 }));
 
@@ -330,6 +330,425 @@ describe('SupabaseStorageIndexer', () => {
         expect.stringContaining('Échec de l\'indexation du fichier'),
         expect.any(Object)
       );
+    });
+  });
+
+  describe('indexAll() avec gestion des erreurs partielles', () => {
+    const mockFiles = [
+      { name: 'good-file1.txt', path: 'documents/good-file1.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      { name: 'bad-file.txt', path: 'documents/bad-file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      { name: 'good-file2.txt', path: 'documents/good-file2.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+    ];
+
+    it('Devrait continuer le traitement après une erreur sur un fichier', async () => {
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      
+      // Le premier et troisième fichier réussissent, le deuxième échoue
+      let callCount = 0;
+      (storageClient.downloadFile as jest.Mock).mockImplementation(() => {
+        callCount++;
+        if (callCount === 2) {
+          return Promise.reject(new Error('File corrupted'));
+        }
+        return Promise.resolve({
+          data: Buffer.from('test content'),
+          fileInfo: mockFiles[callCount - 1],
+        });
+      });
+
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      const result = await indexer.indexAll();
+
+      expect(result.processed).toBe(3);
+      expect(result.succeeded).toBe(2);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].file).toBe('documents/bad-file.txt');
+    });
+
+    it('Devrait gérer les erreurs de sauvegarde en base sans arrêter le traitement', async () => {
+      (storageClient.listFiles as jest.Mock).mockResolvedValue([mockFiles[0]]);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      // Forcer une erreur sur la sauvegarde du chunk
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'chunks') {
+          return {
+            insert: jest.fn().mockResolvedValue({ data: null, error: { message: 'Insert error' } }),
+            select: jest.fn().mockReturnThis(),
+            single: jest.fn(),
+          };
+        }
+        return { insert: jest.fn().mockResolvedValue(mockInsertResult) };
+      });
+
+      const result = await indexer.indexAll();
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1); // Le fichier est marqué comme réussi même si chunk échoue
+      expect(mockLogger.error).toHaveBeenCalled();
+    });
+  });
+
+  describe('indexAll() avec options avancées', () => {
+    it('Devrait utiliser toutes les options dans les métadonnées', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      const options = {
+        prefix: 'test/prefix',
+        client: 'test-client',
+        documentType: 'test-type',
+        dryRun: false,
+        limit: 100,
+      };
+
+      await indexer.indexAll(options);
+
+      expect(mockChunkDocument).toHaveBeenCalledWith(
+        expect.objectContaining({
+          metadata: expect.objectContaining({
+            client: 'test-client',
+            documentType: 'test-type',
+          }),
+        })
+      );
+    });
+
+    it('Devrait gérer les fichiers avec différents types de contenu', async () => {
+      const mockFiles = [
+        { name: 'file1.pdf', path: 'documents/file1.pdf', contentType: 'application/pdf', size: 2048, updatedAt: '2026-06-28T00:00:00Z' },
+        { name: 'file2.txt', path: 'documents/file2.txt', contentType: 'text/plain', size: 512, updatedAt: '2026-06-28T00:00:00Z' },
+        { name: 'file3.md', path: 'documents/file3.md', contentType: 'text/markdown', size: 768, updatedAt: '2026-06-28T00:00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      
+      let currentFileIndex = 0;
+      (storageClient.downloadFile as jest.Mock).mockImplementation(() => {
+        const file = mockFiles[currentFileIndex++];
+        return Promise.resolve({
+          data: Buffer.from(`content for ${file.name}`),
+          fileInfo: file,
+        });
+      });
+
+      (ocrService.extractText as jest.Mock).mockImplementation((buffer: Buffer, fileName: string) => {
+        if (fileName.includes('.pdf')) {
+          return Promise.resolve({ text: 'PDF extracted text', contentType: 'pdf', pageCount: 5 });
+        } else if (fileName.includes('.txt')) {
+          return Promise.resolve({ text: 'Text file content', contentType: 'text', pageCount: 0 });
+        } else {
+          return Promise.resolve({ text: 'Markdown content', contentType: 'text', pageCount: 0 });
+        }
+      });
+
+      const result = await indexer.indexAll({ dryRun: true });
+
+      expect(result.processed).toBe(3);
+      expect(result.succeeded).toBe(3);
+      expect(mockChunkDocument).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('indexAll() avec reindexSource', () => {
+    it('Devrait appeler reindexSource pour chaque fichier en mode non-dryRun', async () => {
+      const mockFiles = [
+        { name: 'file1.txt', path: 'documents/file1.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+        { name: 'file2.txt', path: 'documents/file2.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      await indexer.indexAll({ dryRun: false });
+
+      expect(mockReindexSource).toHaveBeenCalledTimes(2);
+      expect(mockReindexSource).toHaveBeenCalledWith(
+        'documents/file1.txt',
+        expect.objectContaining({
+          client: undefined,
+          documentType: undefined,
+          userId: 'system',
+        })
+      );
+    });
+
+    it('Devrait appeler reindexSource avec les options fournies', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      const options = {
+        client: 'nexia-client',
+        documentType: 'contract',
+        dryRun: false,
+      };
+
+      await indexer.indexAll(options);
+
+      expect(mockReindexSource).toHaveBeenCalledWith(
+        'documents/file.txt',
+        expect.objectContaining({
+          client: 'nexia-client',
+          documentType: 'contract',
+          userId: 'system',
+        })
+      );
+    });
+
+    it('Devrait continuer même si reindexSource échoue', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      mockReindexSource.mockRejectedValue(new Error('Reindex failed'));
+
+      const result = await indexer.indexAll({ dryRun: false });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Échec de la re-indexation'),
+        expect.any(Object)
+      );
+    });
+  });
+
+  describe('indexAll() avec gestion des embeddings', () => {
+    it('Devrait générer des embeddings pour chaque chunk', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      await indexer.indexAll({ dryRun: false });
+
+      // mockChunkDocument retourne 2 chunks
+      expect(mockGenerateEmbeddings).toHaveBeenCalledTimes(2);
+    });
+
+    it('Devrait gérer les erreurs de génération d\'embeddings', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      // Forcer une erreur sur la génération d'embeddings
+      mockGenerateEmbeddings.mockRejectedValue(new Error('Embedding generation failed'));
+
+      const result = await indexer.indexAll({ dryRun: false });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1); // Le fichier est quand même marqué comme réussi
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Échec du traitement du chunk'),
+        expect.any(Object)
+      );
+    });
+  });
+
+  describe('indexAll() avec gestion des erreurs de base de données', () => {
+    it('Devrait gérer les erreurs de sauvegarde des embeddings', async () => {
+      const mockFiles = [
+        { name: 'file.txt', path: 'documents/file.txt', contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test content'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted text',
+        contentType: 'text',
+      });
+
+      // Forcer une erreur sur la sauvegarde des embeddings
+      mockSupabase.from.mockImplementation((table: string) => {
+        if (table === 'embeddings') {
+          return {
+            insert: jest.fn().mockResolvedValue({ data: null, error: { message: 'Embedding save failed' } }),
+          };
+        }
+        return { insert: jest.fn().mockResolvedValue(mockInsertResult), select: jest.fn().mockReturnThis(), single: jest.fn() };
+      });
+
+      const result = await indexer.indexAll({ dryRun: false });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Échec de la sauvegarde de l\'embedding'),
+        expect.any(Object)
+      );
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('Devrait gérer les fichiers avec du texte vide extrait', async () => {
+      const mockFiles = [
+        { name: 'empty.txt', path: 'documents/empty.txt', contentType: 'text/plain', size: 0, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from(''),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: '',
+        contentType: 'text',
+      });
+
+      const result = await indexer.indexAll();
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
+      expect(result.chunksCreated).toBe(0); // Pas de chunks créés pour du texte vide
+      expect(result.embeddingsGenerated).toBe(0);
+    });
+
+    it('Devrait gérer les fichiers avec un seul caractère', async () => {
+      const mockFiles = [
+        { name: 'single.txt', path: 'documents/single.txt', contentType: 'text/plain', size: 1, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('A'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'A',
+        contentType: 'text',
+      });
+
+      const result = await indexer.indexAll({ dryRun: true });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
+    });
+
+    it('Devrait gérer les noms de fichiers très longs', async () => {
+      const longFileName = 'a'.repeat(255) + '.txt';
+      const mockFiles = [
+        { name: longFileName, path: `documents/${longFileName}`, contentType: 'text/plain', size: 100, updatedAt: '2026-06-28T00:00:00Z' },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'test content',
+        contentType: 'text',
+      });
+
+      const result = await indexer.indexAll({ dryRun: true });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
+    });
+
+    it('Devrait gérer les fichiers avec des métadonnées complexes', async () => {
+      const mockFiles = [
+        {
+          name: 'complex-file.pdf',
+          path: 'documents/complex-file.pdf',
+          contentType: 'application/pdf',
+          size: 5242880, // 5MB
+          updatedAt: '2026-06-28T12:34:56.789Z',
+          metadata: {
+            customField: 'customValue',
+            tags: ['tag1', 'tag2'],
+          },
+        },
+      ];
+
+      (storageClient.listFiles as jest.Mock).mockResolvedValue(mockFiles);
+      (storageClient.downloadFile as jest.Mock).mockResolvedValue({
+        data: Buffer.from('test'),
+        fileInfo: mockFiles[0],
+      });
+      (ocrService.extractText as jest.Mock).mockResolvedValue({
+        text: 'extracted content',
+        contentType: 'pdf',
+        pageCount: 10,
+      });
+
+      const result = await indexer.indexAll({ dryRun: true });
+
+      expect(result.processed).toBe(1);
+      expect(result.succeeded).toBe(1);
     });
   });
 });

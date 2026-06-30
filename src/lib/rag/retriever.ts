@@ -4,7 +4,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import { Chunk, ChunkMetadata } from './types';
 import { generateEmbedding, EmbeddingService } from './embeddings';
 

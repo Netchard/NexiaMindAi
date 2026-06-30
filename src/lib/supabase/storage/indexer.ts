@@ -3,15 +3,15 @@
  * Fait partie de ST-201 - Intégrer Supabase Storage
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '../../logger';
 import { storageClient } from './client';
 import { ocrService } from './ocr';
-import { chunkDocument, ChunkingResult } from '@/lib/rag/chunker';
-import { generateEmbeddings, EmbeddingResult, BatchEmbeddingResult } from '@/lib/rag/embeddings';
-import { reindexSource } from '@/lib/rag/retriever';
-import { createClient } from '@/lib/supabase/server';
+import { chunkDocument, ChunkingResult } from '../../rag/chunker';
+import { generateEmbeddings, EmbeddingResult, BatchEmbeddingResult } from '../../rag/embeddings';
+import { reindexSource } from '../../rag/retriever';
+import { supabase } from '../server';
 import { StorageFileInfo, IndexationOptions, IndexationResult } from './types';
-import { Chunk } from '@/lib/rag/types';
+import { Chunk } from '../../rag/types';
 
 /**
  * Service principal pour l'indexation des fichiers depuis Supabase Storage
@@ -171,20 +171,20 @@ export class SupabaseStorageIndexer {
 
       if (!options.dryRun) {
         // 4. Sauvegarder les chunks et générer les embeddings
-        const supabase = createClient();
+        const supabaseClient = supabase;
 
         for (let i = 0; i < chunks.length; i++) {
           const chunk = chunks[i];
 
           try {
             // Sauvegarder le chunk dans la base
-            const { data: savedChunk, error: saveError } = await supabase
+            const { data: savedChunk, error: saveError } = await supabaseClient
               .from('chunks')
               .insert({
                 content: chunk.content,
                 metadata: {
                   ...chunk.metadata,
-                  chunk_index: chunk.index,
+                  chunk_index: chunk.metadata.chunkIndex,
                   total_chunks: chunks.length,
                   source: fileInfo.path,
                   source_type: 'supabase_storage',
@@ -203,7 +203,7 @@ export class SupabaseStorageIndexer {
             embeddingsGenerated++;
 
             // 6. Sauvegarder l'embedding
-            const { error: embedError } = await supabase
+            const { error: embedError } = await supabaseClient
               .from('embeddings')
               .insert({
                 chunk_id: savedChunk?.id,

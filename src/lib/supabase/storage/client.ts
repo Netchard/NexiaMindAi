@@ -4,8 +4,8 @@
  * Fait partie de ST-201 - Intégrer Supabase Storage
  */
 
-import { createClient } from '@/lib/supabase/server';
-import { logger } from '@/lib/logger';
+import { supabase } from '../server';
+import { logger } from '../../logger';
 import { StorageFileInfo, DownloadResult } from './types';
 
 /**
@@ -33,7 +33,7 @@ export class SupabaseStorageClient {
    */
   async listFiles(prefix?: string, limit: number = 1000): Promise<StorageFileInfo[]> {
     const startTime = Date.now();
-    const supabase = createClient();
+    const supabaseClient = supabase;
 
     try {
       logger.info(`Liste des fichiers du bucket ${this.bucketName}`, {
@@ -41,7 +41,7 @@ export class SupabaseStorageClient {
         limit,
       });
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .storage
         .from(this.bucketName)
         .list(prefix || '', { limit });
@@ -90,14 +90,14 @@ export class SupabaseStorageClient {
    */
   async downloadFile(path: string): Promise<DownloadResult> {
     const startTime = Date.now();
-    const supabase = createClient();
+    const supabaseClient = supabase;
 
     try {
       logger.info(`Téléchargement du fichier: ${path}`, {
         bucket: this.bucketName,
       });
 
-      const { data: blobData, error } = await supabase
+      const { data: blobData, error } = await supabaseClient
         .storage
         .from(this.bucketName)
         .download(path);
@@ -145,7 +145,7 @@ export class SupabaseStorageClient {
    * @returns Promise avec les informations du fichier
    */
   async getFileInfo(path: string): Promise<StorageFileInfo> {
-    const supabase = createClient();
+    const supabaseClient = supabase;
 
     try {
       // Récupérer le dossier parent pour trouver le fichier
@@ -153,7 +153,7 @@ export class SupabaseStorageClient {
       const folderPath = pathParts.slice(0, -1).join('/');
       const fileName = pathParts[pathParts.length - 1];
 
-      const { data: files, error } = await supabase
+      const { data: files, error } = await supabaseClient
         .storage
         .from(this.bucketName)
         .list(folderPath || '', { limit: 1000 });
@@ -206,7 +206,7 @@ export class SupabaseStorageClient {
    * @returns Client Supabase
    */
   getSupabaseClient() {
-    return createClient();
+    return supabase;
   }
 
   /**

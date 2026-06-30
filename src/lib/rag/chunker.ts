@@ -4,7 +4,7 @@
  * Fait partie de NexiaMind AI
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import {
   Chunk,
   ChunkMetadata,
@@ -13,6 +13,8 @@ import {
   ContentType,
   CodeLanguage
 } from './types';
+
+export { ChunkingResult };
 import {
   estimateTokenCount,
   detectContentType,

@@ -1,6 +1,6 @@
-import { format as _format, transports as _transports, createLogger } from 'winston';
+import { format, transports, createLogger } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
-const { combine, timestamp, printf, json, colorize, errors } = _format;
+const { combine, timestamp, printf, json, colorize, errors } = format;
 
 // Format personnalisé pour la console
 const consoleFormat = combine(

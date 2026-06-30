@@ -3,7 +3,7 @@
  * Formate les réponses IA avec les citations de sources
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from '../logger';
 import { Chunk } from './types';
 
 /**
