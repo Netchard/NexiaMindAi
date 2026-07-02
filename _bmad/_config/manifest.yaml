@@ -1,35 +1,35 @@
 installation:
-  version: 6.8.0
+  version: 6.9.0
   installDate: 2026-06-20T08:20:25.924Z
-  lastUpdated: 2026-06-21T15:59:16.347Z
+  lastUpdated: 2026-07-01T18:35:57.344Z
 modules:
   - name: core
-    version: 6.8.0
+    version: 6.9.0
     installDate: 2026-06-20T08:20:13.112Z
-    lastUpdated: 2026-06-21T15:59:16.317Z
+    lastUpdated: 2026-07-01T18:35:57.292Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
-    version: 6.8.0
+    version: 6.9.0
     installDate: 2026-06-20T08:20:12.654Z
-    lastUpdated: 2026-06-21T15:59:16.321Z
+    lastUpdated: 2026-07-01T18:35:57.300Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmb
-    version: v2.0.0
+    version: v2.1.0
     installDate: 2026-06-20T08:20:14.163Z
-    lastUpdated: 2026-06-21T15:59:16.326Z
+    lastUpdated: 2026-07-01T18:35:57.307Z
     source: external
     npmPackage: bmad-builder
     repoUrl: https://github.com/bmad-code-org/bmad-builder
     channel: stable
-    sha: 41569013c018c100aeabdeb802855e3459e8b9d6
+    sha: d54981a8ba3b990148256455ccf4e6c1cb4918f0
   - name: cis
     version: v0.2.1
     installDate: 2026-06-20T08:20:14.496Z
-    lastUpdated: 2026-06-21T15:59:16.331Z
+    lastUpdated: 2026-07-01T18:35:57.326Z
     source: external
     npmPackage: bmad-creative-intelligence-suite
     repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
@@ -38,7 +38,7 @@ modules:
   - name: wds
     version: v0.4.3
     installDate: 2026-06-20T08:20:19.995Z
-    lastUpdated: 2026-06-21T15:59:16.339Z
+    lastUpdated: 2026-07-01T18:35:57.331Z
     source: external
     npmPackage: bmad-wds
     repoUrl: https://github.com/bmad-code-org/bmad-method-wds-expansion
@@ -47,7 +47,7 @@ modules:
   - name: tea
     version: v1.19.0
     installDate: 2026-06-20T08:20:25.408Z
-    lastUpdated: 2026-06-21T15:59:16.347Z
+    lastUpdated: 2026-07-01T18:35:57.344Z
     source: external
     npmPackage: bmad-method-test-architecture-enterprise
     repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise

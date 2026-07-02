@@ -230,16 +230,17 @@ async function main(): Promise<void> {
     // Terminer avec le bon code de sortie
     process.exit(result.failed > 0 ? 1 : 0);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as Error;
     logger.error('Echec du script d\'indexation', {
-      error: error.message,
-      stack: error.stack,
+      error: err?.message,
+      stack: err?.stack,
     });
     console.error('\n' + '='.repeat(60));
     console.error('ERREUR');
     console.error('='.repeat(60));
-    console.error(`Message: ${error.message}`);
-    console.error(`Stack: ${error.stack}`);
+    console.error(`Message: ${err?.message ?? String(error)}`);
+    console.error(`Stack: ${err?.stack ?? ''}`);
     process.exit(1);
   }
 }

@@ -172,7 +172,7 @@ export function generateChunkId(documentId: string, chunkIndex: number): string 
 /**
  * Vérifier si un chunk est valide (non vide, taille raisonnable)
  */
-export function isValidChunk(content: string, minTokens: number = 10): boolean {
+export function isValidChunk(content: string, minTokens: number = 5): boolean {
   const tokenCount = estimateTokenCount(content);
   return content.trim().length > 0 && tokenCount >= minTokens;
 }

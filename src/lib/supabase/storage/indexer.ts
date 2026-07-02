@@ -65,6 +65,10 @@ export class SupabaseStorageIndexer {
 
       if (files.length === 0) {
         logger.info('Aucun fichier à indexer');
+        logger.info('Indexation terminée', {
+          result,
+          processingTime: '0ms',
+        });
         return result;
       }
 
@@ -83,32 +87,39 @@ export class SupabaseStorageIndexer {
               chunksCreated: fileResult.chunksCreated,
             });
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorStack = error instanceof Error ? error.stack : undefined;
+          
           result.failed++;
           result.errors.push({
             file: file.path,
-            error: error.message,
+            error: errorMessage,
           });
           logger.error(`Échec de l'indexation du fichier: ${file.path}`, {
-            error: error.message,
-            stack: error.stack,
+            error: errorMessage,
+            stack: errorStack,
           });
         }
       }
 
       const processingTime = Date.now() - startTime;
+      const avgTimePerFile = result.processed > 0 ? `${processingTime / result.processed}ms` : '0ms';
       logger.info('Indexation terminée', {
         result,
         processingTime: `${processingTime}ms`,
-        avgTimePerFile: `${processingTime / result.processed}ms`,
+        avgTimePerFile,
       });
 
       return result;
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
       logger.error('Échec global de l\'indexation Supabase Storage', {
-        error: error.message,
-        stack: error.stack,
+        error: errorMessage,
+        stack: errorStack,
       });
       throw error;
     }
@@ -173,58 +184,154 @@ export class SupabaseStorageIndexer {
         // 4. Sauvegarder les chunks et générer les embeddings
         const supabaseClient = supabase;
 
+        // D'abord, créer le document parent s'il n'existe pas
+        const { data: existingDocument, error: docCheckError } = await supabaseClient
+          .from('documents')
+          .select('id')
+          .eq('file_path', fileInfo.path)
+          .single();
+
+        let documentId: string;
+        
+        
+        if (docCheckError && !docCheckError.message.includes('no rows')) {
+          logger.error(`Erreur de vérification du document: ${docCheckError.message} ${fileInfo.path}`, {
+            error: docCheckError.message,
+          });
+         // throw docCheckError;
+        }
+
+        if (existingDocument) {
+          documentId = existingDocument.id;
+          logger.info(`Document existant trouvé: ${fileInfo.path}`, {
+            documentId,
+          });
+        } else {
+          logger.info (`Aucun document existant trouvé pour: ${fileInfo.path}. Création d'un nouveau document.`);
+          // Créer un nouveau document
+          const { data: newDocument, error: docCreateError } = await supabaseClient
+            .from('documents')
+            .insert({
+              name: fileInfo.name,
+              type: extractedText.contentType || 'text',
+              source: 'supabase',
+              file_path: fileInfo.path,
+              file_size: fileInfo.size,
+              mime_type: fileInfo.contentType,
+              language: 'fr', // Par défaut français
+              metadata: {
+                client: options.client || 'default',
+                documentType: options.documentType || extractedText.contentType,
+                sourceBucket: this.bucketName,
+              },
+            })
+            .select('id')
+            .single();
+
+          if (docCreateError) {
+            logger.error(`Échec de la création du document: ${fileInfo.path}`, {
+              error: docCreateError.message,
+              details: docCreateError.details,
+            });
+            throw docCreateError;
+          }
+
+          documentId = newDocument.id;
+          logger.info(`Nouveau document créé: ${fileInfo.path}`, {
+            documentId,
+          });
+        }
+
         for (let i = 0; i < chunks.length; i++) {
           const chunk = chunks[i];
 
           try {
+            logger.info(`Traitement du chunk ${i}/${chunks.length} pour ${fileInfo.path}`, {
+              chunkLength: chunk.content.length,
+              metadata: chunk.metadata,
+            });
+
             // Sauvegarder le chunk dans la base
             const { data: savedChunk, error: saveError } = await supabaseClient
               .from('chunks')
               .insert({
+                document_id: documentId,
                 content: chunk.content,
+                chunk_index: i,
+                token_count: chunk.content.split(' ').length, // Estimation simple
                 metadata: {
                   ...chunk.metadata,
-                  chunk_index: chunk.metadata.chunkIndex,
+                  chunk_index: i,
                   total_chunks: chunks.length,
                   source: fileInfo.path,
                   source_type: 'supabase_storage',
+                  document_id: documentId,
                 },
               })
               .select('id')
               .single();
 
             if (saveError) {
+              logger.error(`Échec de la sauvegarde du chunk ${i} pour ${fileInfo.path} \n ${saveError.message}`, {
+                error: saveError.message,
+                details: saveError.details,
+                chunkContentLength: chunk.content.length,
+                chunkIndex: i,
+              });
               throw saveError;
             }
 
+            logger.info(`Chunk sauvegardé avec succès`, {
+              chunkId: savedChunk?.id,
+              chunkIndex: i,
+              contentLength: chunk.content.length,
+            });
+
             // 5. Générer l'embedding pour ce chunk
+            logger.info(`Génération de l'embedding pour le chunk ${i}`, {
+              chunkId: savedChunk?.id,
+            });
+
             const embeddingsResult: BatchEmbeddingResult = await generateEmbeddings([chunk.content]);
             const embedding: EmbeddingResult = embeddingsResult.embeddings[0];
             embeddingsGenerated++;
+
+            logger.info(`Embedding généré pour le chunk ${i}`, {
+              embeddingLength: embedding.embedding.length,
+              tokenCount: embedding.tokenCount,
+            });
 
             // 6. Sauvegarder l'embedding
             const { error: embedError } = await supabaseClient
               .from('embeddings')
               .insert({
                 chunk_id: savedChunk?.id,
-                embedding: embedding.embedding,
-                dimensions: embedding.embedding.length,
-                model: 'mistral-embed',
-                token_count: embedding.tokenCount,
+                vector: embedding.embedding,
               });
 
             if (embedError) {
-              logger.error(`Échec de la sauvegarde de l'embedding pour le chunk ${i}`, {
+              logger.error(`Échec de la sauvegarde de l'embedding pour le chunk ${i} - ${embedError.message}`, {
                 error: embedError.message,
+                details: embedError.details,
                 chunkId: savedChunk?.id,
+                embeddingLength: embedding.embedding.length,
               });
               // Ne pas arrêter le traitement, continuer avec les autres chunks
+            } else {
+              logger.info(`Embedding sauvegardé avec succès pour le chunk ${i}`, {
+                chunkId: savedChunk?.id,
+                embeddingLength: embedding.embedding.length,
+              });
             }
-          } catch (error: any) {
-            logger.error(`Échec du traitement du chunk ${i}`, {
-              error: error.message,
-              stack: error.stack,
-              file: fileInfo.path,
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorStack = error instanceof Error ? error.stack : undefined;
+            
+            logger.error(`Échec du traitement du chunk ${i} pour ${fileInfo.path}`, {
+              error: errorMessage,
+              stack: errorStack,
+              chunkIndex: i,
+              filePath: fileInfo.path,
             });
             // Continuer avec les autres chunks
           }
@@ -238,9 +345,11 @@ export class SupabaseStorageIndexer {
             userId: 'system',
           });
           logger.info(`Re-indexation appelée pour: ${fileInfo.path}`);
-        } catch (reindexError: any) {
+        } catch (reindexError: unknown) {
+          const errorMessage = reindexError instanceof Error ? reindexError.message : String(reindexError);
+          
           logger.error(`Échec de la re-indexation pour: ${fileInfo.path}`, {
-            error: reindexError.message,
+            error: errorMessage,
           });
           // Ne pas arrêter le traitement
         }
@@ -255,10 +364,13 @@ export class SupabaseStorageIndexer {
 
       return { chunksCreated, embeddingsGenerated };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
       logger.error(`Échec du traitement du fichier: ${fileInfo.path}`, {
-        error: error.message,
-        stack: error.stack,
+        error: errorMessage,
+        stack: errorStack,
       });
       throw error;
     }

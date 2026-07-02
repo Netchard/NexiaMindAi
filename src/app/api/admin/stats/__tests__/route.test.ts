@@ -7,63 +7,65 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // Mock des dépendances
-const mockSupabaseClient = {
-  from: vi.fn((table: string) => {
-    const query: any = { table };
-    
-    query.select = vi.fn((columns: string, options?: any) => {
-      query._select = columns;
-      return query;
-    });
-    
-    query.eq = vi.fn((col: string, val: any) => {
-      query._where = query._where || [];
-      query._where.push({ col, val });
-      return query;
-    });
-    
-    query.gte = vi.fn((col: string, val: any) => {
-      query._gte = { col, val };
-      return query;
-    });
-    
-    query.lte = vi.fn((col: string, val: any) => {
-      query._lte = { col, val };
-      return query;
-    });
-    
-    query.group = vi.fn((col: string) => {
-      query._group = col;
-      return query;
-    });
-    
-    query.then = vi.fn((onFulfilled: any) => {
-      // Mock data for profiles
-      if (query._select?.includes('id') && query.table === 'profiles') {
-        return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 10, error: null }) : { data: [], count: 10, error: null });
-      }
+const { mockSupabaseClient } = vi.hoisted(() => ({
+  mockSupabaseClient: {
+    from: vi.fn((table: string) => {
+      const query: any = { table };
       
-      // Mock data for conversations
-      if (query._select?.includes('id') && query.table === 'conversations') {
-        return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 50, error: null }) : { data: [], count: 50, error: null });
-      }
+      query.select = vi.fn((columns: string, options?: any) => {
+        query._select = columns;
+        return query;
+      });
       
-      // Mock data for messages
-      if (query._select?.includes('id') && query.table === 'messages' && !query._select.includes('metadata')) {
-        return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 200, error: null }) : { data: [], count: 200, error: null });
-      }
+      query.eq = vi.fn((col: string, val: any) => {
+        query._where = query._where || [];
+        query._where.push({ col, val });
+        return query;
+      });
       
-      // Mock data for tokens
-      if (query._select?.includes('tokensUsed') || query._select?.includes('client')) {
+      query.gte = vi.fn((col: string, val: any) => {
+        query._gte = { col, val };
+        return query;
+      });
+      
+      query.lte = vi.fn((col: string, val: any) => {
+        query._lte = { col, val };
+        return query;
+      });
+      
+      query.group = vi.fn((col: string) => {
+        query._group = col;
+        return query;
+      });
+      
+      query.then = vi.fn((onFulfilled: any) => {
+        // Mock data for profiles
+        if (query._select?.includes('id') && query.table === 'profiles') {
+          return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 10, error: null }) : { data: [], count: 10, error: null });
+        }
+        
+        // Mock data for conversations
+        if (query._select?.includes('id') && query.table === 'conversations') {
+          return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 50, error: null }) : { data: [], count: 50, error: null });
+        }
+        
+        // Mock data for messages
+        if (query._select?.includes('id') && query.table === 'messages' && !query._select.includes('metadata')) {
+          return Promise.resolve(onFulfilled ? onFulfilled({ data: [], count: 200, error: null }) : { data: [], count: 200, error: null });
+        }
+        
+        // Mock data for tokens
+        if (query._select?.includes('tokensUsed') || query._select?.includes('client')) {
+          return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
+        }
+        
         return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
-      }
+      });
       
-      return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
-    });
-    
-    return query;
-  }),
-};
+      return query;
+    }),
+  },
+}));
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockSupabaseClient),

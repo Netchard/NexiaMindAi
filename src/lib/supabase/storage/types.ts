@@ -106,3 +106,117 @@ export interface SyncResponse extends IndexationResult {
   /** Message de statut */
   message: string;
 }
+
+/**
+ * Type pour les erreurs Supabase
+ */
+export interface SupabaseError {
+  message: string;
+  code?: string;
+  details?: any;
+  hint?: string;
+}
+
+/**
+ * Type pour les erreurs d'indexation spécifiques
+ */
+export class IndexationError extends Error {
+  constructor(
+    message: string,
+    public readonly errorType: string,
+    public readonly originalError?: Error,
+    public readonly context?: Record<string, any>
+  ) {
+    super(message);
+    this.name = 'IndexationError';
+  }
+}
+
+/**
+ * Type pour les erreurs de document
+ */
+export class DocumentError extends Error {
+  constructor(
+    message: string,
+    public readonly documentPath: string,
+    public readonly operation: string,
+    public readonly originalError?: Error
+  ) {
+    super(message);
+    this.name = 'DocumentError';
+  }
+}
+
+/**
+ * Type pour les erreurs de chunk
+ */
+export class ChunkError extends Error {
+  constructor(
+    message: string,
+    public readonly chunkIndex: number,
+    public readonly documentPath: string,
+    public readonly operation: string,
+    public readonly originalError?: Error
+  ) {
+    super(message);
+    this.name = 'ChunkError';
+  }
+}
+
+/**
+ * Type pour les erreurs d'embedding
+ */
+export class EmbeddingError extends Error {
+  constructor(
+    message: string,
+    public readonly chunkId: string,
+    public readonly operation: string,
+    public readonly originalError?: Error
+  ) {
+    super(message);
+    this.name = 'EmbeddingError';
+  }
+}
+
+/**
+ * Utilitaire pour la gestion des erreurs typées
+ */
+export function handleSupabaseError(
+  error: unknown,
+  context: string,
+  additionalData?: Record<string, any>
+): Error {
+  if (error instanceof Error) {
+    return new IndexationError(
+      error.message,
+      'supabase_error',
+      error,
+      { context, ...additionalData }
+    );
+  }
+  
+  if (typeof error === 'string') {
+    return new IndexationError(
+      error,
+      'string_error',
+      undefined,
+      { context, ...additionalData }
+    );
+  }
+  
+  if (error && typeof error === 'object' && 'message' in error) {
+    return new IndexationError(
+      String(error.message),
+      'object_error',
+      undefined,
+      { context, ...additionalData }
+    );
+  }
+  
+  return new IndexationError(
+    'Unknown error occurred',
+    'unknown_error',
+    undefined,
+    { context, originalError: error, ...additionalData }
+  );
+}

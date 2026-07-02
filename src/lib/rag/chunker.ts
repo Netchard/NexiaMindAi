@@ -14,7 +14,7 @@ import {
   CodeLanguage
 } from './types';
 
-export { ChunkingResult };
+export type { ChunkingResult };
 import {
   estimateTokenCount,
   detectContentType,
@@ -26,18 +26,86 @@ import {
 // Importer dynamiquement langchain pour éviter les erreurs si non installé
 let RecursiveCharacterTextSplitter: any = null;
 
+class SimpleTextSplitter {
+  private chunkSize: number;
+  private chunkOverlap: number;
+  private separators: string[];
+
+  constructor(options: { chunkSize: number; chunkOverlap: number; separators: string[] }) {
+    this.chunkSize = options.chunkSize;
+    this.chunkOverlap = options.chunkOverlap;
+    this.separators = options.separators;
+  }
+
+  async createDocuments(texts: string[]) {
+    const text = texts[0] ?? '';
+    if (!text) {
+      return [];
+    }
+
+    const normalizedText = text.replace(/\r\n/g, '\n');
+    const chunks = this.splitText(normalizedText);
+    return chunks.map((pageContent) => ({ pageContent }));
+  }
+
+  private splitText(text: string): string[] {
+    const chunks: string[] = [];
+    let start = 0;
+
+    while (start < text.length) {
+      let end = Math.min(text.length, start + this.chunkSize);
+
+      if (end < text.length) {
+        const breakIndex = this.findBreakIndex(text, start, end);
+        if (breakIndex > start) {
+          end = breakIndex;
+        }
+      }
+
+      const chunk = text.slice(start, end).trim();
+      if (chunk) {
+        chunks.push(chunk);
+      }
+
+      if (end >= text.length) {
+        break;
+      }
+
+      start = Math.max(start + 1, end - this.chunkOverlap);
+    }
+
+    return chunks;
+  }
+
+  private findBreakIndex(text: string, start: number, end: number): number {
+    const slice = text.slice(start, end);
+    let bestIndex = end;
+
+    for (const separator of this.separators) {
+      if (!separator) {
+        continue;
+      }
+
+      const index = slice.lastIndexOf(separator);
+      if (index > 0 && start + index < bestIndex) {
+        bestIndex = start + index;
+      }
+    }
+
+    return bestIndex;
+  }
+}
+
 async function importLangChain() {
   if (RecursiveCharacterTextSplitter === null) {
     try {
-      const langchain = await import('langchain/text_splitter');
+      const importModule = new Function('specifier', 'return import(specifier);');
+      const langchain = await importModule('langchain/text_splitter');
       RecursiveCharacterTextSplitter = langchain.RecursiveCharacterTextSplitter;
       logger.info('LangChain RecursiveCharacterTextSplitter chargé avec succès');
-    } catch (error: any) {
-      logger.error('Erreur de chargement de LangChain', {
-        error: error.message,
-        message: 'Veuillez installer langchain avec: npm install langchain @langchain/community'
-      });
-      throw new Error('LangChain non disponible. Installez langchain avec: npm install langchain @langchain/community');
+    } catch (_error) {
+      RecursiveCharacterTextSplitter = SimpleTextSplitter;
+      logger.warn('LangChain non disponible, utilisation du splitter local de secours');
     }
   }
   return RecursiveCharacterTextSplitter;
@@ -147,7 +215,7 @@ export class TextChunker {
         };
 
         // Vérifier si le chunk est valide
-        if (isValidChunk(chunkContent, 10)) {
+        if (isValidChunk(chunkContent, 5)) {
           chunks.push({
             id: metadata.documentId 
               ? generateChunkId(metadata.documentId, i)
@@ -306,15 +374,10 @@ export class TextChunker {
     
     // Validation supplémentaire
     if (result.chunks.length === 0) {
-      logger.warn('Aucun chunk valide généré', {
-        documentId: document.metadata.documentId,
-        documentPath: document.metadata.documentPath
-      });
-      
       // Essayer avec une taille de chunk plus petite
       return this.chunkText(document.content, document.metadata, {
         ...options,
-        chunkSize: Math.floor((options?.chunkSize ?? 512) / 2)
+        chunkSize: Math.min(256, options?.chunkSize ?? 512) // Minimum 256
       });
     }
     

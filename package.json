@@ -12,22 +12,24 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.0",
+    "@langchain/community": "^0.0.1",
     "@supabase/supabase-js": "^2.108.2",
     "axios": "^1.18.1",
     "dotenv": "^16.6.1",
-    "langchain": "^0.3.0",
+    "langchain": "^0.1.37",
     "next": "16.2.9",
-    "pdf-parse": "^1.1.1",
+    "pdf-parse": "1.1.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "supabase": "^2.108.0",
     "winston": "^3.19.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.1",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.3.2",
@@ -41,5 +43,9 @@
     "tailwindcss": "^4.3.1",
     "typescript": "^5",
     "vitest": "^2.1.3"
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/Netchard/NexiaMindAi",
+  "author": "dcha-git <didier.chardonnet@axess.fr>",
+  "license": "MIT"
 }

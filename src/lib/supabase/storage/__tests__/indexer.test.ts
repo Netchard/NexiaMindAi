@@ -1,3 +1,5 @@
+import { vi, describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+
 /**
  * Tests unitaires pour SupabaseStorageIndexer
  * Fait partie de ST-201 - Intégrer Supabase Storage
@@ -6,98 +8,102 @@
 import { SupabaseStorageIndexer, storageIndexer } from '../indexer';
 import { storageClient } from '../client';
 import { ocrService } from '../ocr';
-
-// Mock de logger
-const mockLogger = {
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-};
-
-jest.mock('../../../logger', () => ({ logger: mockLogger }));
+import * as chunkerModule from '../../../rag/chunker';
+import * as embeddingsModule from '../../../rag/embeddings';
+import * as retrieverModule from '../../../rag/retriever';
+import * as loggerModule from '../../../logger';
 
 // Mock des services
-jest.mock('../client');
-jest.mock('../ocr');
+vi.mock('../client');
+vi.mock('../ocr');
+
+
 
 // Mock des services RAG
-const mockChunkDocument = jest.fn().mockResolvedValue({
-  chunks: [
-    { content: 'chunk1', index: 0, metadata: {} },
-    { content: 'chunk2', index: 1, metadata: {} },
-  ],
-  totalChunks: 2,
-  totalTokens: 100,
-  processingTime: 100,
-});
-
-const mockGenerateEmbeddings = jest.fn().mockResolvedValue({
-  embeddings: [
-    { embedding: [0.1, 0.2, 0.3], tokenCount: 10, createdAt: '2026-06-28T00:00:00Z' },
-    { embedding: [0.4, 0.5, 0.6], tokenCount: 10, createdAt: '2026-06-28T00:00:00Z' },
-  ],
-  totalTokens: 20,
-  processingTime: 50,
-});
-
-const mockReindexSource = jest.fn().mockResolvedValue({
-  documentsProcessed: 1,
-  errors: [],
-});
-
-jest.mock('../../../rag/chunker', () => ({
-  chunkDocument: mockChunkDocument,
-}));
-
-jest.mock('../../../rag/embeddings', () => ({
-  generateEmbeddings: mockGenerateEmbeddings,
-}));
-
-jest.mock('../../../rag/retriever', () => ({
-  reindexSource: mockReindexSource,
-}));
-
-// Mock de Supabase
-const mockSupabase = {
-  from: jest.fn(() => mockSupabase),
-  storage: {
-    from: jest.fn(),
-  },
-};
-
-const mockInsertResult = {
-  data: { id: 'chunk-123' },
-  error: null,
-};
-
-const mockInsertError = {
-  data: null,
-  error: { message: 'Insert failed' },
-};
-
-mockSupabase.from.mockImplementation((table: string) => ({
-  insert: jest.fn().mockImplementation((data: any) => {
-    if (table === 'chunks') {
-      return { select: jest.fn().mockReturnThis(), single: jest.fn().mockResolvedValue(mockInsertResult) };
-    }
-    if (table === 'embeddings') {
-      return { insert: jest.fn().mockResolvedValue(mockInsertResult) };
-    }
-    return { insert: jest.fn().mockResolvedValue(mockInsertResult) };
+vi.mock('../../../rag/chunker', () => ({
+  chunkDocument: vi.fn().mockResolvedValue({
+    chunks: [
+      { content: 'chunk1', index: 0, metadata: {} },
+      { content: 'chunk2', index: 1, metadata: {} },
+    ],
+    totalChunks: 2,
+    totalTokens: 100,
+    processingTime: 100,
   }),
-  select: jest.fn().mockReturnThis(),
-  single: jest.fn(),
 }));
 
-jest.mock('../../server', () => ({
-  createClient: jest.fn(() => mockSupabase),
+vi.mock('../../../rag/embeddings', () => ({
+  generateEmbeddings: vi.fn().mockResolvedValue({
+    embeddings: [
+      { embedding: [0.1, 0.2, 0.3], tokenCount: 10, createdAt: '2026-06-28T00:00:00Z' },
+      { embedding: [0.4, 0.5, 0.6], tokenCount: 10, createdAt: '2026-06-28T00:00:00Z' },
+    ],
+    totalTokens: 20,
+    processingTime: 50,
+  }),
+}));
+
+vi.mock('../../../rag/retriever', () => ({
+  reindexSource: vi.fn().mockResolvedValue({
+    documentsProcessed: 1,
+    errors: [],
+  }),
+}));
+
+// Mock du logger
+vi.mock('../../../logger', () => ({
+  logger: {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  },
+}));
+
+beforeEach(() => {
+  // Réinitialiser les mocks avant chaque test
+  vi.clearAllMocks();
+  
+  // Get the mocked functions
+  const mockChunkDocument = vi.mocked(chunkerModule.chunkDocument);
+  const mockGenerateEmbeddings = vi.mocked(embeddingsModule.generateEmbeddings);
+  const mockReindexSource = vi.mocked(retrieverModule.reindexSource);
+  const mockLogger = vi.mocked(loggerModule.logger);
+  
+  // Make them available to the tests
+  (globalThis as any).mockChunkDocument = mockChunkDocument;
+  (globalThis as any).mockGenerateEmbeddings = mockGenerateEmbeddings;
+  (globalThis as any).mockReindexSource = mockReindexSource;
+  (globalThis as any).mockLogger = mockLogger;
+});
+
+// Mock de Supabase client
+const mockInsertResult = { data: { id: 'mock-id' }, error: null };
+const mockSupabaseClient = {
+  from: vi.fn().mockImplementation((table: string) => ({
+    insert: vi.fn().mockImplementation((data: any) => {
+      if (table === 'chunks') {
+        return { select: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: { id: 'chunk-123' }, error: null }) };
+      }
+      if (table === 'embeddings') {
+        return { insert: vi.fn().mockResolvedValue({ data: { id: 'embedding-456' }, error: null }) };
+      }
+      return { insert: vi.fn().mockResolvedValue({ data: { id: 'mock-id' }, error: null }) };
+    }),
+    select: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+  })),
+};
+
+vi.mock('../../server', () => ({
+  createClient: vi.fn(() => mockSupabaseClient),
+  supabase: mockSupabaseClient,
 }));
 
 describe('SupabaseStorageIndexer', () => {
   let indexer: SupabaseStorageIndexer;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     indexer = new SupabaseStorageIndexer('test-bucket');
   });
 
@@ -258,7 +264,7 @@ describe('SupabaseStorageIndexer', () => {
 
       expect(result.processed).toBe(1);
       expect(result.succeeded).toBe(1);
-      expect(mockSupabase.from).not.toHaveBeenCalled(); // Pas de sauvegarde en base
+      expect(mockSupabaseClient.from).not.toHaveBeenCalled(); // Pas de sauvegarde en base
       expect(mockChunkDocument).toHaveBeenCalledTimes(1); // Mais chunking est appelé
     });
 
@@ -382,15 +388,15 @@ describe('SupabaseStorageIndexer', () => {
       });
 
       // Forcer une erreur sur la sauvegarde du chunk
-      mockSupabase.from.mockImplementation((table: string) => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
         if (table === 'chunks') {
           return {
-            insert: jest.fn().mockResolvedValue({ data: null, error: { message: 'Insert error' } }),
-            select: jest.fn().mockReturnThis(),
-            single: jest.fn(),
+            insert: vi.fn().mockResolvedValue({ data: null, error: { message: 'Insert error' } }),
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn(),
           };
         }
-        return { insert: jest.fn().mockResolvedValue(mockInsertResult) };
+        return { insert: vi.fn().mockResolvedValue(mockInsertResult) };
       });
 
       const result = await indexer.indexAll();
@@ -609,7 +615,7 @@ describe('SupabaseStorageIndexer', () => {
       expect(result.processed).toBe(1);
       expect(result.succeeded).toBe(1); // Le fichier est quand même marqué comme réussi
       expect(mockLogger.error).toHaveBeenCalledWith(
-        expect.stringContaining('Échec du traitement du chunk'),
+        expect.stringContaining('(3) Échec du traitement du chunk'),
         expect.any(Object)
       );
     });
@@ -632,13 +638,13 @@ describe('SupabaseStorageIndexer', () => {
       });
 
       // Forcer une erreur sur la sauvegarde des embeddings
-      mockSupabase.from.mockImplementation((table: string) => {
+      mockSupabaseClient.from.mockImplementation((table: string) => {
         if (table === 'embeddings') {
           return {
-            insert: jest.fn().mockResolvedValue({ data: null, error: { message: 'Embedding save failed' } }),
+            insert: vi.fn().mockResolvedValue({ data: null, error: { message: 'Embedding save failed' } }),
           };
         }
-        return { insert: jest.fn().mockResolvedValue(mockInsertResult), select: jest.fn().mockReturnThis(), single: jest.fn() };
+        return { insert: vi.fn().mockResolvedValue(mockInsertResult), select: vi.fn().mockReturnThis(), single: vi.fn() };
       });
 
       const result = await indexer.indexAll({ dryRun: false });

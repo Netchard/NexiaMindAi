@@ -30,6 +30,8 @@ export interface EmbeddingResult {
   tokenCount?: number;
   /** Horodatage de création */
   createdAt: string;
+  /** Horodatage du cache */
+  cachedAt?: number;
 }
 
 /**
@@ -87,7 +89,7 @@ export class EmbeddingService {
   constructor(config: Partial<MistralConfig> = {}, cacheTTL: number = 3600000) {
     this.config = {
       apiKey: process.env.MISTRAL_API_KEY || config.apiKey || '',
-      baseUrl: config.baseUrl || 'https://api.mistral.ai/v1',
+      baseUrl: config.baseUrl || 'https://api.mistral.ai/v1/',
       model: config.model || 'mistral-embed',
       timeout: config.timeout || 30000,
       maxRetries: config.maxRetries || 3,
@@ -160,9 +162,9 @@ export class EmbeddingService {
       });
 
       return embedding;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const embeddingError = this.handleApiError(error);
-      logger.error('Échec de la génération d\'embedding', {
+      logger.error(`Échec de la génération d\'embedding ${embeddingError.message}`, {
         error: embeddingError.message,
         errorType: embeddingError.errorType,
         textLength: text.length,
@@ -238,9 +240,9 @@ export class EmbeddingService {
               this.addToCache(textsToProcess[j], batchResults[j]);
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           const embeddingError = this.handleApiError(error);
-          logger.error('Échec de la génération batch d\'embeddings', {
+          logger.error(`Échec de la génération batch d\'embeddings ${embeddingError.message}`, {
             error: embeddingError.message,
             batchIndex: i / batchSize,
             batchSize: textsToProcess.length,
@@ -275,7 +277,7 @@ export class EmbeddingService {
   async embedChunks(
     chunks: Chunk[],
     options: { useCache?: boolean; batchSize?: number } = { useCache: true, batchSize: 10 }
-  ): Promise<{ chunks: (Chunk & { embedding: number[] }); totalTokens: number }> {
+  ): Promise<{ chunks: (Chunk & { embedding: number[] })[]; totalTokens: number }> {
     const texts = chunks.map(c => c.content);
     const batchResult = await this.generateEmbeddings(texts, options);
 
@@ -301,14 +303,27 @@ export class EmbeddingService {
    * @param text Texte à transformer
    * @returns Réponse brute de l'API
    */
-  private async callMistralApi(text: string): Promise<any> {
+  private async callMistralApi(text: string): Promise<unknown> {
     const payload = {
       model: this.config.model,
       texts: [text],
     };
 
-    const response = await this.client.post('/embeddings', payload);
-    return response.data;
+    try {
+      logger.info('Appel 1 API Mistral');
+      const response = await this.client.post('/embeddings', payload);
+      logger.info('Appel API Mistral réussi', {
+        textLength: text.length,
+        status: response.status,
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Échec de l\'appel API Mistral', {
+        textLength: text.length,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
   /**
@@ -316,14 +331,27 @@ export class EmbeddingService {
    * @param texts Liste de textes
    * @returns Réponse brute de l'API
    */
-  private async callMistralApiBatch(texts: string[]): Promise<any> {
+  private async callMistralApiBatch(texts: string[]): Promise<unknown> {
     const payload = {
       model: this.config.model,
-      texts: texts,
+      input: texts,
     };
 
-    const response = await this.client.post('/embeddings', payload);
-    return response.data;
+    try {
+      logger.info(`Appel 2 API Mistral ${this.client.name}`);
+      const response = await this.client.post('/embeddings', payload);
+      logger.info('Appel API Mistral batch réussi', {
+        batchSize: texts.length,
+        status: response.status,
+      });
+      return response.data;
+    } catch (error) {
+      logger.error('Échec de l\'appel API Mistral batch', {
+        batchSize: texts.length,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
   /**
@@ -332,12 +360,24 @@ export class EmbeddingService {
    * @param text Texte original
    * @returns Résultat formaté
    */
-  private formatResponse(response: any, text: string): EmbeddingResult {
-    if (!response.data || !response.data[0]) {
+  private formatResponse(response: unknown, text: string): EmbeddingResult {
+    // Vérification de type et accès sécurisé
+    if (typeof response !== 'object' || response === null) {
+      throw new EmbeddingError('Réponse API invalide - format inattendu', 500, 'invalid_response_format');
+    }
+
+    const apiResponse = response as { data?: Array<{ embedding: number[] }> };
+    
+    if (!apiResponse.data || !apiResponse.data[0]) {
       throw new EmbeddingError('Réponse API invalide', 500, 'invalid_response');
     }
 
-    const data = response.data[0];
+    const data = apiResponse.data[0];
+
+    // Vérification que l'embedding est un tableau de nombres
+    if (!Array.isArray(data.embedding) || !data.embedding.every(item => typeof item === 'number')) {
+      throw new EmbeddingError('Format d\'embedding invalide', 500, 'invalid_embedding_format');
+    }
 
     return {
       embedding: data.embedding,
@@ -352,16 +392,30 @@ export class EmbeddingService {
    * @param texts Textes originaux
    * @returns Liste de résultats formatés
    */
-  private formatBatchResponse(response: any, texts: string[]): EmbeddingResult[] {
-    if (!response.data || response.data.length !== texts.length) {
+  private formatBatchResponse(response: unknown, texts: string[]): EmbeddingResult[] {
+    // Vérification de type et accès sécurisé
+    if (typeof response !== 'object' || response === null) {
+      throw new EmbeddingError('Réponse batch API invalide - format inattendu', 500, 'invalid_batch_response_format');
+    }
+
+    const apiResponse = response as { data?: Array<{ embedding: number[] }> };
+    
+    if (!apiResponse.data || apiResponse.data.length !== texts.length) {
       throw new EmbeddingError('Réponse batch API invalide', 500, 'invalid_batch_response');
     }
 
-    return response.data.map((item: any, index: number) => ({
-      embedding: item.embedding,
-      tokenCount: this.estimateTokenCount(texts[index]),
-      createdAt: new Date().toISOString(),
-    }));
+    return apiResponse.data.map((item, index) => {
+      // Vérification que chaque item a un embedding valide
+      if (!item || !Array.isArray(item.embedding)) {
+        throw new EmbeddingError(`Embedding invalide à l'index ${index}`, 500, 'invalid_embedding_item');
+      }
+
+      return {
+        embedding: item.embedding,
+        tokenCount: this.estimateTokenCount(texts[index]),
+        createdAt: new Date().toISOString(),
+      };
+    });
   }
 
   /**
@@ -377,7 +431,7 @@ export class EmbeddingService {
    * @param error Erreur Axios
    * @returns EmbeddingError formaté
    */
-  private handleApiError(error: any): EmbeddingError {
+  private handleApiError(error: unknown): EmbeddingError {
     if (error instanceof AxiosError) {
       const status = error.response?.status;
       const data = error.response?.data as MistralApiError;
@@ -423,16 +477,30 @@ export class EmbeddingService {
           );
         default:
           return new EmbeddingError(
-            data.message || error.message || 'Erreur inconnue',
-            status,
+            data.message || (error instanceof Error ? error.message : 'Erreur inconnue'),
+            status || 500,
             data.type || 'unknown_error',
-            status >= 500 // Réessayable pour les erreurs serveur
+            (status || 500) >= 500 // Réessayable pour les erreurs serveur
           );
       }
     }
 
+    // Gestion des erreurs non-Axios
+    let errorMessage = 'Erreur inconnue';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error && typeof error === 'object') {
+      try {
+        errorMessage = JSON.stringify(error);
+      } catch (e) {
+        errorMessage = String(error);
+      }
+    }
+
     return new EmbeddingError(
-      error.message || 'Erreur inconnue',
+      errorMessage,
       undefined,
       'unknown_error'
     );
@@ -562,6 +630,6 @@ export async function generateEmbeddings(
 export async function embedChunks(
   chunks: Chunk[],
   options: { useCache?: boolean; batchSize?: number } = { useCache: true, batchSize: 10 }
-): Promise<{ chunks: (Chunk & { embedding: number[] }); totalTokens: number }> {
+): Promise<{ chunks: (Chunk & { embedding: number[] })[]; totalTokens: number }> {
   return embeddingService.embedChunks(chunks, options);
 }

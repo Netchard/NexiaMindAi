@@ -7,11 +7,7 @@ import { SupabaseStorageClient, storageClient } from '../client';
 import { createClient } from '../../server';
 
 // Mock de Supabase
-const mockSupabase = {
-  storage: {
-    from: jest.fn(() => mockSupabase.storage.from),
-  },
-};
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockListResult = {
   data: [
@@ -44,19 +40,45 @@ const mockListResult = {
 };
 
 const mockDownloadResult = {
-  data: new Blob(['test content']),
+  data: {
+    arrayBuffer: vi.fn().mockResolvedValue(new TextEncoder().encode('test content')),
+  },
   error: null,
 };
 
-jest.mock('../../server', () => ({
-  createClient: jest.fn(() => mockSupabase),
+// Mock Blob pour les tests
+class MockBlob {
+  constructor(public parts: any[]) {}
+  
+  arrayBuffer() {
+    return Promise.resolve(new TextEncoder().encode(this.parts.join('')));
+  }
+}
+
+// Mock global pour Supabase
+let mockSupabase: any;
+
+vi.mock('../../server', () => ({
+  get supabase() {
+    return mockSupabase;
+  },
+  createClient: vi.fn(() => mockSupabase),
 }));
 
-jest.mock('../../../logger', () => ({
+beforeEach(() => {
+  // Initialiser mockSupabase avant chaque test
+  mockSupabase = {
+    storage: {
+      from: vi.fn(() => mockSupabase.storage.from),
+    },
+  };
+});
+
+vi.mock('../../../logger', () => ({
   logger: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -64,7 +86,7 @@ describe('SupabaseStorageClient', () => {
   let client: SupabaseStorageClient;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     client = new SupabaseStorageClient('test-bucket');
   });
 
@@ -88,7 +110,7 @@ describe('SupabaseStorageClient', () => {
   describe('listFiles()', () => {
     it('Devrait lister les fichiers du bucket', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue(mockListResult),
+        list: vi.fn().mockResolvedValue(mockListResult),
       });
 
       const files = await client.listFiles();
@@ -102,7 +124,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait filtrer par prefix', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockImplementation((prefix: string, options: any) => {
+        list: vi.fn().mockImplementation((prefix: string, options: any) => {
           expect(prefix).toBe('documents/subfolder');
           expect(options.limit).toBe(100);
           return Promise.resolve(mockListResult);
@@ -115,7 +137,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait retourner une liste vide si aucun fichier', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({ data: [], error: null }),
+        list: vi.fn().mockResolvedValue({ data: [], error: null }),
       });
 
       const files = await client.listFiles();
@@ -124,7 +146,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les erreurs de Supabase', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'Bucket not found' },
         }),
@@ -137,7 +159,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait utiliser la limite par défaut de 1000', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockImplementation((prefix: string, options: any) => {
+        list: vi.fn().mockImplementation((prefix: string, options: any) => {
           expect(options.limit).toBe(1000);
           return Promise.resolve(mockListResult);
         }),
@@ -148,7 +170,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les fichiers avec des métadonnées manquantes', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: [
             {
               name: 'file-without-metadata.txt',
@@ -171,7 +193,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les fichiers avec des métadonnées partielles', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: [
             {
               name: 'partial-metadata.txt',
@@ -196,7 +218,7 @@ describe('SupabaseStorageClient', () => {
   describe('getFileInfo()', () => {
     it('Devrait récupérer les métadonnées d\'un fichier spécifique', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue(mockListResult),
+        list: vi.fn().mockResolvedValue(mockListResult),
       });
 
       const fileInfo = await client.getFileInfo('documents/test-file.pdf');
@@ -208,7 +230,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait lancer une erreur si le fichier n\'existe pas', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({ data: [], error: null }),
+        list: vi.fn().mockResolvedValue({ data: [], error: null }),
       });
 
       await expect(client.getFileInfo('nonexistent-file.pdf')).rejects.toThrow(
@@ -218,7 +240,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les erreurs de Supabase', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'Access denied' },
         }),
@@ -233,7 +255,7 @@ describe('SupabaseStorageClient', () => {
   describe('fileExists()', () => {
     it('Devrait retourner true si le fichier existe', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue(mockListResult),
+        list: vi.fn().mockResolvedValue(mockListResult),
       });
 
       const exists = await client.fileExists('documents/test-file.pdf');
@@ -242,7 +264,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait retourner false si le fichier n\'existe pas', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({ data: [], error: null }),
+        list: vi.fn().mockResolvedValue({ data: [], error: null }),
       });
 
       const exists = await client.fileExists('nonexistent-file.pdf');
@@ -259,10 +281,10 @@ describe('SupabaseStorageClient', () => {
 
   describe('downloadFile()', () => {
     it('Devrait télécharger un fichier avec succès', async () => {
-      const mockBlob = new Blob(['test file content']);
+      const mockBlob = new MockBlob(['test file content']);
       mockSupabase.storage.from.mockReturnValue({
-        download: jest.fn().mockResolvedValue({ data: mockBlob, error: null }),
-        list: jest.fn().mockResolvedValue(mockListResult),
+        download: vi.fn().mockResolvedValue({ data: mockBlob, error: null }),
+        list: vi.fn().mockResolvedValue(mockListResult),
       });
 
       const result = await client.downloadFile('documents/test-file.pdf');
@@ -274,7 +296,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les erreurs de téléchargement', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        download: jest.fn().mockResolvedValue({
+        download: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'File not found' },
         }),
@@ -286,10 +308,10 @@ describe('SupabaseStorageClient', () => {
     });
 
     it('Devrait gérer les erreurs de récupération des métadonnées après téléchargement', async () => {
-      const mockBlob = new Blob(['test content']);
+      const mockBlob = new MockBlob(['test content']);
       mockSupabase.storage.from.mockReturnValue({
-        download: jest.fn().mockResolvedValue({ data: mockBlob, error: null }),
-        list: jest.fn().mockResolvedValue({
+        download: vi.fn().mockResolvedValue({ data: mockBlob, error: null }),
+        list: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'Metadata error' },
         }),
@@ -304,7 +326,7 @@ describe('SupabaseStorageClient', () => {
   describe('fileExists()', () => {
     it('Devrait retourner false en cas d\'erreur lors de la vérification', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: null,
           error: { message: 'Access denied' },
         }),
@@ -318,7 +340,7 @@ describe('SupabaseStorageClient', () => {
   describe('Edge Cases', () => {
     it('Devrait gérer les noms de fichiers avec des caractères spéciaux', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: [
             {
               name: 'file with spaces & special chars.txt',
@@ -341,7 +363,7 @@ describe('SupabaseStorageClient', () => {
 
     it('Devrait gérer les chemins avec des sous-dossiers imbriqués', async () => {
       mockSupabase.storage.from.mockReturnValue({
-        list: jest.fn().mockResolvedValue({
+        list: vi.fn().mockResolvedValue({
           data: [
             {
               name: 'deep-file.txt',

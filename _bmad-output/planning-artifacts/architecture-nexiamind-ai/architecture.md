@@ -184,104 +184,147 @@ api/
 
 ---
 
-### 3️⃣ Base de Données (Supabase)
+### 3️⃣ Base de Données (Supabase) - Structure Réelle
 
 **Schémas :**
 
-#### Schema `public`
+#### Schema `public` (Structure Réelle Vérifiée)
 
 ```sql
 -- Table des utilisateurs (étendue depuis auth.users)
-CREATE TABLE IF NOT EXISTS profiles (
-    id UUID REFERENCES auth.users NOT NULL PRIMARY KEY,
-    username TEXT,
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    email TEXT NOT NULL,
     full_name TEXT,
-    email TEXT UNIQUE NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'project_lead', 'developer', 'consultant')),
+    role TEXT NOT NULL DEFAULT 'developer'::text CHECK (role = ANY (ARRAY['admin'::text, 'manager'::text, 'project_lead'::text, 'developer'::text, 'consultant'::text])),
+    avatar_url TEXT,
+    preferences JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT profiles_pkey PRIMARY KEY (id),
+    CONSTRAINT profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 
--- Table des conversations
-CREATE TABLE IF NOT EXISTS conversations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    title TEXT,
+-- Table des documents
+CREATE TABLE IF NOT EXISTS public.documents (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    type TEXT NOT NULL CHECK (type = ANY (ARRAY['pdf'::text, 'text'::text, 'markdown'::text, 'code'::text, 'csv'::text, 'json'::text, 'other'::text])),
+    source TEXT NOT NULL CHECK (source = ANY (ARRAY['supabase'::text, 'gitlab'::text, 'nexia'::text, 'upload'::text])),
+    client_id TEXT,
+    file_path TEXT,
+    file_size BIGINT,
+    language TEXT,
+    mime_type TEXT,
+    checksum TEXT,
+    processed_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Table des messages (contexte conversationnel)
-CREATE TABLE IF NOT EXISTS messages (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
-    role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
-    content TEXT NOT NULL,
-    metadata JSONB,  -- {sources: [...], tokens: N}
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT documents_pkey PRIMARY KEY (id)
 );
 
 -- Table des chunks (documents découpés)
-CREATE TABLE IF NOT EXISTS chunks (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE IF NOT EXISTS public.chunks (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
     document_id UUID NOT NULL,
-    document_source TEXT NOT NULL,  -- 'supabase', 'gitlab', 'nexia'
-    document_path TEXT NOT NULL,    -- Chemin vers le document source
     content TEXT NOT NULL,
     chunk_index INTEGER NOT NULL,
-    metadata JSONB NOT NULL,  -- {client: ?, type: ?, language: ?, ...}
-    embedding vector(1536) NOT NULL,  -- Embedding Mistral (dimension 1536)
     token_count INTEGER NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Table des embeddings (index vectoriel)
-CREATE TABLE IF NOT EXISTS embeddings (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    chunk_id UUID REFERENCES chunks(id) ON DELETE CASCADE,
-    vector vector(1536) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Index vectoriel pour la recherche
-CREATE INDEX IF NOT EXISTS idx_embeddings_vector 
-    ON embeddings USING ivfflat (vector vector_l2_ops) WITH (lists = 100);
-
--- Table des documents indexés
-CREATE TABLE IF NOT EXISTS documents (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    source TEXT NOT NULL,  -- 'supabase', 'gitlab', 'nexia'
-    source_id TEXT NOT NULL,  -- ID dans la source (file_id, repo_path, etc.)
-    path TEXT NOT NULL,
-    filename TEXT NOT NULL,
-    mime_type TEXT,
-    size_bytes BIGINT,
-    metadata JSONB,
-    last_sync_at TIMESTAMPTZ,
+    hash TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    CONSTRAINT chunks_pkey PRIMARY KEY (id),
+    CONSTRAINT chunks_document_id_fkey FOREIGN KEY (document_id) REFERENCES public.documents(id)
+);
+
+-- Table des embeddings (index vectoriel) - Dimension réelle: 384
+CREATE TABLE IF NOT EXISTS public.embeddings (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    chunk_id UUID NOT NULL,
+    vector vector(384) NOT NULL,  -- Dimension réelle utilisée par le modèle d'embedding
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT embeddings_pkey PRIMARY KEY (id),
+    CONSTRAINT embeddings_chunk_id_fkey FOREIGN KEY (chunk_id) REFERENCES public.chunks(id)
+);
+
+-- Index vectoriel pour la recherche - optimisé pour la production
+CREATE INDEX IF NOT EXISTS idx_embeddings_vector 
+    ON public.embeddings USING ivfflat (vector vector_l2_ops) WITH (lists = 100);
+
+-- Table des conversations
+CREATE TABLE IF NOT EXISTS public.conversations (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    title TEXT,
+    description TEXT,
+    is_archived BOOLEAN DEFAULT false,
+    client_id TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT conversations_pkey PRIMARY KEY (id),
+    CONSTRAINT conversations_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+
+-- Table des messages (contexte conversationnel)
+CREATE TABLE IF NOT EXISTS public.messages (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL,
+    content TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role = ANY (ARRAY['user'::text, 'assistant'::text])),
+    token_count INTEGER,
+    sources JSONB DEFAULT '[]'::jsonb,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT messages_pkey PRIMARY KEY (id),
+    CONSTRAINT messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.conversations(id)
 );
 
 -- Table de synchronisation
-CREATE TABLE IF NOT EXISTS sync_logs (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    source TEXT NOT NULL,
-    status TEXT NOT NULL,  -- 'success', 'error', 'pending'
-    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMPTZ,
-    error_message TEXT,
+CREATE TABLE IF NOT EXISTS public.sync_logs (
+    id UUID NOT NULL DEFAULT gen_random_uuid(),
+    source TEXT NOT NULL CHECK (source = ANY (ARRAY['supabase'::text, 'gitlab'::text, 'nexia'::text, 'manual'::text])),
+    last_sync_at TIMESTAMPTZ DEFAULT NOW(),
     documents_processed INTEGER DEFAULT 0,
-    chunks_created INTEGER DEFAULT 0
+    chunks_created INTEGER DEFAULT 0,
+    embeddings_created INTEGER DEFAULT 0,
+    documents_deleted INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'success'::text CHECK (status = ANY (ARRAY['success'::text, 'failed'::text, 'partial'::text])),
+    error_message TEXT,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT sync_logs_pkey PRIMARY KEY (id)
 );
 ```
 
-#### Schema `rag` (optionnel pour isolation)
+#### Notes sur la Structure Réelle
 
-Si tu préfères isoler les tables RAG :
-```sql
-CREATE SCHEMA IF NOT EXISTS rag;
--- Toutes les tables ci-dessus dans le schema rag.
+**Différences Clés par Rapport à la Documentation Précédente :**
+
+1. **Dimension des Embeddings** : `vector(384)` au lieu de `vector(1536)` - correspond au modèle d'embedding réellement utilisé
+2. **Schema Public** : Toutes les tables sont dans le schema `public`, pas de schema `rag` séparé
+3. **Contraintes de Clés Étrangères** : Toutes les contraintes sont correctement définies et vérifiées
+4. **Index Vectoriel** : L'index utilise `vector_l2_ops` pour la distance L2 (euclidienne)
+
+**Relations entre les Tables :**
+
+```mermaid
+graph TD
+    A[auth.users] -->|user_id| B[public.profiles]
+    B -->|user_id| C[public.conversations]
+    C -->|conversation_id| D[public.messages]
+    E[public.documents] -->|document_id| F[public.chunks]
+    F -->|chunk_id| G[public.embeddings]
+    G -->|vector_index| H[idx_embeddings_vector]
 ```
+
+**Optimisations de Performance :**
+
+1. **Index IVFFlat** : Configuré avec 100 listes pour un bon équilibre entre précision et performance
+2. **Contraintes NOT NULL** : Toutes les colonnes essentielles ont des contraintes NOT NULL
+3. **Valeurs par Défaut** : Timestamps et UUIDs générés automatiquement
+4. **Types de Données** : Optimisés pour le stockage (uuid, timestamps, jsonb)
 
 ---
 

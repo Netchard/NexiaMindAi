@@ -39,21 +39,14 @@ export class OCRService {
           logger.warn(`Type de fichier non supporté: ${contentType}`, {
             fileName,
           });
-          // Essayer quand même de le traiter comme du texte
-          try {
-            const text = fileBuffer.toString('utf-8');
-            if (text.trim().length > 0) {
-              return { text, contentType: 'text' };
-            }
-          } catch {
-            // Ignorer et retourner vide
-          }
-          return { text: '', contentType: 'other' };
+          return { text: '', contentType: 'other', pageCount: 0 };
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error('Échec de l\'extraction de texte', {
-        error: error.message,
-        stack: error.stack,
+        error: errorMessage,
+        stack: errorStack,
         fileName,
         contentType,
       });
@@ -74,6 +67,10 @@ export class OCRService {
    */
   private detectContentType(fileName: string): 'pdf' | 'image' | 'text' | 'other' {
     const ext = fileName.toLowerCase().split('.').pop() || '';
+
+    if (!ext) {
+      return 'other';
+    }
 
     // Extensions PDF
     if (ext === 'pdf') {
@@ -97,6 +94,10 @@ export class OCRService {
       return 'text';
     }
 
+    if (ext === 'unknown') {
+      return 'text';
+    }
+
     return 'other';
   }
 
@@ -110,8 +111,18 @@ export class OCRService {
     const startTime = Date.now();
 
     try {
-      // Charger dynamiquement pdf-parse pour éviter les erreurs si non installé
-      const { default: pdfParse } = await import('pdf-parse');
+      // Importer pdf-parse avec gestion d'erreur améliorée
+      let pdfParse: any;
+      try {
+        const pdfParseModule = await import('pdf-parse');
+        pdfParse = pdfParseModule.default || pdfParseModule;
+      } catch (importError: unknown) {
+        const errorMessage = importError instanceof Error ? importError.message : String(importError);
+        logger.error('Échec de l\'import de pdf-parse', {
+          error: errorMessage,
+        });
+        throw new Error('Module pdf-parse non disponible. Installer avec: npm install pdf-parse');
+      }
 
       const data = await pdfParse(buffer);
 
@@ -125,12 +136,14 @@ export class OCRService {
         contentType: 'pdf',
         pageCount: data.numpages,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
       logger.error('Échec du parsing PDF', {
-        error: error.message,
-        stack: error.stack,
+        error: errorMessage,
+        stack: errorStack,
       });
-      throw new Error(`Échec de l'extraction PDF: ${error.message}`);
+      throw new Error(`Échec de l'extraction PDF: ${errorMessage}`);
     }
   }
 
@@ -147,12 +160,10 @@ export class OCRService {
       fileSize: buffer.length,
     });
 
-    // Pour l'instant, on lance une erreur pour indiquer que l'OCR n'est pas implémenté
-    // En production, on pourrait appeler une API externe comme :
-    // - Google Cloud Vision
-    // - Azure Computer Vision
-    // - Service Nexia OCR
-    // - Tesseract.js (mais lourd pour le serveur)
+    if (buffer.length === 0) {
+      return { text: '', contentType: 'image' };
+    }
+
     throw new Error(
       `OCR pour images non implémenté. ` +
       `Utiliser un service externe (Google Cloud Vision, Azure, ou Nexia) pour le fichier: ${fileName}`
@@ -168,14 +179,14 @@ export class OCRService {
     try {
       // Essayer UTF-8
       const text = buffer.toString('utf-8');
-      return { text, contentType: 'text' };
+      return { text, contentType: 'text', pageCount: 0 };
     } catch {
       // Essayer d'autres encodages si nécessaire
       try {
         const text = buffer.toString('latin1');
-        return { text, contentType: 'text' };
+        return { text, contentType: 'text', pageCount: 0 };
       } catch {
-        return { text: '', contentType: 'text' };
+        return { text: '', contentType: 'text', pageCount: 0 };
       }
     }
   }

@@ -1,0 +1,431 @@
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 12:59:07"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 12:59:07"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 12:59:08"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 12:59:10"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 12:59:10"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"661ms","timestamp":"2026-07-02 12:59:10"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 12:59:10"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 12:59:10"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 12:59:10"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"492ms","size":58499,"timestamp":"2026-07-02 12:59:11"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 12:59:11"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"373ms","timestamp":"2026-07-02 12:59:11"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"374ms","timestamp":"2026-07-02 12:59:11"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 12:59:11"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 12:59:13"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"2110ms","timestamp":"2026-07-02 12:59:13","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 12:59:14"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T10:59:13.885Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 12:59:14"}
+{"chunkId":"a874ec58-f421-4835-9de4-be1e24aa4f6f","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 12:59:14"}
+{"chunkId":"a874ec58-f421-4835-9de4-be1e24aa4f6f","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 12:59:14"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 12:59:14"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 12:59:15"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 12:59:15"}
+{"avgTimePerText":"273ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"273ms","timestamp":"2026-07-02 12:59:15","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 12:59:15","tokenCount":121}
+{"chunkId":"a874ec58-f421-4835-9de4-be1e24aa4f6f","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 0","timestamp":"2026-07-02 12:59:15"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T10:59:13.885Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 12:59:15"}
+{"chunkId":"eef461d0-8bcc-490a-9884-ae3008f4bc38","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 12:59:15"}
+{"chunkId":"eef461d0-8bcc-490a-9884-ae3008f4bc38","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 12:59:15"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 12:59:15"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 12:59:15"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 12:59:15"}
+{"avgTimePerText":"194ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"194ms","timestamp":"2026-07-02 12:59:15","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 12:59:15","tokenCount":102}
+{"chunkId":"eef461d0-8bcc-490a-9884-ae3008f4bc38","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 1","timestamp":"2026-07-02 12:59:15"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T10:59:13.885Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 12:59:15"}
+{"chunkId":"19b96bc9-74ca-4c51-99e1-e1e0e11cde3d","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 12:59:15"}
+{"chunkId":"19b96bc9-74ca-4c51-99e1-e1e0e11cde3d","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 12:59:15"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 12:59:15"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 12:59:15"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 12:59:15"}
+{"avgTimePerText":"148ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"148ms","timestamp":"2026-07-02 12:59:15","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 12:59:15","tokenCount":117}
+{"chunkId":"19b96bc9-74ca-4c51-99e1-e1e0e11cde3d","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 2","timestamp":"2026-07-02 12:59:15"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 12:59:15","userId":"system"}
+{"error":"Échec de récupération des documents: column documents.path does not exist","level":"error","message":"Échec global de la re-indexation pour source: Mon-1.pdf","stack":"RetrievalError: Échec de récupération des documents: column documents.path does not exist\n    at RetrievalService.reindexSource (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\rag\\retriever.ts:497:15)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async SupabaseStorageIndexer.indexFile (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:342:11)\n    at async SupabaseStorageIndexer.indexAll (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:80:30)\n    at async main (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\scripts\\index-supabase.ts:201:20)","timestamp":"2026-07-02 12:59:16"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 13:00:38"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 13:00:38"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:00:39"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:00:39"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 13:00:40"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 13:00:40"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 13:00:40"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"336ms","timestamp":"2026-07-02 13:00:40"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 13:00:40"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 13:00:40"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 13:00:40"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"274ms","size":58499,"timestamp":"2026-07-02 13:00:40"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 13:00:40"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"258ms","timestamp":"2026-07-02 13:00:40"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"268ms","timestamp":"2026-07-02 13:00:40"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 13:00:40"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 13:00:41"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"549ms","timestamp":"2026-07-02 13:00:41","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 13:00:41"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T11:00:41.441Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 13:00:41"}
+{"chunkId":"7559c7ca-66ca-43a0-9aca-d2888abe1630","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:00:41"}
+{"chunkId":"7559c7ca-66ca-43a0-9aca-d2888abe1630","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 13:00:41"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:00:41"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:00:41"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:00:41"}
+{"avgTimePerText":"226ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"226ms","timestamp":"2026-07-02 13:00:41","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 13:00:41","tokenCount":121}
+{"chunkId":"7559c7ca-66ca-43a0-9aca-d2888abe1630","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 0 - expected 1536 dimensions, not 1024","timestamp":"2026-07-02 13:00:42"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T11:00:41.441Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 13:00:42"}
+{"chunkId":"b4481663-d399-4cb3-96ca-1db960c1a0ec","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:00:42"}
+{"chunkId":"b4481663-d399-4cb3-96ca-1db960c1a0ec","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 13:00:42"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:00:42"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:00:42"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:00:42"}
+{"avgTimePerText":"159ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"159ms","timestamp":"2026-07-02 13:00:42","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 13:00:42","tokenCount":102}
+{"chunkId":"b4481663-d399-4cb3-96ca-1db960c1a0ec","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 1 - expected 1536 dimensions, not 1024","timestamp":"2026-07-02 13:00:42"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T11:00:41.441Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 13:00:42"}
+{"chunkId":"9f4e59b4-fa17-490e-8b2a-9a8fedb7a6c2","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:00:42"}
+{"chunkId":"9f4e59b4-fa17-490e-8b2a-9a8fedb7a6c2","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 13:00:42"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:00:42"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:00:42"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:00:42"}
+{"avgTimePerText":"154ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"154ms","timestamp":"2026-07-02 13:00:42","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 13:00:42","tokenCount":117}
+{"chunkId":"9f4e59b4-fa17-490e-8b2a-9a8fedb7a6c2","details":null,"embeddingLength":1024,"error":"expected 1536 dimensions, not 1024","level":"error","message":"Échec de la sauvegarde de l'embedding pour le chunk 2 - expected 1536 dimensions, not 1024","timestamp":"2026-07-02 13:00:42"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 13:00:42","userId":"system"}
+{"error":"Échec de récupération des documents: column documents.path does not exist","level":"error","message":"Échec global de la re-indexation pour source: Mon-1.pdf","stack":"RetrievalError: Échec de récupération des documents: column documents.path does not exist\n    at RetrievalService.reindexSource (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\rag\\retriever.ts:497:15)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async SupabaseStorageIndexer.indexFile (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:342:11)\n    at async SupabaseStorageIndexer.indexAll (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:80:30)\n    at async main (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\scripts\\index-supabase.ts:201:20)","timestamp":"2026-07-02 13:00:42"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 13:12:01"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 13:12:01"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:12:01"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 13:12:02"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 13:12:02"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"493ms","timestamp":"2026-07-02 13:12:02"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 13:12:02"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 13:12:02"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"366ms","size":58499,"timestamp":"2026-07-02 13:12:02"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 13:12:02"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"170ms","timestamp":"2026-07-02 13:12:03"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"172ms","timestamp":"2026-07-02 13:12:03"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 13:12:03"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 13:12:03"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"269ms","timestamp":"2026-07-02 13:12:03","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 13:12:03"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T11:12:03.364Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 13:12:03"}
+{"chunkId":"0d6110bb-8209-4474-b72f-b21c5b9b69ec","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:12:03"}
+{"chunkId":"0d6110bb-8209-4474-b72f-b21c5b9b69ec","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 13:12:03"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:12:03"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:12:03"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:12:03"}
+{"avgTimePerText":"319ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"319ms","timestamp":"2026-07-02 13:12:03","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 13:12:03","tokenCount":121}
+{"chunkId":"0d6110bb-8209-4474-b72f-b21c5b9b69ec","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 0","timestamp":"2026-07-02 13:12:04"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T11:12:03.364Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 13:12:04"}
+{"chunkId":"2ca54b63-f800-4c06-a9ae-b3927d456f0e","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:12:04"}
+{"chunkId":"2ca54b63-f800-4c06-a9ae-b3927d456f0e","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 13:12:04"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:12:04"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:12:04"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:12:04"}
+{"avgTimePerText":"156ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"156ms","timestamp":"2026-07-02 13:12:04","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 13:12:04","tokenCount":102}
+{"chunkId":"2ca54b63-f800-4c06-a9ae-b3927d456f0e","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 1","timestamp":"2026-07-02 13:12:04"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T11:12:03.364Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 13:12:04"}
+{"chunkId":"e3770686-8fd1-4bac-a3b9-eebcc04cbc01","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:12:04"}
+{"chunkId":"e3770686-8fd1-4bac-a3b9-eebcc04cbc01","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 13:12:04"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:12:04"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:12:05"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:12:05"}
+{"avgTimePerText":"899ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"899ms","timestamp":"2026-07-02 13:12:05","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 13:12:05","tokenCount":117}
+{"chunkId":"e3770686-8fd1-4bac-a3b9-eebcc04cbc01","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 2","timestamp":"2026-07-02 13:12:05"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 13:12:05","userId":"system"}
+{"error":"Échec de récupération des documents: column documents.path does not exist","level":"error","message":"Échec global de la re-indexation pour source: Mon-1.pdf","stack":"RetrievalError: Échec de récupération des documents: column documents.path does not exist\n    at RetrievalService.reindexSource (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\rag\\retriever.ts:497:15)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async SupabaseStorageIndexer.indexFile (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:342:11)\n    at async SupabaseStorageIndexer.indexAll (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:80:30)\n    at async main (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\scripts\\index-supabase.ts:201:20)","timestamp":"2026-07-02 13:12:05"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 13:13:18"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 13:13:18"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:13:18"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 13:13:19"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 13:13:19"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"277ms","timestamp":"2026-07-02 13:13:19"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 13:13:19"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 13:13:19"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"246ms","size":58499,"timestamp":"2026-07-02 13:13:19"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"173ms","timestamp":"2026-07-02 13:13:19"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"175ms","timestamp":"2026-07-02 13:13:19"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 13:13:19"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 13:13:20"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"259ms","timestamp":"2026-07-02 13:13:20","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 13:13:20"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T11:13:20.146Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 13:13:20"}
+{"chunkId":"445b391d-ccb1-4a2e-96be-99bed778711a","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:13:20"}
+{"chunkId":"445b391d-ccb1-4a2e-96be-99bed778711a","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 13:13:20"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:13:20"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:13:21"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:13:21"}
+{"avgTimePerText":"515ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"515ms","timestamp":"2026-07-02 13:13:21","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 13:13:21","tokenCount":121}
+{"chunkId":"445b391d-ccb1-4a2e-96be-99bed778711a","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 0","timestamp":"2026-07-02 13:13:21"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T11:13:20.146Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 13:13:21"}
+{"chunkId":"08485ebc-70b4-4ef7-b1d6-605fb86d51fc","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:13:21"}
+{"chunkId":"08485ebc-70b4-4ef7-b1d6-605fb86d51fc","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 13:13:21"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:13:21"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:13:21"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:13:21"}
+{"avgTimePerText":"214ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"214ms","timestamp":"2026-07-02 13:13:21","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 13:13:21","tokenCount":102}
+{"chunkId":"08485ebc-70b4-4ef7-b1d6-605fb86d51fc","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 1","timestamp":"2026-07-02 13:13:21"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T11:13:20.146Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 13:13:21"}
+{"chunkId":"bbf99b76-aa62-4a43-b648-35e04980d6ff","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 13:13:21"}
+{"chunkId":"bbf99b76-aa62-4a43-b648-35e04980d6ff","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 13:13:21"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 13:13:21"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 13:13:22"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 13:13:22"}
+{"avgTimePerText":"606ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"606ms","timestamp":"2026-07-02 13:13:22","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 13:13:22","tokenCount":117}
+{"chunkId":"bbf99b76-aa62-4a43-b648-35e04980d6ff","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 2","timestamp":"2026-07-02 13:13:22"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 13:13:22","userId":"system"}
+{"error":"Échec de récupération des documents: column documents.path does not exist","level":"error","message":"Échec global de la re-indexation pour source: Mon-1.pdf - Échec de récupération des documents: column documents.path does not exist","stack":"RetrievalError: Échec de récupération des documents: column documents.path does not exist\n    at RetrievalService.reindexSource (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\rag\\retriever.ts:497:15)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async SupabaseStorageIndexer.indexFile (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:342:11)\n    at async SupabaseStorageIndexer.indexAll (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\src\\lib\\supabase\\storage\\indexer.ts:80:30)\n    at async main (D:\\VibeCoding\\Projects\\Project-D\\nexiamind-ai\\scripts\\index-supabase.ts:201:20)","timestamp":"2026-07-02 13:13:22"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 18:18:38"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 18:18:38"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 18:18:38"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 18:18:39"}
+{"bucket":"documents","dryRun":true,"level":"info","limit":1,"message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 18:18:39"}
+{"level":"info","limit":1,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 18:18:39"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"1058ms","timestamp":"2026-07-02 18:18:40"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 18:18:40"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 18:18:40"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 18:18:40"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"249ms","size":58499,"timestamp":"2026-07-02 18:18:41"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 18:18:41"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"658ms","timestamp":"2026-07-02 18:18:41"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"661ms","timestamp":"2026-07-02 18:18:41"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 18:18:41"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 18:18:43"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 18:19:10"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 18:19:10"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 18:19:11"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 18:19:11"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 18:19:11"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"219ms","timestamp":"2026-07-02 18:19:11"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 18:19:11"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 18:19:11"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 18:19:11"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"172ms","size":58499,"timestamp":"2026-07-02 18:19:12"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 18:19:12"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"165ms","timestamp":"2026-07-02 18:19:12"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"167ms","timestamp":"2026-07-02 18:19:12"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 18:19:12"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 18:19:12"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"274ms","timestamp":"2026-07-02 18:19:12","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 18:19:13"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T16:19:12.606Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 18:19:13"}
+{"chunkId":"35c5e790-200d-4f55-85e1-13ccf05d6489","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 18:19:13"}
+{"chunkId":"35c5e790-200d-4f55-85e1-13ccf05d6489","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 18:19:13"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 18:19:13"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 18:19:13"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 18:19:13"}
+{"avgTimePerText":"233ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"233ms","timestamp":"2026-07-02 18:19:13","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 18:19:13","tokenCount":121}
+{"chunkId":"35c5e790-200d-4f55-85e1-13ccf05d6489","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 0","timestamp":"2026-07-02 18:19:13"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T16:19:12.606Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 18:19:13"}
+{"chunkId":"379161d4-bbc6-4edd-b418-42f1bf73c2c5","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 18:19:14"}
+{"chunkId":"379161d4-bbc6-4edd-b418-42f1bf73c2c5","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 18:19:14"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 18:19:14"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 18:19:15"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 18:19:15"}
+{"avgTimePerText":"1016ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"1016ms","timestamp":"2026-07-02 18:19:15","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 18:19:15","tokenCount":102}
+{"chunkId":"379161d4-bbc6-4edd-b418-42f1bf73c2c5","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 1","timestamp":"2026-07-02 18:19:15"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T16:19:12.606Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 18:19:15"}
+{"chunkId":"e8b8dbee-e4a7-4588-b0a7-1a89b2830aaa","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 18:19:15"}
+{"chunkId":"e8b8dbee-e4a7-4588-b0a7-1a89b2830aaa","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 18:19:15"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 18:19:15"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 18:19:15"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 18:19:15"}
+{"avgTimePerText":"157ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"157ms","timestamp":"2026-07-02 18:19:15","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 18:19:15","tokenCount":117}
+{"chunkId":"e8b8dbee-e4a7-4588-b0a7-1a89b2830aaa","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 2","timestamp":"2026-07-02 18:19:15"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 18:19:15","userId":"system"}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Traitement du document: Mon-1.pdf","path":"Mon-1.pdf","timestamp":"2026-07-02 18:19:15"}
+{"documentsProcessed":1,"errorsCount":0,"level":"info","message":"Re-indexation terminée pour la source: Mon-1.pdf","processingTime":"128ms","timestamp":"2026-07-02 18:19:15"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 21:49:06"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 21:49:07"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 21:49:07"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 21:49:09"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 21:49:09"}
+{"bucket":"documents","count":1,"level":"info","message":"Fichiers listés avec succès","processingTime":"578ms","timestamp":"2026-07-02 21:49:09"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 1","timestamp":"2026-07-02 21:49:09"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 21:49:09"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"307ms","size":58499,"timestamp":"2026-07-02 21:49:09"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 21:49:09"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"346ms","timestamp":"2026-07-02 21:49:10"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"350ms","timestamp":"2026-07-02 21:49:10"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 21:49:10"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 21:49:10"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"612ms","timestamp":"2026-07-02 21:49:10","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 21:49:11"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T19:49:10.897Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 21:49:11"}
+{"chunkId":"7d508aaf-25df-4bf6-ab0c-7046e268c444","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:49:11"}
+{"chunkId":"7d508aaf-25df-4bf6-ab0c-7046e268c444","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 21:49:11"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:49:11"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:49:12"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:49:12"}
+{"avgTimePerText":"245ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"245ms","timestamp":"2026-07-02 21:49:12","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 21:49:12","tokenCount":121}
+{"chunkId":"7d508aaf-25df-4bf6-ab0c-7046e268c444","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 0","timestamp":"2026-07-02 21:49:12"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T19:49:10.897Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 21:49:12"}
+{"chunkId":"9f40ebff-59c2-4da0-909e-30728cfca379","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:49:12"}
+{"chunkId":"9f40ebff-59c2-4da0-909e-30728cfca379","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 21:49:12"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:49:12"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:49:12"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:49:12"}
+{"avgTimePerText":"187ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"187ms","timestamp":"2026-07-02 21:49:12","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 21:49:12","tokenCount":102}
+{"chunkId":"9f40ebff-59c2-4da0-909e-30728cfca379","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 1","timestamp":"2026-07-02 21:49:12"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T19:49:10.897Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 21:49:12"}
+{"chunkId":"4fe9ecd8-8f40-48d0-b166-5025f87688a7","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:49:12"}
+{"chunkId":"4fe9ecd8-8f40-48d0-b166-5025f87688a7","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 21:49:12"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:49:12"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:49:12"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:49:12"}
+{"avgTimePerText":"169ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"169ms","timestamp":"2026-07-02 21:49:12","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 21:49:12","tokenCount":117}
+{"chunkId":"4fe9ecd8-8f40-48d0-b166-5025f87688a7","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 2","timestamp":"2026-07-02 21:49:12"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 21:49:12","userId":"system"}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Traitement du document: Mon-1.pdf","path":"Mon-1.pdf","timestamp":"2026-07-02 21:49:13"}
+{"documentsProcessed":1,"errorsCount":0,"level":"info","message":"Re-indexation terminée pour la source: Mon-1.pdf","processingTime":"72ms","timestamp":"2026-07-02 21:49:13"}
+{"level":"info","message":"SupabaseStorageClient initialisé pour le bucket: documents","timestamp":"2026-07-02 21:51:25"}
+{"chunkOverlap":50,"chunkSize":512,"level":"info","message":"TextChunker initialisé","timestamp":"2026-07-02 21:51:26"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 21:51:26"}
+{"cacheTTL":"60 minutes","level":"info","message":"EmbeddingService initialisé","model":"mistral-embed","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"RetrievalService initialisé","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"SupabaseStorageIndexer initialisé pour le bucket: documents","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"Script d'indexation Supabase Storage","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"============================================================","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"\nDebut de l'indexation...","timestamp":"2026-07-02 21:51:27"}
+{"bucket":"documents","dryRun":false,"level":"info","message":"Début de l'indexation Supabase Storage","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","limit":1000,"message":"Liste des fichiers du bucket documents","timestamp":"2026-07-02 21:51:27"}
+{"bucket":"documents","count":6,"level":"info","message":"Fichiers listés avec succès","processingTime":"788ms","timestamp":"2026-07-02 21:51:27"}
+{"bucket":"documents","level":"info","message":"Fichiers à indexer: 6","timestamp":"2026-07-02 21:51:27"}
+{"contentType":"application/vnd.openxmlformats-officedocument.wordprocessingml.document","fileName":"00005416..docx","level":"info","message":"Indexation du fichier: 00005416..docx","size":145509,"timestamp":"2026-07-02 21:51:27"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: 00005416..docx","timestamp":"2026-07-02 21:51:27"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"00005416..docx","processingTime":"516ms","size":145509,"timestamp":"2026-07-02 21:51:28"}
+{"fileName":"00005416..docx","fileSize":145509,"level":"info","message":"Extraction de texte - type détecté: other","timestamp":"2026-07-02 21:51:28"}
+{"fileName":"00005416..docx","level":"warn","message":"Type de fichier non supporté: other","timestamp":"2026-07-02 21:51:28"}
+{"contentType":"other","fileName":"00005416..docx","level":"info","message":"Extraction de texte terminée","processingTime":"1ms","timestamp":"2026-07-02 21:51:28"}
+{"contentType":"other","level":"warn","message":"Aucun texte extrait pour: 00005416..docx","timestamp":"2026-07-02 21:51:28"}
+{"contentType":"application/vnd.openxmlformats-officedocument.presentationml.presentation","fileName":"00005476..pptx","level":"info","message":"Indexation du fichier: 00005476..pptx","size":5548552,"timestamp":"2026-07-02 21:51:28"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: 00005476..pptx","timestamp":"2026-07-02 21:51:28"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"00005476..pptx","processingTime":"885ms","size":5548552,"timestamp":"2026-07-02 21:51:29"}
+{"fileName":"00005476..pptx","fileSize":5548552,"level":"info","message":"Extraction de texte - type détecté: other","timestamp":"2026-07-02 21:51:29"}
+{"fileName":"00005476..pptx","level":"warn","message":"Type de fichier non supporté: other","timestamp":"2026-07-02 21:51:29"}
+{"contentType":"other","fileName":"00005476..pptx","level":"info","message":"Extraction de texte terminée","processingTime":"3ms","timestamp":"2026-07-02 21:51:29"}
+{"contentType":"other","level":"warn","message":"Aucun texte extrait pour: 00005476..pptx","timestamp":"2026-07-02 21:51:29"}
+{"contentType":"application/vnd.openxmlformats-officedocument.presentationml.presentation","fileName":"00005478..pptx","level":"info","message":"Indexation du fichier: 00005478..pptx","size":5548552,"timestamp":"2026-07-02 21:51:29"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: 00005478..pptx","timestamp":"2026-07-02 21:51:29"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"00005478..pptx","processingTime":"839ms","size":5548552,"timestamp":"2026-07-02 21:51:30"}
+{"fileName":"00005478..pptx","fileSize":5548552,"level":"info","message":"Extraction de texte - type détecté: other","timestamp":"2026-07-02 21:51:30"}
+{"fileName":"00005478..pptx","level":"warn","message":"Type de fichier non supporté: other","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"other","fileName":"00005478..pptx","level":"info","message":"Extraction de texte terminée","processingTime":"1ms","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"other","level":"warn","message":"Aucun texte extrait pour: 00005478..pptx","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"application/vnd.openxmlformats-officedocument.wordprocessingml.document","fileName":"00005492.docx","level":"info","message":"Indexation du fichier: 00005492.docx","size":778037,"timestamp":"2026-07-02 21:51:30"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: 00005492.docx","timestamp":"2026-07-02 21:51:30"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"00005492.docx","processingTime":"389ms","size":778037,"timestamp":"2026-07-02 21:51:30"}
+{"fileName":"00005492.docx","fileSize":778037,"level":"info","message":"Extraction de texte - type détecté: other","timestamp":"2026-07-02 21:51:30"}
+{"fileName":"00005492.docx","level":"warn","message":"Type de fichier non supporté: other","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"other","fileName":"00005492.docx","level":"info","message":"Extraction de texte terminée","processingTime":"0ms","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"other","level":"warn","message":"Aucun texte extrait pour: 00005492.docx","timestamp":"2026-07-02 21:51:30"}
+{"contentType":"application/vnd.openxmlformats-officedocument.wordprocessingml.document","fileName":"00005493.docx","level":"info","message":"Indexation du fichier: 00005493.docx","size":773169,"timestamp":"2026-07-02 21:51:30"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: 00005493.docx","timestamp":"2026-07-02 21:51:30"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"00005493.docx","processingTime":"412ms","size":773169,"timestamp":"2026-07-02 21:51:31"}
+{"fileName":"00005493.docx","fileSize":773169,"level":"info","message":"Extraction de texte - type détecté: other","timestamp":"2026-07-02 21:51:31"}
+{"fileName":"00005493.docx","level":"warn","message":"Type de fichier non supporté: other","timestamp":"2026-07-02 21:51:31"}
+{"contentType":"other","fileName":"00005493.docx","level":"info","message":"Extraction de texte terminée","processingTime":"2ms","timestamp":"2026-07-02 21:51:31"}
+{"contentType":"other","level":"warn","message":"Aucun texte extrait pour: 00005493.docx","timestamp":"2026-07-02 21:51:31"}
+{"contentType":"application/pdf","fileName":"Mon-1.pdf","level":"info","message":"Indexation du fichier: Mon-1.pdf","size":58499,"timestamp":"2026-07-02 21:51:31"}
+{"bucket":"documents","level":"info","message":"Téléchargement du fichier: Mon-1.pdf","timestamp":"2026-07-02 21:51:31"}
+{"level":"info","message":"Fichier téléchargé avec succès","path":"Mon-1.pdf","processingTime":"209ms","size":58499,"timestamp":"2026-07-02 21:51:31"}
+{"fileName":"Mon-1.pdf","fileSize":58499,"level":"info","message":"Extraction de texte - type détecté: pdf","timestamp":"2026-07-02 21:51:31"}
+{"level":"info","message":"PDF parsed avec succès","numPages":1,"processingTime":"225ms","timestamp":"2026-07-02 21:51:31"}
+{"contentType":"pdf","fileName":"Mon-1.pdf","level":"info","message":"Extraction de texte terminée","processingTime":"228ms","timestamp":"2026-07-02 21:51:31"}
+{"estimatedTokens":318,"level":"info","message":"Début du chunking","textLength":1307,"timestamp":"2026-07-02 21:51:31"}
+{"level":"info","message":"LangChain RecursiveCharacterTextSplitter chargé avec succès","timestamp":"2026-07-02 21:51:31"}
+{"avgChunkSize":113,"contentType":"text","level":"info","message":"Chunking terminé avec succès","processingTime":"189ms","timestamp":"2026-07-02 21:51:31","totalChunks":3,"totalTokens":340}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Document existant trouvé: Mon-1.pdf","timestamp":"2026-07-02 21:51:31"}
+{"chunkLength":510,"level":"info","message":"Traitement du chunk 0/3 pour Mon-1.pdf","metadata":{"chunkIndex":0,"client":"default","contentType":"text","createdAt":"2026-07-02T19:51:31.640Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":121,"totalChunks":3},"timestamp":"2026-07-02 21:51:31"}
+{"chunkId":"eb76efae-579a-4397-91d7-581fa0aaa8e4","chunkIndex":0,"contentLength":510,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:51:32"}
+{"chunkId":"eb76efae-579a-4397-91d7-581fa0aaa8e4","level":"info","message":"Génération de l'embedding pour le chunk 0","timestamp":"2026-07-02 21:51:32"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:51:32"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:51:32"}
+{"cacheKey":"embed--754765865...","cacheSize":1,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:51:32"}
+{"avgTimePerText":"275ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"275ms","timestamp":"2026-07-02 21:51:32","totalTexts":1,"totalTokens":121}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 0","timestamp":"2026-07-02 21:51:32","tokenCount":121}
+{"chunkId":"eb76efae-579a-4397-91d7-581fa0aaa8e4","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 0","timestamp":"2026-07-02 21:51:32"}
+{"chunkLength":408,"level":"info","message":"Traitement du chunk 1/3 pour Mon-1.pdf","metadata":{"chunkIndex":1,"client":"default","contentType":"text","createdAt":"2026-07-02T19:51:31.640Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":102,"totalChunks":3},"timestamp":"2026-07-02 21:51:32"}
+{"chunkId":"f3ee70fd-5365-4570-8a29-4d19aba37e8b","chunkIndex":1,"contentLength":408,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:51:32"}
+{"chunkId":"f3ee70fd-5365-4570-8a29-4d19aba37e8b","level":"info","message":"Génération de l'embedding pour le chunk 1","timestamp":"2026-07-02 21:51:32"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:51:32"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:51:32"}
+{"cacheKey":"embed-638993457...","cacheSize":2,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:51:32"}
+{"avgTimePerText":"181ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"181ms","timestamp":"2026-07-02 21:51:32","totalTexts":1,"totalTokens":102}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 1","timestamp":"2026-07-02 21:51:32","tokenCount":102}
+{"chunkId":"f3ee70fd-5365-4570-8a29-4d19aba37e8b","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 1","timestamp":"2026-07-02 21:51:32"}
+{"chunkLength":468,"level":"info","message":"Traitement du chunk 2/3 pour Mon-1.pdf","metadata":{"chunkIndex":2,"client":"default","contentType":"text","createdAt":"2026-07-02T19:51:31.640Z","documentType":"pdf","extractionMethod":"pdf","fileContentType":"application/pdf","fileName":"Mon-1.pdf","fileSize":58499,"source":"Mon-1.pdf","sourceBucket":"documents","sourceType":"supabase_storage","tokenCount":117,"totalChunks":3},"timestamp":"2026-07-02 21:51:32"}
+{"chunkId":"fd0755d0-84ee-41ad-b5b8-a17b4124d529","chunkIndex":2,"contentLength":468,"level":"info","message":"Chunk sauvegardé avec succès","timestamp":"2026-07-02 21:51:32"}
+{"chunkId":"fd0755d0-84ee-41ad-b5b8-a17b4124d529","level":"info","message":"Génération de l'embedding pour le chunk 2","timestamp":"2026-07-02 21:51:32"}
+{"level":"info","message":"Appel 2 API Mistral wrap","timestamp":"2026-07-02 21:51:32"}
+{"batchSize":1,"level":"info","message":"Appel API Mistral batch réussi","status":200,"timestamp":"2026-07-02 21:51:33"}
+{"cacheKey":"embed-1437729283...","cacheSize":3,"level":"info","message":"Embedding mis en cache","timestamp":"2026-07-02 21:51:33"}
+{"avgTimePerText":"210ms","level":"info","message":"Batch d'embeddings généré avec succès","processingTime":"210ms","timestamp":"2026-07-02 21:51:33","totalTexts":1,"totalTokens":117}
+{"embeddingLength":1024,"level":"info","message":"Embedding généré pour le chunk 2","timestamp":"2026-07-02 21:51:33","tokenCount":117}
+{"chunkId":"fd0755d0-84ee-41ad-b5b8-a17b4124d529","embeddingLength":1024,"level":"info","message":"Embedding sauvegardé avec succès pour le chunk 2","timestamp":"2026-07-02 21:51:33"}
+{"level":"info","message":"Début de la re-indexation de la source: Mon-1.pdf","timestamp":"2026-07-02 21:51:33","userId":"system"}
+{"documentId":"4f11d66d-0152-44c5-a18e-fac67ee9e67a","level":"info","message":"Traitement du document: Mon-1.pdf","path":"Mon-1.pdf","timestamp":"2026-07-02 21:51:33"}
+{"documentsProcessed":1,"errorsCount":0,"level":"info","message":"Re-indexation terminée pour la source: Mon-1.pdf","processingTime":"113ms","timestamp":"2026-07-02 21:51:33"}

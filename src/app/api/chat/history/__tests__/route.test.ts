@@ -7,84 +7,86 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // Mock des dépendances
-const mockSupabaseClient = {
-  from: vi.fn((table: string) => {
-    const query: any = { table };
-    
-    query.select = vi.fn((columns: string, options?: any) => {
-      query._select = columns;
-      query._options = options;
-      return query;
-    });
-    
-    query.eq = vi.fn((col: string, val: any) => {
-      query._where = query._where || [];
-      query._where.push({ col, val });
-      return query;
-    });
-    
-    query.in = vi.fn((col: string, vals: any[]) => {
-      query._in = { col, vals };
-      return query;
-    });
-    
-    query.group = vi.fn((col: string) => {
-      query._group = col;
-      return query;
-    });
-    
-    query.order = vi.fn((col: string, opts: any) => {
-      query._order = { col, opts };
-      return query;
-    });
-    
-    query.range = vi.fn((start: number, end: number) => {
-      query._range = { start, end };
-      return query;
-    });
-    
-    query.gte = vi.fn((col: string, val: any) => {
-      query._gte = { col, val };
-      return query;
-    });
-    
-    query.lte = vi.fn((col: string, val: any) => {
-      query._lte = { col, val };
-      return query;
-    });
-    
-    query.then = vi.fn((onFulfilled: any) => {
-      // Mock data for conversations
-      if (query._select?.includes('id, title, created_at, updated_at')) {
-        const result = {
-          data: [
-            { id: 'conv_1', title: 'Test Conversation 1', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-02T00:00:00Z' },
-            { id: 'conv_2', title: 'Test Conversation 2', created_at: '2024-01-03T00:00:00Z', updated_at: '2024-01-04T00:00:00Z' },
-          ],
-          count: 2,
-          error: null,
-        };
-        return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
-      }
+const { mockSupabaseClient } = vi.hoisted(() => ({
+  mockSupabaseClient: {
+    from: vi.fn((table: string) => {
+      const query: any = { table };
       
-      // Mock data for message counts
-      if (query._select?.includes('count()') && query._group === 'conversation_id') {
-        const result = {
-          data: [
-            { conversation_id: 'conv_1', count: 5 },
-            { conversation_id: 'conv_2', count: 3 },
-          ],
-          error: null,
-        };
-        return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
-      }
-      
-      return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
-    });
+      query.select = vi.fn((columns: string, options?: any) => {
+        query._select = columns;
+        query._options = options;
+        return query;
+      });
     
-    return query;
-  }),
-};
+      query.eq = vi.fn((col: string, val: any) => {
+        query._where = query._where || [];
+        query._where.push({ col, val });
+        return query;
+      });
+      
+      query.in = vi.fn((col: string, vals: any[]) => {
+        query._in = { col, vals };
+        return query;
+      });
+      
+      query.group = vi.fn((col: string) => {
+        query._group = col;
+        return query;
+      });
+      
+      query.order = vi.fn((col: string, opts: any) => {
+        query._order = { col, opts };
+        return query;
+      });
+      
+      query.range = vi.fn((start: number, end: number) => {
+        query._range = { start, end };
+        return query;
+      });
+      
+      query.gte = vi.fn((col: string, val: any) => {
+        query._gte = { col, val };
+        return query;
+      });
+      
+      query.lte = vi.fn((col: string, val: any) => {
+        query._lte = { col, val };
+        return query;
+      });
+      
+      query.then = vi.fn((onFulfilled: any) => {
+        // Mock data for conversations
+        if (query._select?.includes('id, title, created_at, updated_at')) {
+          const result = {
+            data: [
+              { id: 'conv_1', title: 'Test Conversation 1', created_at: '2024-01-01T00:00:00Z', updated_at: '2024-01-02T00:00:00Z' },
+              { id: 'conv_2', title: 'Test Conversation 2', created_at: '2024-01-03T00:00:00Z', updated_at: '2024-01-04T00:00:00Z' },
+            ],
+            count: 2,
+            error: null,
+          };
+          return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
+        }
+        
+        // Mock data for message counts
+        if (query._select?.includes('count()') && query._group === 'conversation_id') {
+          const result = {
+            data: [
+              { conversation_id: 'conv_1', count: 5 },
+              { conversation_id: 'conv_2', count: 3 },
+            ],
+            error: null,
+          };
+          return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
+        }
+        
+        return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
+      });
+      
+      return query;
+    }),
+  },
+}));
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockSupabaseClient),

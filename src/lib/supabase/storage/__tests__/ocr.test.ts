@@ -1,3 +1,5 @@
+import { vi, describe, it, expect, beforeEach, beforeAll, afterEach, afterAll } from 'vitest';
+
 /**
  * Tests unitaires pour OCRService
  * Fait partie de ST-201 - Intégrer Supabase Storage
@@ -6,29 +8,40 @@
 import { OCRService, ocrService } from '../ocr';
 
 // Mock de pdf-parse
-const mockPdfParse = {
-  default: jest.fn().mockResolvedValue({
+let mockPdfParse: any;
+let mockLogger: any;
+
+vi.mock('../../../logger', () => ({
+  get logger() {
+    return mockLogger;
+  }
+}));
+
+vi.mock('pdf-parse', () => ({
+  get default() {
+    return mockPdfParse;
+  }
+}));
+
+beforeEach(() => {
+  // Initialiser les mocks avant chaque test
+  mockPdfParse = vi.fn().mockResolvedValue({
     text: 'Extracted PDF text content',
     numpages: 5,
-  }),
-};
-
-// Mock de logger
-const mockLogger = {
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
-};
-
-jest.mock('../../../logger', () => ({ logger: mockLogger }));
-
-jest.mock('pdf-parse', () => mockPdfParse);
+  });
+  
+  mockLogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  };
+});
 
 describe('OCRService', () => {
   let service: OCRService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     service = new OCRService();
   });
 
@@ -76,7 +89,7 @@ describe('OCRService', () => {
 
         // Simuler UTF-8 qui échoue, puis latin1 qui réussit
         const originalToString = Buffer.prototype.toString;
-        Buffer.prototype.toString = jest.fn(function(this: Buffer, encoding: string) {
+        Buffer.prototype.toString = vi.fn(function(this: Buffer, encoding: string) {
           if (encoding === 'utf-8') {
             throw new Error('Invalid encoding');
           }
@@ -108,11 +121,11 @@ describe('OCRService', () => {
         expect(result.text).toBe('Extracted PDF text content');
         expect(result.contentType).toBe('pdf');
         expect(result.pageCount).toBe(5);
-        expect(mockPdfParse.default).toHaveBeenCalledWith(pdfBuffer);
+        expect(mockPdfParse).toHaveBeenCalledWith(pdfBuffer);
       });
 
       it('Devrait gérer les erreurs de parsing PDF', async () => {
-        mockPdfParse.default.mockRejectedValue(new Error('Invalid PDF'));
+        mockPdfParse.mockRejectedValue(new Error('Invalid PDF'));
         const pdfBuffer = Buffer.from('Invalid PDF content');
 
         await expect(service.extractText(pdfBuffer, 'invalid.pdf'))
@@ -261,7 +274,7 @@ describe('OCRService', () => {
     });
 
     it('Devrait logger les erreurs d\'extraction', async () => {
-      mockPdfParse.default.mockRejectedValue(new Error('Parse error'));
+      mockPdfParse.mockRejectedValue(new Error('Parse error'));
       const buffer = Buffer.from('invalid', 'utf-8');
 
       try {
@@ -322,7 +335,7 @@ describe('OCRService', () => {
     });
 
     it('Devrait gérer les PDF avec nombre de pages variable', async () => {
-      mockPdfParse.default.mockResolvedValueOnce({
+      mockPdfParse.mockResolvedValueOnce({
         text: 'Single page PDF',
         numpages: 1,
       });
@@ -335,7 +348,7 @@ describe('OCRService', () => {
     });
 
     it('Devrait gérer les PDF avec beaucoup de pages', async () => {
-      mockPdfParse.default.mockResolvedValueOnce({
+      mockPdfParse.mockResolvedValueOnce({
         text: 'Large document text'.repeat(100),
         numpages: 200,
       });
@@ -402,7 +415,7 @@ describe('OCRService', () => {
 
   describe('Gestion des erreurs avancée', () => {
     it('Devrait gérer les erreurs de parsing PDF avec message détaillé', async () => {
-      mockPdfParse.default.mockRejectedValue(new Error('PDF is encrypted or corrupted'));
+      mockPdfParse.mockRejectedValue(new Error('PDF is encrypted or corrupted'));
       const pdfBuffer = Buffer.from('corrupted pdf');
 
       try {
@@ -415,7 +428,7 @@ describe('OCRService', () => {
     });
 
     it('Devrait gérer les PDF avec du texte vide', async () => {
-      mockPdfParse.default.mockResolvedValueOnce({
+      mockPdfParse.mockResolvedValueOnce({
         text: '',
         numpages: 0,
       });

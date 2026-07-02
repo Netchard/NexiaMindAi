@@ -7,28 +7,30 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // Mock des dépendances
-const mockSupabaseClient = {
-  from: vi.fn((table: string) => {
-    const query: any = { table };
-    
-    query.select = vi.fn((columns: string, options?: any) => {
-      query._select = columns;
+const { mockSupabaseClient } = vi.hoisted(() => ({
+  mockSupabaseClient: {
+    from: vi.fn((table: string) => {
+      const query: any = { table };
+      
+      query.select = vi.fn((columns: string, options?: any) => {
+        query._select = columns;
+        return query;
+      });
+      
+      query.eq = vi.fn((col: string, val: any) => {
+        query._where = query._where || [];
+        query._where.push({ col, val });
+        return query;
+      });
+      
+      query.then = vi.fn((onFulfilled: any) => {
+        return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
+      });
+      
       return query;
-    });
-    
-    query.eq = vi.fn((col: string, val: any) => {
-      query._where = query._where || [];
-      query._where.push({ col, val });
-      return query;
-    });
-    
-    query.then = vi.fn((onFulfilled: any) => {
-      return Promise.resolve(onFulfilled ? onFulfilled({ data: [], error: null }) : { data: [], error: null });
-    });
-    
-    return query;
-  }),
-};
+    }),
+  },
+}));
 
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => mockSupabaseClient),

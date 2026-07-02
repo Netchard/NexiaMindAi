@@ -128,7 +128,8 @@ export class RetrievalService {
     try {
       // 1. Générer l'embedding de la requête
       const startEmbeddingTime = Date.now();
-      const queryEmbedding = await this.embeddingService.generateEmbedding(query);
+      const queryEmbeddingResult = await this.embeddingService.generateEmbedding(query);
+      const queryEmbedding = this.normalizeEmbedding(queryEmbeddingResult);
       const embeddingTime = Date.now() - startEmbeddingTime;
       
       logger.info('Embedding de la requête généré', {
@@ -136,13 +137,35 @@ export class RetrievalService {
         embeddingTime: `${embeddingTime}ms`,
       });
 
-      // 2. Construire la requête Supabase avec pgvector
+      // 2. Construire la requête Supabase en joignant les tables réelles
       const limit = filters.limit || 5;
+      const candidateLimit = Math.max(limit * 5, 20);
       let supabaseQuery = this.supabase
         .from('embeddings')
-        .select('chunks(*), similarity')
-        .order('vector <=> query_embedding', { ascending: false })
-        .limit(limit);
+        .select(`
+          id,
+          chunk_id,
+          vector,
+          chunks!inner(
+            id,
+            document_id,
+            content,
+            chunk_index,
+            token_count,
+            metadata,
+            documents!inner(
+              id,
+              file_path,
+              type,
+              source,
+              client_id,
+              language,
+              mime_type,
+              created_at
+            )
+          )
+        `)
+        .limit(candidateLimit);
 
       // 3. Appliquer les filtres
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
@@ -157,7 +180,7 @@ export class RetrievalService {
         });
         throw new RetrievalError(
           `Erreur de recherche: ${error.message || 'Erreur Supabase'}`,
-          error.status || 500,
+          (error as any).status || 500,
           'supabase_query_error',
           true
         );
@@ -173,30 +196,30 @@ export class RetrievalService {
         };
       }
 
-      const chunks: Chunk[] = data.map((item: any, index: number) => {
-        const chunkData = item.chunks;
-        return {
-          id: chunkData.id || `${index}`,
-          content: chunkData.content,
-          metadata: {
-            documentPath: chunkData.document_path || chunkData.documentPath,
-            source: chunkData.source || 'unknown',
-            documentType: chunkData.document_type || chunkData.documentType || 'text',
-            client: chunkData.client,
-            language: chunkData.language,
-            chunkIndex: chunkData.chunk_index || chunkData.chunkIndex || index,
-            totalChunks: chunkData.total_chunks || chunkData.totalChunks,
-            createdAt: chunkData.created_at || chunkData.createdAt,
-            tokenCount: chunkData.token_count || chunkData.tokenCount,
-            similarity: item.similarity || 0,
-          },
-        };
-      });
+      const scoredRows = data
+        .map((item: any, index: number) => {
+          const chunkData = item?.chunks;
+          const documentData = chunkData?.documents;
+          const similarity = this.getSimilarityScore(item, queryEmbedding);
+
+          if (filters.similarityThreshold != null && similarity < filters.similarityThreshold) {
+            return null;
+          }
+
+          return {
+            chunk: this.buildChunkFromRow(chunkData, documentData, item, index, similarity),
+            similarity,
+          };
+        })
+        .filter((row): row is { chunk: Chunk; similarity: number } => Boolean(row));
+
+      scoredRows.sort((a, b) => b.similarity - a.similarity);
+      const chunks: Chunk[] = scoredRows.slice(0, limit).map((row) => row.chunk);
 
       const searchTime = Date.now() - startTime;
-      const averageSimilarity = chunks.reduce((sum, chunk) => {
-        return sum + (chunk.metadata.similarity || 0);
-      }, 0) / chunks.length;
+      const averageSimilarity = chunks.length > 0
+        ? chunks.reduce((sum, chunk) => sum + (chunk.metadata.similarity || 0), 0) / chunks.length
+        : 0;
 
       logger.info('Recherche terminée avec succès', {
         queryLength: query.length,
@@ -209,7 +232,7 @@ export class RetrievalService {
         chunks,
         averageSimilarity: Math.round(averageSimilarity * 100) / 100,
         searchTime,
-        totalChunksScanned: count,
+        totalChunksScanned: count ?? undefined,
       };
     } catch (error: any) {
       const retrievalError = this.handleError(error);
@@ -245,11 +268,33 @@ export class RetrievalService {
 
     try {
       const limit = filters.limit || 5;
+      const candidateLimit = Math.max(limit * 5, 20);
       let supabaseQuery = this.supabase
         .from('embeddings')
-        .select('chunks(*), similarity')
-        .order('vector <=> query_embedding', { ascending: false })
-        .limit(limit);
+        .select(`
+          id,
+          chunk_id,
+          vector,
+          chunks!inner(
+            id,
+            document_id,
+            content,
+            chunk_index,
+            token_count,
+            metadata,
+            documents!inner(
+              id,
+              file_path,
+              type,
+              source,
+              client_id,
+              language,
+              mime_type,
+              created_at
+            )
+          )
+        `)
+        .limit(candidateLimit);
 
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
 
@@ -258,7 +303,7 @@ export class RetrievalService {
       if (error) {
         throw new RetrievalError(
           `Erreur de recherche: ${error.message || 'Erreur Supabase'}`,
-          error.status || 500,
+          (error as any).status || 500,
           'supabase_query_error',
           true
         );
@@ -273,41 +318,164 @@ export class RetrievalService {
         };
       }
 
-      const chunks: Chunk[] = data.map((item: any, index: number) => {
-        const chunkData = item.chunks;
-        return {
-          id: chunkData.id || `${index}`,
-          content: chunkData.content,
-          metadata: {
-            documentPath: chunkData.document_path || chunkData.documentPath,
-            source: chunkData.source || 'unknown',
-            documentType: chunkData.document_type || chunkData.documentType || 'text',
-            client: chunkData.client,
-            language: chunkData.language,
-            chunkIndex: chunkData.chunk_index || chunkData.chunkIndex || index,
-            totalChunks: chunkData.total_chunks || chunkData.totalChunks,
-            createdAt: chunkData.created_at || chunkData.createdAt,
-            tokenCount: chunkData.token_count || chunkData.tokenCount,
-            similarity: item.similarity || 0,
-          },
-        };
-      });
+      const scoredRows = data
+        .map((item: any, index: number) => {
+          const chunkData = item?.chunks;
+          const documentData = chunkData?.documents;
+          const similarity = this.getSimilarityScore(item, embedding);
+
+          if (filters.similarityThreshold != null && similarity < filters.similarityThreshold) {
+            return null;
+          }
+
+          return {
+            chunk: this.buildChunkFromRow(chunkData, documentData, item, index, similarity),
+            similarity,
+          };
+        })
+        .filter((row): row is { chunk: Chunk; similarity: number } => Boolean(row));
+
+      scoredRows.sort((a, b) => b.similarity - a.similarity);
+      const chunks: Chunk[] = scoredRows.slice(0, limit).map((row) => row.chunk);
 
       const searchTime = Date.now() - startTime;
-      const averageSimilarity = chunks.reduce((sum, chunk) => {
-        return sum + (chunk.metadata.similarity || 0);
-      }, 0) / chunks.length;
+      const averageSimilarity = chunks.length > 0
+        ? chunks.reduce((sum, chunk) => sum + (chunk.metadata.similarity || 0), 0) / chunks.length
+        : 0;
 
       return {
         chunks,
         averageSimilarity: Math.round(averageSimilarity * 100) / 100,
         searchTime,
-        totalChunksScanned: count,
+        totalChunksScanned: count ?? undefined,
       };
     } catch (error: any) {
       const retrievalError = this.handleError(error);
       throw retrievalError;
     }
+  }
+
+  /**
+   * Construire un chunk à partir du résultat de la requête Supabase
+   */
+  private buildChunkFromRow(
+    chunkData: any,
+    documentData: any,
+    item: any,
+    index: number,
+    similarity: number = 0
+  ): Chunk {
+    const metadata = chunkData?.metadata || {};
+    const documentPath = documentData?.file_path
+      || metadata.documentPath
+      || metadata.document_path
+      || chunkData?.document_path
+      || chunkData?.documentPath;
+    const source = documentData?.source
+      || metadata.source
+      || chunkData?.source
+      || 'unknown';
+    const documentType = documentData?.type
+      || metadata.documentType
+      || metadata.document_type
+      || chunkData?.document_type
+      || chunkData?.documentType
+      || 'text';
+    const contentType = metadata.contentType
+      || metadata.content_type
+      || chunkData?.content_type
+      || chunkData?.contentType
+      || 'text';
+    const client = metadata.client
+      || documentData?.client_id
+      || chunkData?.client
+      || 'default';
+    const language = documentData?.language
+      || metadata.language
+      || chunkData?.language
+      || 'unknown';
+    const chunkIndex = Number(chunkData?.chunk_index ?? metadata.chunkIndex ?? index);
+    const totalChunks = Number(chunkData?.total_chunks ?? metadata.totalChunks ?? 1);
+    const createdAt = chunkData?.created_at || documentData?.created_at || metadata.createdAt;
+    const tokenCount = Number(chunkData?.token_count ?? metadata.tokenCount ?? 0);
+    const documentId = chunkData?.document_id || documentData?.id || metadata.documentId;
+
+    return {
+      id: chunkData?.id || item?.chunk_id || `${index}`,
+      content: chunkData?.content || '',
+      metadata: {
+        documentPath,
+        source,
+        documentType,
+        contentType,
+        client,
+        language,
+        chunkIndex,
+        totalChunks,
+        createdAt,
+        tokenCount,
+        similarity,
+        documentId,
+      },
+    };
+  }
+
+  /**
+   * Extraire ou calculer la similarité à partir d'un résultat Supabase
+   */
+  private getSimilarityScore(item: any, embedding?: number[]): number {
+    if (typeof item?.similarity === 'number') {
+      return item.similarity;
+    }
+
+    return this.calculateSimilarity(embedding, item?.vector);
+  }
+
+  /**
+   * Normaliser un embedding retourné sous forme d'objet ou de tableau brut
+   */
+  private normalizeEmbedding(embedding: any): number[] {
+    if (Array.isArray(embedding)) {
+      return embedding;
+    }
+
+    if (embedding && Array.isArray(embedding.embedding)) {
+      return embedding.embedding;
+    }
+
+    return [];
+  }
+
+  /**
+   * Calculer la similarité cosinus entre deux embeddings
+   */
+  private calculateSimilarity(embeddingA?: number[], embeddingB?: number[]): number {
+    if (!Array.isArray(embeddingA) || !Array.isArray(embeddingB)) {
+      return 0;
+    }
+
+    const length = Math.min(embeddingA.length, embeddingB.length);
+    if (length === 0) {
+      return 0;
+    }
+
+    let dotProduct = 0;
+    let normA = 0;
+    let normB = 0;
+
+    for (let i = 0; i < length; i++) {
+      const a = embeddingA[i] || 0;
+      const b = embeddingB[i] || 0;
+      dotProduct += a * b;
+      normA += a * a;
+      normB += b * b;
+    }
+
+    if (normA === 0 || normB === 0) {
+      return 0;
+    }
+
+    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   }
 
   /**
@@ -320,31 +488,31 @@ export class RetrievalService {
     query: any,
     filters: RetrievalFilters
   ): any {
-    // Filtre par client
+    // Filtre par client (colonne réelle de la table documents)
     if (filters.client) {
       const clientValues = Array.isArray(filters.client) 
         ? filters.client 
         : [filters.client];
-      query = query.in('chunks.metadata->>client', clientValues);
+      query = query.in('documents.client_id', clientValues);
     }
 
-    // Filtre par type de document
+    // Filtre par type de document (colonne réelle de la table documents)
     if (filters.documentType) {
       const typeValues = Array.isArray(filters.documentType) 
         ? filters.documentType 
         : [filters.documentType];
-      query = query.in('chunks.metadata->>documentType', typeValues);
+      query = query.in('documents.type', typeValues);
     }
 
-    // Filtre par langage
+    // Filtre par langage (colonne réelle de la table documents)
     if (filters.language) {
       const langValues = Array.isArray(filters.language) 
         ? filters.language 
         : [filters.language];
-      query = query.in('chunks.metadata->>language', langValues);
+      query = query.in('documents.language', langValues);
     }
 
-    // Filtre par rôle
+    // Filtre par rôle (métadonnée JSON stockée dans chunks.metadata)
     if (filters.role) {
       const roleValues = Array.isArray(filters.role) 
         ? filters.role 
@@ -352,12 +520,12 @@ export class RetrievalService {
       query = query.in('chunks.metadata->>role', roleValues);
     }
 
-    // Filtre par source
+    // Filtre par source (colonne réelle de la table documents ou métadonnée JSON)
     if (filters.source) {
       const sourceValues = Array.isArray(filters.source) 
         ? filters.source 
         : [filters.source];
-      query = query.in('chunks.metadata->>source', sourceValues);
+      query = query.in('documents.source', sourceValues);
     }
 
     return query;
@@ -476,8 +644,8 @@ export class RetrievalService {
       
       let query = this.supabase
         .from('documents')
-        .select('id, path, name, metadata, created_at, updated_at')
-        .eq('source', sourceId);
+        .select('id, file_path, name, metadata, created_at, updated_at, source')
+        .or(`file_path.eq.${sourceId},metadata->>source.eq.${sourceId}`);
 
       // Filtrer par client si fourni
       if (options.client) {
@@ -518,7 +686,7 @@ export class RetrievalService {
           // Simulation pour l'instant
           logger.info(`Traitement du document: ${doc.name}`, {
             documentId: doc.id,
-            path: doc.path,
+            path: doc.file_path,
           });
           
           // Incrementer le compteur
@@ -547,7 +715,7 @@ export class RetrievalService {
       return { documentsProcessed, errors };
       
     } catch (error: any) {
-      logger.error(`Échec global de la re-indexation pour source: ${sourceId}`, {
+      logger.error(`Échec global de la re-indexation pour source: ${sourceId} - ${error.message}`, {
         error: error.message,
         stack: error.stack,
       });

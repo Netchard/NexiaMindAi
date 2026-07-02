@@ -495,7 +495,7 @@ export class TextChunker {
         };
 
         // Vérifier si le chunk est valide
-        if (isValidChunk(chunkContent, 10)) {
+        if (isValidChunk(chunkContent, 5)) {
           chunks.push({
             id: metadata.documentId 
               ? generateChunkId(metadata.documentId, i)

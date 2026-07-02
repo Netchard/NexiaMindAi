@@ -1,4 +1,4 @@
-import { format, transports, createLogger } from 'winston';
+import { format, createLogger, transports as winstonTransports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 const { combine, timestamp, printf, json, colorize, errors } = format;
 
@@ -19,13 +19,11 @@ const fileFormat = combine(
 );
 
 // Configuration des transports
-const transports = [
+const transportList = [
   // Console transport (pour développement)
-  new _transports.Console({
+  new winstonTransports.Console({
     level: 'info',
     format: consoleFormat,
-    handleExceptions: true,
-    json: false,
   }),
   
   // Fichier pour les erreurs
@@ -63,19 +61,20 @@ const transports = [
 const logger = createLogger({
   level: 'info',
   format: combine(timestamp(), errors({ stack: true }), json()),
-  transports,
+  transports: transportList,
   exitOnError: false,
 });
 
 // Ajouter un stream pour morgan (si utilisé)
-logger.stream = {
-  write: (message) => {
-    logger.info(message.trim());
-  },
-};
+// Désactivé pour éviter les erreurs de typage - à réactiver si nécessaire
+// logger.stream = {
+//   write: (message: string) => {
+//     logger.info(message.trim());
+//   },
+// };
 
 // Middleware pour Express/Next.js API Routes
-const loggerMiddleware = (req, res, next) => {
+const loggerMiddleware = (req: any, res: any, next: any) => {
   const start = Date.now();
   
   res.on('finish', () => {
@@ -95,22 +94,17 @@ const loggerMiddleware = (req, res, next) => {
 };
 
 // Middleware pour capturer les erreurs
-const errorLogger = (err, req, res, next) => {
+const errorLogger = (err: any, req: any, res: any, next: any) => {
   logger.error({
     type: 'API_ERROR',
-    error: err.message,
+    message: err.message,
     stack: err.stack,
     method: req.method,
     path: req.path,
-    status: res.statusCode,
+    status: err.status || 500,
   });
+  
   next(err);
 };
 
-// Exporter le logger et les middlewares
-// eslint-disable-next-line import/no-anonymous-default-export
-export  {
-  logger,
-  loggerMiddleware,
-  errorLogger,
-};
+export { logger, loggerMiddleware, errorLogger };

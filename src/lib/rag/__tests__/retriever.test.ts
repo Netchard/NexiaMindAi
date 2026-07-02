@@ -222,6 +222,55 @@ describe('RetrievalService', () => {
       expect(result.totalChunksScanned).toBe(100);
     });
 
+    it('devrait utiliser les colonnes et joins réels de la base pour construire les métadonnées', async () => {
+      const mockData = [
+        {
+          id: 'embedding-1',
+          chunk_id: 'chunk-1',
+          vector: [0.1, 0.2, 0.3, 0.4, 0.5],
+          chunks: {
+            id: 'chunk-1',
+            content: 'Contenu issu des colonnes réelles',
+            document_id: 'doc-1',
+            chunk_index: 0,
+            token_count: 42,
+            metadata: {
+              client: 'acme',
+              documentType: 'pdf',
+              source: 'upload',
+              role: 'analyst',
+            },
+            documents: {
+              id: 'doc-1',
+              file_path: 'uploads/acme/report.pdf',
+              type: 'pdf',
+              source: 'upload',
+              client_id: 'acme',
+              language: 'fr',
+              mime_type: 'application/pdf',
+            },
+          },
+          similarity: 0.95,
+        },
+      ];
+
+      const mockClient = createMockClientWithResult({
+        data: mockData,
+        error: null,
+        count: 1,
+      });
+
+      const service = new RetrievalService(mockClient);
+      const result = await service.retrieveRelevantChunks('test query');
+
+      expect(result.chunks).toHaveLength(1);
+      expect(result.chunks[0].metadata.documentPath).toBe('uploads/acme/report.pdf');
+      expect(result.chunks[0].metadata.documentType).toBe('pdf');
+      expect(result.chunks[0].metadata.client).toBe('acme');
+      expect(result.chunks[0].metadata.language).toBe('fr');
+      expect(result.chunks[0].metadata.source).toBe('upload');
+    });
+
     it('devrait gérer une requête vide', async () => {
       await expect(
         retrievalService.retrieveRelevantChunks('')
