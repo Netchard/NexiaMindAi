@@ -5,7 +5,7 @@ import { AuthService } from '@/lib/api/auth/service'
 import { logger } from '@/lib/logger'
 
 // Mock dependencies
-import { vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/lib/gitlab/indexer')
 vi.mock('@/lib/api/auth/service')
@@ -19,20 +19,20 @@ vi.mock('@/lib/logger', () => ({
 }))
 
 describe('GitLab Sync API Endpoint', () => {
-  let mockIndexer: jest.Mocked<GitLabIndexer>
-  let mockAuthService: jest.Mocked<typeof AuthService>
+  let mockIndexer: any
+  let mockAuthService: any
 
   beforeEach(() => {
     mockIndexer = {
-      indexProject: jest.fn()
-    } as unknown as jest.Mocked<GitLabIndexer>
+      indexProject: vi.fn()
+    }
 
     mockAuthService = {
-      isAdminByUserId: jest.fn()
-    } as unknown as jest.Mocked<typeof AuthService>
+      isAdminByUserId: vi.fn()
+    }
 
-    ;(GitLabIndexer as jest.Mock).mockImplementation(() => mockIndexer)
-    ;(AuthService as unknown as jest.Mock).mockImplementation(() => mockAuthService)
+    ;(GitLabIndexer as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => mockIndexer)
+    ;(AuthService as unknown as ReturnType<typeof vi.fn>).mockImplementation(() => mockAuthService)
 
     vi.clearAllMocks()
   })
@@ -168,7 +168,8 @@ describe('GitLab Sync API Endpoint', () => {
     it('should handle internal server errors', async () => {
       // Simulate an unexpected error
       const originalFetch = global.fetch
-      global.fetch = jest.fn().mockRejectedValue(new Error('Unexpected error'))
+      // Avoid using the jest namespace as a value in TS by assigning a real async function
+      global.fetch = () => Promise.reject(new Error('Unexpected error'))
 
       const request = createMockRequest(
         { projectId: '123' },
@@ -267,3 +268,22 @@ describe('GitLab Sync API Endpoint', () => {
     })
   })
 })
+
+
+function createMockRequest(
+  params: { projectId: string },
+  headers: { 'x-user-id': string; 'x-user-email': string }
+) {
+  // Construct a minimal Fetch API Request suitable for Next.js route handler tests
+  const url = `http://localhost/api/sources/gitlab/sync?projectId=${encodeURIComponent(
+    params.projectId
+  )}`
+
+  const req = new Request(url, {
+    method: 'POST',
+    headers: new Headers(headers as Record<string, string>),
+  })
+
+  return req
+}
+
