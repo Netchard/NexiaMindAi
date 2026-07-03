@@ -7,7 +7,7 @@
 
 export { GitLabClient } from './client'
 export { GitLabIndexer } from './indexer'
-export {
+export type {
   GitLabConfig,
   GitLabProject,
   GitLabFileInfo,

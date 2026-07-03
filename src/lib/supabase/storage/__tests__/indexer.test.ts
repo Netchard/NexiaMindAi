@@ -76,27 +76,32 @@ beforeEach(() => {
   (globalThis as any).mockLogger = mockLogger;
 });
 
-// Mock de Supabase client
-const mockInsertResult = { data: { id: 'mock-id' }, error: null };
+// Mock de Supabase client - doit être défini AVANT l'import du module
 const mockSupabaseClient = {
   from: vi.fn().mockImplementation((table: string) => ({
     insert: vi.fn().mockImplementation((data: any) => {
       if (table === 'chunks') {
-        return { select: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: { id: 'chunk-123' }, error: null }) };
+        return {
+          select: vi.fn().mockReturnThis(),
+          single: vi.fn().mockResolvedValue({ data: { id: 'chunk-123' }, error: null })
+        };
       }
       if (table === 'embeddings') {
-        return { insert: vi.fn().mockResolvedValue({ data: { id: 'embedding-456' }, error: null }) };
+        return {
+          insert: vi.fn().mockResolvedValue({ data: { id: 'embedding-456' }, error: null })
+        };
       }
       return { insert: vi.fn().mockResolvedValue({ data: { id: 'mock-id' }, error: null }) };
     }),
     select: vi.fn().mockReturnThis(),
-    single: vi.fn(),
+    single: vi.fn().mockResolvedValue({ data: null, error: null }),
+    eq: vi.fn().mockReturnThis(),
   })),
 };
 
+// Déplacer ce mock AVANT l'import du module
 vi.mock('../../server', () => ({
   createClient: vi.fn(() => mockSupabaseClient),
-  supabase: mockSupabaseClient,
 }));
 
 describe('SupabaseStorageIndexer', () => {

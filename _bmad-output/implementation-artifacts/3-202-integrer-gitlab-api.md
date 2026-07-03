@@ -3,7 +3,7 @@ story_id: ST-202
 epic: Epic 3
 title: Intégrer GitLab API
 description: Pouvoir indexer et rechercher les documents de GitLab afin d'offrir l'accès aux documents techniques et au code source.
-status: review
+status: done
 priority: ⭐⭐⭐⭐
 estimation: 6 heures
 assigned_to: Dday

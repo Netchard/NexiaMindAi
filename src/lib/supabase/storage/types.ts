@@ -38,7 +38,7 @@ export interface ExtractedText {
   /** Texte extrait */
   text: string;
   /** Type de contenu détecté */
-  contentType: 'text' | 'pdf' | 'image' | 'other';
+  contentType: 'text' | 'pdf' | 'image' | 'office' |'other';
   /** Langue détectée (optionnelle) */
   language?: string;
   /** Nombre de pages (pour PDF, optionnel) */
