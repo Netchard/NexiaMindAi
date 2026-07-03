@@ -72,9 +72,9 @@ development_status:
   epic-3: in-progress
   3-201-integrer-supabase-storage: done
   3-202-integrer-gitlab-api: done
-  3-203-integrer-nexia-ged-api: backlog
+  3-203-integrer-nexia-ged-api: rejected
   3-204-creer-le-script-d-indexation-complete: done
-  3-205-implementer-le-bouton-rafraichir-dans-l-ui: backlog
+  3-205-implementer-le-bouton-rafraichir-dans-l-ui: done
   epic-3-retrospective: optional
 
   # Epic 4: Frontend (Interface Utilisateur)
