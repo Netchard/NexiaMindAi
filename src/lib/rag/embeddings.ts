@@ -89,7 +89,7 @@ export class EmbeddingService {
   constructor(config: Partial<MistralConfig> = {}, cacheTTL: number = 3600000) {
     this.config = {
       apiKey: process.env.MISTRAL_API_KEY || config.apiKey || '',
-      baseUrl: config.baseUrl || 'https://api.mistral.ai/v1/',
+      baseUrl: config.baseUrl || process.env.MISTRAL_API_BASE_URL || 'https://api.mistral.ai/v1/',
       model: config.model || 'mistral-embed',
       timeout: config.timeout || 30000,
       maxRetries: config.maxRetries || 3,

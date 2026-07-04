@@ -93,7 +93,7 @@ export class ResponseGenerator {
   constructor(config: Partial<MistralChatConfig> = {}) {
     this.config = {
       apiKey: process.env.MISTRAL_API_KEY || config.apiKey || '',
-      baseUrl: config.baseUrl || 'https://api.mistral.ai/v1',
+      baseUrl: config.baseUrl || process.env.MISTRAL_API_BASE_URL || 'https://api.mistral.ai/v1',
       model: config.model || (process.env.MISTRAL_CHAT_MODEL || 'mistral-small'),
       timeout: config.timeout || 60000,
       maxRetries: config.maxRetries || 3,

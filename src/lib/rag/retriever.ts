@@ -80,10 +80,18 @@ export class RetrievalService {
     this.embeddingService = embeddingService || new EmbeddingService();
     
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-      logger.warn('SUPABASE_URL ou SUPABASE_ANON_KEY non configurés. Le retrieval ne pourra pas fonctionner.');
+      throw new RetrievalError(
+        'SUPABASE_URL ou SUPABASE_ANON_KEY non configurés. Impossible d\'effectuer des recherches.',
+        500,
+        'supabase_not_configured',
+        false
+      );
     }
     
-    logger.info('RetrievalService initialisé');
+    logger.info('RetrievalService initialisé', {
+      supabaseUrlDefined: !!process.env.SUPABASE_URL,
+      supabaseAnonKeyDefined: !!process.env.SUPABASE_ANON_KEY,
+    });
   }
 
   /**
