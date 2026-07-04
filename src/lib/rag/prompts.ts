@@ -133,7 +133,7 @@ export function buildPrompt(
   context: string,
   userRole: UserRole = 'user',
   additionalVars: Record<string, string> = {}
-): Array<{ role: string; content: string }> {
+): Array<{ role: 'system' | 'user' | 'assistant'; content: string }> {
   const prompts = getPromptsForRole(userRole);
   
   // Remplacer les variables dans le template système

@@ -396,8 +396,15 @@ export class TextChunker {
   }
 }
 
-// Instance singleton par défaut
-export const textChunker = new TextChunker();
+// Instance singleton par défaut (initialisation paresseuse)
+let textChunkerInstance: TextChunker | null = null;
+
+function getTextChunker(): TextChunker {
+  if (!textChunkerInstance) {
+    textChunkerInstance = new TextChunker();
+  }
+  return textChunkerInstance;
+}
 
 /**
  * Fonction principale de chunking (wrapper)
@@ -411,7 +418,7 @@ export async function chunkText(
   metadata: Partial<ChunkMetadata> = {},
   options?: ChunkingOptions
 ): Promise<ChunkingResult> {
-  return textChunker.chunkText(text, metadata, options);
+  return getTextChunker().chunkText(text, metadata, options);
 }
 
 /**
@@ -426,7 +433,7 @@ export async function chunkCode(
   language: CodeLanguage,
   metadata: Partial<ChunkMetadata> = {}
 ): Promise<ChunkingResult> {
-  return textChunker.chunkCode(code, language, metadata);
+  return getTextChunker().chunkCode(code, language, metadata);
 }
 
 /**
@@ -439,5 +446,8 @@ export async function chunkDocument(
   document: { content: string; metadata: Partial<ChunkMetadata> },
   options?: ChunkingOptions
 ): Promise<ChunkingResult> {
-  return textChunker.chunkDocument(document, options);
+  return getTextChunker().chunkDocument(document, options);
 }
+
+// Exporter l'instance pour la compatibilité (désapprouvé - utiliser les fonctions wrappers)
+export const textChunker = getTextChunker();

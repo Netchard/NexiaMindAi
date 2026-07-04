@@ -96,7 +96,12 @@ export class EmbeddingService {
     };
 
     if (!this.config.apiKey) {
-      logger.warn('MISTRAL_API_KEY non configuré. Les embeddings ne pourront pas être générés.');
+      throw new EmbeddingError(
+        'MISTRAL_API_KEY non configuré. Impossible de générer des embeddings.',
+        500,
+        'api_not_configured',
+        false
+      );
     }
 
     this.cache = new Map();
@@ -592,8 +597,15 @@ export class EmbeddingService {
   }
 }
 
-// Instance singleton par défaut
-export const embeddingService = new EmbeddingService();
+// Instance singleton par défaut (initialisation paresseuse)
+let embeddingServiceInstance: EmbeddingService | null = null;
+
+function getEmbeddingService(): EmbeddingService {
+  if (!embeddingServiceInstance) {
+    embeddingServiceInstance = new EmbeddingService();
+  }
+  return embeddingServiceInstance;
+}
 
 /**
  * Fonction principale de génération d'embedding (wrapper)
@@ -605,7 +617,7 @@ export async function generateEmbedding(
   text: string,
   options: { useCache?: boolean } = { useCache: true }
 ): Promise<EmbeddingResult> {
-  return embeddingService.generateEmbedding(text, options);
+  return getEmbeddingService().generateEmbedding(text, options);
 }
 
 /**
@@ -618,8 +630,11 @@ export async function generateEmbeddings(
   texts: string[],
   options: { useCache?: boolean; batchSize?: number } = { useCache: true, batchSize: 10 }
 ): Promise<BatchEmbeddingResult> {
-  return embeddingService.generateEmbeddings(texts, options);
+  return getEmbeddingService().generateEmbeddings(texts, options);
 }
+
+// Exporter l'instance pour la compatibilité (désapprouvé - utiliser les fonctions wrappers)
+export const embeddingService = getEmbeddingService();
 
 /**
  * Fonction pour embedder des chunks (wrapper)

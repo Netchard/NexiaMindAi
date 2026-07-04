@@ -730,8 +730,15 @@ export class RetrievalService {
   }
 }
 
-// Instance singleton par défaut
-export const retrievalService = new RetrievalService();
+// Instance singleton par défaut (initialisation paresseuse)
+let retrievalServiceInstance: RetrievalService | null = null;
+
+function getRetrievalService(): RetrievalService {
+  if (!retrievalServiceInstance) {
+    retrievalServiceInstance = new RetrievalService();
+  }
+  return retrievalServiceInstance;
+}
 
 /**
  * Fonction principale de retrieval (wrapper)
@@ -743,7 +750,7 @@ export async function retrieveRelevantChunks(
   query: string,
   filters: RetrievalFilters = {}
 ): Promise<RetrievalResult> {
-  return retrievalService.retrieveRelevantChunks(query, filters);
+  return getRetrievalService().retrieveRelevantChunks(query, filters);
 }
 
 /**
@@ -756,7 +763,7 @@ export async function retrieveSimilarChunks(
   embedding: number[],
   filters: RetrievalFilters = {}
 ): Promise<RetrievalResult> {
-  return retrievalService.retrieveSimilarChunks(embedding, filters);
+  return getRetrievalService().retrieveSimilarChunks(embedding, filters);
 }
 
 /**
@@ -769,5 +776,8 @@ export async function reindexSource(
   sourceId: string,
   options: { client?: string; documentType?: string; userId?: string } = {}
 ): Promise<{ documentsProcessed: number; errors: string[] }> {
-  return retrievalService.reindexSource(sourceId, options);
+  return getRetrievalService().reindexSource(sourceId, options);
 }
+
+// Exporter l'instance pour la compatibilité (désapprouvé - utiliser les fonctions wrappers)
+export const retrievalService = getRetrievalService();

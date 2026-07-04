@@ -109,7 +109,12 @@ export class ResponseGenerator {
     };
 
     if (!this.config.apiKey) {
-      logger.warn('MISTRAL_API_KEY non configuré. La génération ne pourra pas fonctionner.');
+      throw new GenerationError(
+        'MISTRAL_API_KEY non configuré. Impossible de générer des réponses.',
+        500,
+        'api_not_configured',
+        false
+      );
     }
 
     // Créer le client Axios
@@ -396,7 +401,7 @@ export class ResponseGenerator {
       return null;
     } catch (error) {
       logger.warn('Erreur de parsing du chunk SSE', { 
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         chunkType: typeof chunk 
       });
       return null;
@@ -506,8 +511,15 @@ export class ResponseGenerator {
   }
 }
 
-// Instance singleton par défaut
-export const responseGenerator = new ResponseGenerator();
+// Instance singleton par défaut (initialisation paresseuse)
+let responseGeneratorInstance: ResponseGenerator | null = null;
+
+function getResponseGenerator(): ResponseGenerator {
+  if (!responseGeneratorInstance) {
+    responseGeneratorInstance = new ResponseGenerator();
+  }
+  return responseGeneratorInstance;
+}
 
 /**
  * Fonction principale de génération de réponse (wrapper)
@@ -526,7 +538,7 @@ export async function generateResponse(
     maxTokens?: number;
   } = {}
 ): Promise<GenerationResult> {
-  return responseGenerator.generateResponse(query, contextChunks, options);
+  return getResponseGenerator().generateResponse(query, contextChunks, options);
 }
 
 /**
@@ -547,5 +559,8 @@ export async function streamResponse(
     onChunk?: (chunk: StreamingChunk) => void;
   } = {}
 ): Promise<void> {
-  return responseGenerator.streamResponse(query, contextChunks, options);
+  return getResponseGenerator().streamResponse(query, contextChunks, options);
 }
+
+// Exporter l'instance pour la compatibilité (désapprouvé - utiliser les fonctions wrappers)
+export const responseGenerator = getResponseGenerator();
