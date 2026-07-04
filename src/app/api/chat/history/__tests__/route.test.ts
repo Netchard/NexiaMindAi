@@ -28,12 +28,7 @@ const { mockSupabaseClient } = vi.hoisted(() => ({
         query._in = { col, vals };
         return query;
       });
-      
-      query.group = vi.fn((col: string) => {
-        query._group = col;
-        return query;
-      });
-      
+
       query.order = vi.fn((col: string, opts: any) => {
         query._order = { col, opts };
         return query;
@@ -68,12 +63,18 @@ const { mockSupabaseClient } = vi.hoisted(() => ({
           return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
         }
         
-        // Mock data for message counts
-        if (query._select?.includes('count()') && query._group === 'conversation_id') {
+        // Mock data for message counts (tallied client-side, no .group() — unsupported by @supabase/supabase-js)
+        if (query._select === 'conversation_id' && query._in) {
           const result = {
             data: [
-              { conversation_id: 'conv_1', count: 5 },
-              { conversation_id: 'conv_2', count: 3 },
+              { conversation_id: 'conv_1' },
+              { conversation_id: 'conv_1' },
+              { conversation_id: 'conv_1' },
+              { conversation_id: 'conv_1' },
+              { conversation_id: 'conv_1' },
+              { conversation_id: 'conv_2' },
+              { conversation_id: 'conv_2' },
+              { conversation_id: 'conv_2' },
             ],
             error: null,
           };
@@ -100,7 +101,7 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-import { GET, getChatHistory } from '../route';
+import { GET } from '../route';
 
 // Helper pour créer un mock de NextRequest
 function createMockRequest(url: string, headers: Record<string, string> = {}): any {
@@ -268,6 +269,22 @@ describe('GET /api/chat/history', () => {
         expect(conv).toHaveProperty('updatedAt');
         expect(conv).toHaveProperty('messageCount');
       }
+    });
+
+    it('devrait tallier correctement le nombre de messages par conversation (sans .group(), non supporté par le client Supabase JS)', async () => {
+      mockRequest = createMockRequest('http://localhost/api/chat/history', {
+        'x-user-id': 'user_123',
+        'x-user-email': 'test@example.com',
+      });
+
+      const response = await GET(mockRequest);
+      const data = await response.json();
+
+      const conv1 = data.conversations.find((c: any) => c.id === 'conv_1');
+      const conv2 = data.conversations.find((c: any) => c.id === 'conv_2');
+
+      expect(conv1.messageCount).toBe(5);
+      expect(conv2.messageCount).toBe(3);
     });
   });
 

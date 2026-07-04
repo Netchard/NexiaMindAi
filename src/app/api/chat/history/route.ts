@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     // 3. Récupération depuis Supabase
     let query = supabase
       .from('conversations')
-      .select('id, title, created_at, updated_at', { head: true, count: 'exact' })
+      .select('id, title, created_at, updated_at', { count: 'exact' })
       .eq('user_id', userId)
       .order('updated_at', { ascending: false });
 
@@ -126,9 +126,8 @@ export async function GET(request: NextRequest) {
     if (conversationIds.length > 0) {
       const { data: messages, error: msgError } = await supabase
         .from('messages')
-        .select('conversation_id, count()')
-        .in('conversation_id', conversationIds)
-        .group('conversation_id');
+        .select('conversation_id')
+        .in('conversation_id', conversationIds);
 
       if (msgError) {
         logger.warn('Échec de récupération du count de messages', {
@@ -136,8 +135,8 @@ export async function GET(request: NextRequest) {
           userId,
         });
       } else {
-        (messages as any[])?.forEach(m => {
-          messageCounts[m.conversation_id] = m.count || 0;
+        (messages as { conversation_id: string }[])?.forEach(m => {
+          messageCounts[m.conversation_id] = (messageCounts[m.conversation_id] || 0) + 1;
         });
       }
     }
@@ -178,35 +177,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Fonction utilitaire pour appeler l'endpoint depuis le frontend
-export async function getChatHistory(
-  conversationId?: string,
-  limit: number = 50,
-  offset: number = 0
-): Promise<HistoryResponse> {
-  // Note: In browser environment, use window.location
-  // In Node.js environment (tests), this will fail - that's expected
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
-  const url = new URL('/api/chat/history', baseUrl);
-  
-  if (conversationId) url.searchParams.set('conversationId', conversationId);
-  url.searchParams.set('limit', String(limit));
-  url.searchParams.set('offset', String(offset));
-
-  const response = await fetch(url.toString(), {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      `Erreur ${response.status}: ${errorData.error || response.statusText}`
-    );
-  }
-
-  return response.json();
 }

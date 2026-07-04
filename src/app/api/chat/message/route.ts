@@ -384,26 +384,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-// Fonction utilitaire pour appeler l'endpoint
-export async function sendChatMessage(
-  message: string,
-  conversationId?: string,
-  options?: ChatMessageRequest['options']
-): Promise<ChatMessageResponse> {
-  const response = await fetch('/api/chat/message', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, conversationId, options }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      `Erreur ${response.status}: ${errorData.error || response.statusText}`
-    );
-  }
-
-  return response.json();
-}
-
