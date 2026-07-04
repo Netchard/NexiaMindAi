@@ -119,6 +119,9 @@ export class EmbeddingService {
 
     logger.info('EmbeddingService initialisé', {
       model: this.config.model,
+      baseUrl: this.config.baseUrl,
+      apiKeyDefined: !!this.config.apiKey,
+      apiKeyLength: this.config.apiKey.length,
       cacheTTL: `${this.cacheTTL / 1000 / 60} minutes`,
     });
   }
@@ -323,9 +326,23 @@ export class EmbeddingService {
       });
       return response.data;
     } catch (error) {
-      logger.error('Échec de l\'appel API Mistral', {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorDetails = (error as any).response ? {
+        status: (error as any).response.status,
+        statusText: (error as any).response.statusText,
+        data: (error as any).response.data,
+      } : {};
+      
+      logger.error('Échec de l\'appel API Mistral Embeddings', {
         textLength: text.length,
-        error: error instanceof Error ? error.message : String(error),
+        error: errorMessage,
+        ...errorDetails,
+        config: {
+          baseUrl: this.config.baseUrl,
+          model: this.config.model,
+          apiKeyDefined: !!this.config.apiKey,
+          apiKeyLength: this.config.apiKey.length,
+        },
       });
       throw error;
     }

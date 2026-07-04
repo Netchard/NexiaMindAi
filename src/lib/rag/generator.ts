@@ -129,6 +129,9 @@ export class ResponseGenerator {
 
     logger.info('ResponseGenerator initialisé', {
       model: this.config.model,
+      baseUrl: this.config.baseUrl,
+      apiKeyDefined: !!this.config.apiKey,
+      apiKeyLength: this.config.apiKey.length,
       temperature: this.config.temperature,
       maxTokens: this.config.maxTokens,
     });
@@ -357,6 +360,30 @@ export class ResponseGenerator {
       const response = await this.client.post('/chat/completions', payload);
       return response.data;
     } catch (error: any) {
+      // Logger les détails de l'erreur avant de la transformer
+      const errorDetails = error.response ? {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+      } : {};
+      
+      logger.error('Échec de l\'appel API Mistral Chat', {
+        error: error.message,
+        ...errorDetails,
+        config: {
+          baseUrl: this.config.baseUrl,
+          model: this.config.model,
+          apiKeyDefined: !!this.config.apiKey,
+          apiKeyLength: this.config.apiKey.length,
+        },
+        payload: {
+          model: payload.model,
+          messageCount: payload.messages.length,
+          temperature: payload.temperature,
+          max_tokens: payload.max_tokens,
+        },
+      });
+      
       // Ne pas appeler handleApiError ici si l'erreur est déjà une GenerationError
       if (error instanceof GenerationError) {
         throw error;
