@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { supabase as supabaseServer } from '@/lib/supabase/server';
 import {
   retrieveRelevantChunks,
   generateResponse,
@@ -10,6 +9,9 @@ import {
   FormattedResponse,
 } from '@/lib/rag';
 import { Citation } from '@/lib/rag/formatter';
+
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack (même dans les API routes)
 
 // Types pour les requêtes et réponses
 interface ChatMessageRequest {
@@ -47,16 +49,8 @@ interface ChatMessageResponse {
   };
 }
 
-// Initialiser Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  logger.error('SUPABASE_URL and SUPABASE_ANON_KEY must be defined');
-  throw new Error('Supabase configuration missing');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Utilise le client serveur standardisé
+// La validation est déjà faite dans server.ts
 
 /**
  * Endpoint POST /api/chat/message
@@ -72,7 +66,7 @@ export async function POST(request: NextRequest) {
     const userEmail = request.headers.get('x-user-email');
 
     if (!userId) {
-      logger.warn('Accès non autorisé - utilisateur non authentifié', {
+      console.warn('Accès non autorisé - utilisateur non authentifié', {
         path: request.nextUrl.pathname,
         method: request.method,
       });
@@ -89,7 +83,7 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch (jsonError) {
-      logger.warn('Erreur de parsing JSON', {
+      console.warn('Erreur de parsing JSON', {
         error: (jsonError as Error).message,
         userId,
       });
@@ -101,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!body.message || typeof body.message !== 'string') {
-      logger.warn('Message manquant ou invalide', {
+      console.warn('Message manquant ou invalide', {
         message: body?.message,
         userId,
       });
@@ -113,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (body.message.trim() === '') {
-      logger.warn('Message vide', { userId });
+      console.warn('Message vide', { userId });
 
       return NextResponse.json(
         { error: 'Le message ne peut pas être vide' },
@@ -121,7 +115,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    logger.info(`Nouveau message de ${userId}`, {
+    console.info(`Nouveau message de ${userId}`, {
       messageLength: body.message.length,
       conversationId: body.conversationId || 'new',
     });
@@ -132,7 +126,7 @@ export async function POST(request: NextRequest) {
 
     if (conversationId) {
       // Récupérer l'historique de la conversation
-      const { data: messages, error: msgError } = await supabase
+      const { data: messages, error: msgError } = await supabaseServer
         .from('messages')
         .select('content, role')
         .eq('conversation_id', conversationId)
@@ -140,7 +134,7 @@ export async function POST(request: NextRequest) {
         .order('created_at', { ascending: true });
 
       if (msgError) {
-        logger.warn('Échec de récupération de l\'historique de la conversation', {
+        console.warn('Échec de récupération de l\'historique de la conversation', {
           error: msgError.message,
           conversationId,
           userId,
@@ -150,7 +144,7 @@ export async function POST(request: NextRequest) {
           .map((m: any) => `${m.role}: ${m.content}`)
           .join('\n');
 
-        logger.info('Contexte conversationnel récupéré', {
+        console.info('Contexte conversationnel récupéré', {
           messageCount: messages.length,
           conversationId,
         });
@@ -167,12 +161,12 @@ export async function POST(request: NextRequest) {
         limit: 5,
       });
 
-      logger.info('Chunks récupérés', {
+      console.info('Chunks récupérés', {
         chunkCount: retrievalResult.chunks.length,
         totalChunks: retrievalResult.totalChunks,
       });
     } catch (retrieveError) {
-      logger.error('Échec de la récupération des chunks', {
+      console.error('Échec de la récupération des chunks', {
         error: (retrieveError as Error).message,
         stack: (retrieveError as Error).stack,
         userId,
@@ -196,12 +190,12 @@ export async function POST(request: NextRequest) {
         maxTokens: body.options?.maxTokens,
       });
 
-      logger.info('Réponse générée', {
+      console.info('Réponse générée', {
         responseLength: generationResult.response.length,
         tokensUsed: generationResult.tokensUsed,
       });
     } catch (generateError) {
-      logger.error('Échec de la génération de la réponse', {
+      console.error('Échec de la génération de la réponse', {
         error: (generateError as Error).message,
         stack: (generateError as Error).stack,
         userId,
@@ -219,12 +213,12 @@ export async function POST(request: NextRequest) {
     try {
       formatted = await formatResponse(generationResult.response, retrievalResult.chunks);
 
-      logger.info('Réponse formatée', {
+      console.info('Réponse formatée', {
         citationCount: formatted.citationCount,
         formatTime: formatted.formatTime,
       });
     } catch (formatError) {
-      logger.error('Échec du formatage de la réponse', {
+      console.error('Échec du formatage de la réponse', {
         error: (formatError as Error).message,
         stack: (formatError as Error).stack,
         userId,
@@ -243,7 +237,7 @@ export async function POST(request: NextRequest) {
     const userMessageId = `msg_${Date.now()}_user_${userId}`;
 
     try {
-      const { error: userMsgError } = await supabase.from('messages').insert({
+      const { error: userMsgError } = await supabaseServer.from('messages').insert({
         id: userMessageId,
         conversation_id: newConversationId,
         role: 'user',
@@ -257,20 +251,20 @@ export async function POST(request: NextRequest) {
       });
 
       if (userMsgError) {
-        logger.error('Échec du stockage du message utilisateur', {
+        console.error('Échec du stockage du message utilisateur', {
           error: userMsgError.message,
           userId,
           conversationId: newConversationId,
         });
       } else {
-        logger.info('Message utilisateur stocké', {
+        console.info('Message utilisateur stocké', {
           messageId: userMessageId,
           conversationId: newConversationId,
           userId,
         });
       }
     } catch (storeUserError) {
-      logger.error('Échec du stockage du message utilisateur', {
+      console.error('Échec du stockage du message utilisateur', {
         error: (storeUserError as Error).message,
         userId,
         conversationId: newConversationId,
@@ -281,7 +275,7 @@ export async function POST(request: NextRequest) {
     const assistantMessageId = `msg_${Date.now() + 1}_assistant_${userId}`;
 
     try {
-      const { error: assistantMsgError } = await supabase.from('messages').insert({
+      const { error: assistantMsgError } = await supabaseServer.from('messages').insert({
         id: assistantMessageId,
         conversation_id: newConversationId,
         role: 'assistant',
@@ -297,13 +291,13 @@ export async function POST(request: NextRequest) {
       });
 
       if (assistantMsgError) {
-        logger.error('Échec du stockage du message assistant', {
+        console.error('Échec du stockage du message assistant', {
           error: assistantMsgError.message,
           userId,
           conversationId: newConversationId,
         });
       } else {
-        logger.info('Message assistant stocké', {
+        console.info('Message assistant stocké', {
           messageId: assistantMessageId,
           conversationId: newConversationId,
           citationCount: formatted.citationCount,
@@ -311,7 +305,7 @@ export async function POST(request: NextRequest) {
         });
       }
     } catch (storeAssistantError) {
-      logger.error('Échec du stockage du message assistant', {
+      console.error('Échec du stockage du message assistant', {
         error: (storeAssistantError as Error).message,
         userId,
         conversationId: newConversationId,
@@ -320,7 +314,7 @@ export async function POST(request: NextRequest) {
 
     // Mettre à jour la conversation (upsert pour créer ou mettre à jour)
     try {
-      const { error: convError } = await supabase
+      const { error: convError } = await supabaseServer
         .from('conversations')
         .upsert({
           id: newConversationId,
@@ -330,13 +324,13 @@ export async function POST(request: NextRequest) {
         });
 
       if (convError) {
-        logger.warn('Échec de la mise à jour de la conversation', {
+        console.warn('Échec de la mise à jour de la conversation', {
           error: convError.message,
           conversationId: newConversationId,
         });
       }
     } catch (convUpdateError) {
-      logger.warn('Échec de la mise à jour de la conversation', {
+      console.warn('Échec de la mise à jour de la conversation', {
         error: (convUpdateError as Error).message,
         conversationId: newConversationId,
       });
@@ -360,7 +354,7 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    logger.info('Requête chat traitée avec succès', {
+    console.info('Requête chat traitée avec succès', {
       conversationId: newConversationId,
       userId,
       processingTime: `${processingTime}ms`,
@@ -371,7 +365,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(response, { status: 200 });
 
   } catch (error: any) {
-    logger.error('Échec du traitement de la requête chat', {
+    console.error('Échec du traitement de la requête chat', {
       error: error.message,
       stack: error.stack,
       userId: request.headers.get('x-user-id') || 'unknown',

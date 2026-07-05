@@ -4,7 +4,8 @@
  * Fait partie de NexiaMind AI
  */
 
-import { logger } from '../logger';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 import {
   Chunk,
   ChunkMetadata,
@@ -102,10 +103,10 @@ async function importLangChain() {
       const importModule = new Function('specifier', 'return import(specifier);');
       const langchain = await importModule('langchain/text_splitter');
       RecursiveCharacterTextSplitter = langchain.RecursiveCharacterTextSplitter;
-      logger.info('LangChain RecursiveCharacterTextSplitter chargé avec succès');
+      console.info('LangChain RecursiveCharacterTextSplitter chargé avec succès');
     } catch (_error) {
       RecursiveCharacterTextSplitter = SimpleTextSplitter;
-      logger.warn('LangChain non disponible, utilisation du splitter local de secours');
+      console.warn('LangChain non disponible, utilisation du splitter local de secours');
     }
   }
   return RecursiveCharacterTextSplitter;
@@ -130,7 +131,7 @@ export class TextChunker {
       separators: options.separators ?? ['\n\n', '\n', '. ', ' ', '']
     };
 
-    logger.info('TextChunker initialisé', {
+    console.info('TextChunker initialisé', {
       chunkSize: this.options.chunkSize,
       chunkOverlap: this.options.chunkOverlap
     });
@@ -151,7 +152,7 @@ export class TextChunker {
     const startTime = Date.now();
     
     if (!text || text.trim().length === 0) {
-      logger.warn('Texte vide fourni au chunker');
+      console.warn('Texte vide fourni au chunker');
       return {
         chunks: [],
         totalChunks: 0,
@@ -161,7 +162,7 @@ export class TextChunker {
       };
     }
 
-    logger.info('Début du chunking', {
+    console.info('Début du chunking', {
       textLength: text.length,
       estimatedTokens: estimateTokenCount(text)
     });
@@ -224,7 +225,7 @@ export class TextChunker {
             metadata: chunkMetadata
           });
         } else {
-          logger.warn('Chunk trop petit généré, ignoré', {
+          console.warn('Chunk trop petit généré, ignoré', {
             chunkIndex: i,
             contentLength: chunkContent.length,
             tokenCount
@@ -235,7 +236,7 @@ export class TextChunker {
       const processingTime = Date.now() - startTime;
       const avgChunkSize = chunks.length > 0 ? totalTokens / chunks.length : 0;
 
-      logger.info('Chunking terminé avec succès', {
+      console.info('Chunking terminé avec succès', {
         totalChunks: chunks.length,
         totalTokens,
         avgChunkSize: Math.round(avgChunkSize),
@@ -251,7 +252,7 @@ export class TextChunker {
         processingTime
       };
     } catch (error: any) {
-      logger.error('Erreur lors du chunking', {
+      console.error('Erreur lors du chunking', {
         error: error.message,
         stack: error.stack,
         textLength: text.length

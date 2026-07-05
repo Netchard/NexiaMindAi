@@ -3,8 +3,9 @@
  * Formate les réponses IA avec les citations de sources
  */
 
-import { logger } from '../logger';
 import { Chunk } from './types';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 
 /**
  * Options de formatage pour les réponses
@@ -83,7 +84,7 @@ export class ResponseFormatter {
    */
   constructor(options: FormatOptions = {}) {
     this.options = options;
-    logger.info('ResponseFormatter initialisé');
+    console.info('ResponseFormatter initialisé');
   }
 
   /**
@@ -119,7 +120,7 @@ export class ResponseFormatter {
         rawResponse,
       };
     } catch (error: any) {
-      logger.error('Échec du formatage de la réponse', {
+      console.error('Échec du formatage de la réponse', {
         error: error.message,
         responseLength: rawResponse?.length || 0,
       });

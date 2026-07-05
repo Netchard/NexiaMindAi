@@ -1,9 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { supabase as supabaseServer } from '@/lib/supabase/server';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Utilise le client serveur standardisé
+// La validation est déjà faite dans server.ts
 
 /**
  * Service d'authentification
@@ -14,19 +14,19 @@ export class AuthService {
    * Connexion avec email et mot de passe
    */
   static async login(email: string, password: string) {
-    logger.info(`Tentative de login pour: ${email}`);
+    console.info(`Tentative de login pour: ${email}`);
     
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseServer.auth.signInWithPassword({
       email,
       password,
     });
     
     if (error) {
-      logger.error('Login échoué', { email, error: error.message });
+      console.error('Login échoué', { email, error: error.message });
       throw new Error('Invalid credentials');
     }
     
-    logger.info(`Login réussi pour: ${email}`);
+    console.info(`Login réussi pour: ${email}`);
     return { user: data.user, session: data.session };
   }
   
@@ -34,16 +34,16 @@ export class AuthService {
    * Déconnexion
    */
   static async logout(accessToken: string) {
-    logger.info('Tentative de logout');
+    console.info('Tentative de logout');
     
-    const { error } = await supabase.auth.signOut(accessToken);
+    const { error } = await supabaseServer.auth.signOut(accessToken);
     
     if (error) {
-      logger.error('Logout échoué', { error: error.message });
+      console.error('Logout échoué', { error: error.message });
       throw new Error('Failed to logout');
     }
     
-    logger.info('Logout réussi');
+    console.info('Logout réussi');
     return { success: true };
   }
   
@@ -51,16 +51,16 @@ export class AuthService {
    * Récupérer les informations de l'utilisateur
    */
   static async getUser(accessToken: string) {
-    logger.info('Récupération des informations utilisateur');
+    console.info('Récupération des informations utilisateur');
     
-    const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+    const { data: { user }, error } = await supabaseServer.auth.getUser(accessToken);
     
     if (error) {
-      logger.error('Récupération user échouée', { error: error.message });
+      console.error('Récupération user échouée', { error: error.message });
       throw new Error('Failed to get user');
     }
     
-    logger.info(`User info récupérée pour: ${user?.email}`);
+    console.info(`User info récupérée pour: ${user?.email}`);
     return { user };
   }
   
@@ -68,18 +68,18 @@ export class AuthService {
    * Rafraîchir le token
    */
   static async refreshToken(refreshToken: string) {
-    logger.info('Tentative de rafraîchissement du token');
+    console.info('Tentative de rafraîchissement du token');
     
-    const { data, error } = await supabase.auth.refreshSession({
+    const { data, error } = await supabaseServer.auth.refreshSession({
       refresh_token: refreshToken
     } as any);
     
     if (error) {
-      logger.error('Refresh token échoué', { error: error.message });
+      console.error('Refresh token échoué', { error: error.message });
       throw new Error('Failed to refresh token');
     }
     
-    logger.info('Token rafraîchi avec succès');
+    console.info('Token rafraîchi avec succès');
     return { session: data.session, user: data.user };
   }
   
@@ -88,7 +88,7 @@ export class AuthService {
    */
   static async isAdmin(accessToken: string): Promise<boolean> {
     try {
-      const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+      const { data: { user }, error } = await supabaseServer.auth.getUser(accessToken);
       
       if (error || !user) {
         return false;
@@ -96,7 +96,7 @@ export class AuthService {
       
       return await this.checkUserRole(user.id);
     } catch (error: any) {
-      logger.error('Erreur vérification rôle admin', { error: error.message });
+      console.error('Erreur vérification rôle admin', { error: error.message });
       return false;
     }
   }
@@ -107,10 +107,10 @@ export class AuthService {
    */
   static async isAdminByUserId(userId: string): Promise<boolean> {
     try {
-      logger.info(`Vérification rôle admin pour userId: ${userId}`);
+      console.info(`Vérification rôle admin pour userId: ${userId}`);
       return await this.checkUserRole(userId);
     } catch (error: any) {
-      logger.error('Erreur vérification rôle admin', { error: error.message });
+      console.error('Erreur vérification rôle admin', { error: error.message });
       return false;
     }
   }
@@ -123,14 +123,14 @@ export class AuthService {
   private static async checkUserRole(userId: string): Promise<boolean> {
     try {
       // Vérifier dans la table profiles si l'utilisateur a le rôle admin
-      const { data: profile, error } = await supabase
+      const { data: profile, error } = await supabaseServer
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single();
       
       if (error || !profile) {
-        logger.warn(`Profil non trouvé pour userId: ${userId}`);
+        console.warn(`Profil non trouvé pour userId: ${userId}`);
         return false;
       }
       
@@ -139,14 +139,14 @@ export class AuthService {
       const userRole = profile.role?.toLowerCase() || '';
       
       if (adminRoles.includes(userRole)) {
-        logger.info(`Utilisateur ${userId} a le rôle admin: ${profile.role}`);
+        console.info(`Utilisateur ${userId} a le rôle admin: ${profile.role}`);
         return true;
       }
       
-      logger.warn(`Utilisateur ${userId} n'a pas le rôle admin (rôle: ${profile.role})`);
+      console.warn(`Utilisateur ${userId} n'a pas le rôle admin (rôle: ${profile.role})`);
       return false;
     } catch (error: any) {
-      logger.error('Erreur vérification rôle utilisateur', {
+      console.error('Erreur vérification rôle utilisateur', {
         error: error.message,
         userId,
       });

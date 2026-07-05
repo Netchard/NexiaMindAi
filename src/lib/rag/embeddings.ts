@@ -4,8 +4,9 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { logger } from '../logger';
 import { Chunk } from './types';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 
 /**
  * Configuration de l'API Mistral
@@ -117,7 +118,7 @@ export class EmbeddingService {
       },
     });
 
-    logger.info('EmbeddingService initialisé', {
+    console.info('EmbeddingService initialisé', {
       model: this.config.model,
       baseUrl: this.config.baseUrl,
       apiKeyDefined: !!this.config.apiKey,
@@ -146,7 +147,7 @@ export class EmbeddingService {
     if (options.useCache) {
       const cached = this.getFromCache(text);
       if (cached) {
-        logger.info('Embedding récupéré depuis le cache', {
+        console.info('Embedding récupéré depuis le cache', {
           textLength: text.length,
           processingTime: `${Date.now() - startTime}ms`,
         });
@@ -163,7 +164,7 @@ export class EmbeddingService {
         this.addToCache(text, embedding);
       }
 
-      logger.info('Embedding généré avec succès', {
+      console.info('Embedding généré avec succès', {
         textLength: text.length,
         embeddingLength: embedding.embedding.length,
         processingTime: `${Date.now() - startTime}ms`,
@@ -172,7 +173,7 @@ export class EmbeddingService {
       return embedding;
     } catch (error: unknown) {
       const embeddingError = this.handleApiError(error);
-      logger.error(`Échec de la génération d\'embedding ${embeddingError.message}`, {
+      console.error(`Échec de la génération d\'embedding ${embeddingError.message}`, {
         error: embeddingError.message,
         errorType: embeddingError.errorType,
         textLength: text.length,
@@ -250,7 +251,7 @@ export class EmbeddingService {
           }
         } catch (error: unknown) {
           const embeddingError = this.handleApiError(error);
-          logger.error(`Échec de la génération batch d\'embeddings ${embeddingError.message}`, {
+          console.error(`Échec de la génération batch d\'embeddings ${embeddingError.message}`, {
             error: embeddingError.message,
             batchIndex: i / batchSize,
             batchSize: textsToProcess.length,
@@ -262,7 +263,7 @@ export class EmbeddingService {
 
     const processingTime = Date.now() - startTime;
 
-    logger.info('Batch d\'embeddings généré avec succès', {
+    console.info('Batch d\'embeddings généré avec succès', {
       totalTexts: validTexts.length,
       totalTokens,
       processingTime: `${processingTime}ms`,
@@ -314,26 +315,30 @@ export class EmbeddingService {
   private async callMistralApi(text: string): Promise<unknown> {
     const payload = {
       model: this.config.model,
-      texts: [text],
+      input: [text],
     };
 
     try {
-      logger.info('Appel 1 API Mistral');
+      console.info(`Appel API Mistral Embeddings`);
+      
       const response = await this.client.post('/embeddings', payload);
-      logger.info('Appel API Mistral réussi', {
+      console.info('Appel API Mistral réussi', {
         textLength: text.length,
         status: response.status,
       });
       return response.data;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorDetails = (error as any).response ? {
-        status: (error as any).response.status,
-        statusText: (error as any).response.statusText,
-        data: (error as any).response.data,
+      const errorResponse = typeof error === 'object' && error !== null && 'response' in error
+        ? (error as { response?: { status?: number; statusText?: string; data?: unknown } }).response
+        : undefined;
+      const errorDetails = errorResponse ? {
+        status: errorResponse.status,
+        statusText: errorResponse.statusText,
+        data: errorResponse.data,
       } : {};
-      
-      logger.error('Échec de l\'appel API Mistral Embeddings', {
+
+      console.error('Échec de l\'appel API Mistral Embeddings', {
         textLength: text.length,
         error: errorMessage,
         ...errorDetails,
@@ -360,15 +365,15 @@ export class EmbeddingService {
     };
 
     try {
-      logger.info(`Appel 2 API Mistral ${this.client.name}`);
+      console.info(`Appel API Mistral Embeddings (batch)`);
       const response = await this.client.post('/embeddings', payload);
-      logger.info('Appel API Mistral batch réussi', {
+      console.info('Appel API Mistral batch réussi', {
         batchSize: texts.length,
         status: response.status,
       });
       return response.data;
     } catch (error) {
-      logger.error('Échec de l\'appel API Mistral batch', {
+      console.error('Échec de l\'appel API Mistral batch', {
         batchSize: texts.length,
         error: error instanceof Error ? error.message : String(error),
       });
@@ -540,7 +545,7 @@ export class EmbeddingService {
       cachedAt: Date.now(),
     });
 
-    logger.info('Embedding mis en cache', {
+    console.info('Embedding mis en cache', {
       cacheKey: key.substring(0, 20) + '...',
       cacheSize: this.cache.size,
     });
@@ -593,7 +598,7 @@ export class EmbeddingService {
    */
   clearCache(): void {
     this.cache.clear();
-    logger.info('Cache des embeddings vidé');
+    console.info('Cache des embeddings vidé');
   }
 
   /**

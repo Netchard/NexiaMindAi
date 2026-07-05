@@ -1,4 +1,5 @@
-import { logger } from '@/lib/logger';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 
 /**
  * Validateur de requêtes
@@ -274,7 +275,7 @@ export class RequestValidator {
     const result = this.validate(schema, data);
     
     if (!result.isValid) {
-      logger.warn(`${context} validation échouée`, {
+      console.warn(`${context} validation échouée`, {
         errors: result.errors,
         data,
       });

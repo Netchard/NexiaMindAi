@@ -4,8 +4,9 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { logger } from '../logger';
 import { Chunk } from './types';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 import { UserRole, buildPrompt, PromptTemplate } from './prompts';
 
 /**
@@ -127,7 +128,7 @@ export class ResponseGenerator {
       },
     });
 
-    logger.info('ResponseGenerator initialisé', {
+    console.info('ResponseGenerator initialisé', {
       model: this.config.model,
       baseUrl: this.config.baseUrl,
       apiKeyDefined: !!this.config.apiKey,
@@ -192,7 +193,7 @@ export class ResponseGenerator {
 
       const generationTime = Date.now() - startTime;
 
-      logger.info('Réponse générée avec succès', {
+      console.info('Réponse générée avec succès', {
         queryLength: query.length,
         contextChunks: contextChunks.length,
         responseLength: response.choices[0].message.content.length,
@@ -210,7 +211,7 @@ export class ResponseGenerator {
       };
     } catch (error: any) {
       const generationError = this.handleApiError(error);
-      logger.error('Échec de la génération de réponse', {
+      console.error('Échec de la génération de réponse', {
         error: generationError.message,
         errorType: generationError.errorType,
         queryLength: query.length,
@@ -309,7 +310,7 @@ export class ResponseGenerator {
       }
     }
 
-    logger.info('Streaming terminé');
+    console.info('Streaming terminé');
   }
 
   /**
@@ -330,7 +331,7 @@ export class ResponseGenerator {
 
     const context = contextParts.join('\n\n');
     
-    logger.info('Contexte construit', {
+    console.info('Contexte construit', {
       chunksCount: chunks.length,
       contextLength: context.length,
     });
@@ -367,7 +368,7 @@ export class ResponseGenerator {
         data: error.response.data,
       } : {};
       
-      logger.error('Échec de l\'appel API Mistral Chat', {
+      console.error('Échec de l\'appel API Mistral Chat', {
         error: error.message,
         ...errorDetails,
         config: {
@@ -427,7 +428,7 @@ export class ResponseGenerator {
       }
       return null;
     } catch (error) {
-      logger.warn('Erreur de parsing du chunk SSE', { 
+      console.warn('Erreur de parsing du chunk SSE', { 
         error: error instanceof Error ? error.message : String(error),
         chunkType: typeof chunk 
       });
@@ -531,7 +532,7 @@ export class ResponseGenerator {
       this.client.defaults.headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
     
-    logger.info('Configuration du ResponseGenerator mise à jour', {
+    console.info('Configuration du ResponseGenerator mise à jour', {
       model: this.config.model,
       temperature: this.config.temperature,
     });

@@ -1,11 +1,15 @@
 /**
  * Service de Retrieval pour le pipeline RAG
  * Récupère les chunks pertinents via pgvector et Supabase
+ * 
+ * Utilise le client SERVEUR (pas le client navigateur)
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { logger } from '../logger';
+import { supabase as supabaseServer } from '../supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { Chunk, ChunkMetadata } from './types';
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack
 import { generateEmbedding, EmbeddingService } from './embeddings';
 
 /**
@@ -73,24 +77,17 @@ export class RetrievalService {
     supabaseClient?: SupabaseClient,
     embeddingService?: EmbeddingService
   ) {
-    this.supabase = supabaseClient || createClient(
-      process.env.SUPABASE_URL || '',
-      process.env.SUPABASE_ANON_KEY || ''
-    );
+    // Utilise le client serveur par défaut (déjà validé dans server.ts)
+    this.supabase = supabaseClient || supabaseServer;
     this.embeddingService = embeddingService || new EmbeddingService();
     
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-      throw new RetrievalError(
-        'SUPABASE_URL ou SUPABASE_ANON_KEY non configurés. Impossible d\'effectuer des recherches.',
-        500,
-        'supabase_not_configured',
-        false
-      );
-    }
+    // La validation du client Supabase est déjà faite dans server.ts
+    // La validation de l'embedding service est faite dans son constructeur
     
-    logger.info('RetrievalService initialisé', {
-      supabaseUrlDefined: !!process.env.SUPABASE_URL,
-      supabaseAnonKeyDefined: !!process.env.SUPABASE_ANON_KEY,
+    console.info('RetrievalService initialisé', {
+      supabaseUrlDefined: true,
+      supabaseAnonKeyDefined: true,
+      embeddingServiceConfigured: this.embeddingService.isConfigured(),
     });
   }
 
@@ -140,14 +137,25 @@ export class RetrievalService {
       const queryEmbedding = this.normalizeEmbedding(queryEmbeddingResult);
       const embeddingTime = Date.now() - startEmbeddingTime;
       
-      logger.info('Embedding de la requête généré', {
+      console.info('Embedding de la requête généré', {
         queryLength: query.length,
         embeddingTime: `${embeddingTime}ms`,
+        embeddingLength: queryEmbedding.length,
       });
 
-      // 2. Construire la requête Supabase en joignant les tables réelles
+      // 2. Construire la requête Supabase avec pgvector
       const limit = filters.limit || 5;
       const candidateLimit = Math.max(limit * 5, 20);
+
+      // ⭐ CORRIGÉ : Ajout de l'ordre vectoriel pour pgvector
+      // Mistral Embeddings (mistral-embed) génère des vecteurs de 1024 dimensions
+      // La syntaxe 'vector <=> query_embedding' ne fonctionne pas car Supabase JS
+      // ne connaît pas la variable TypeScript. On utilise JSON.stringify pour passer
+      // l'embedding comme valeur littérale, avec cast explicite vers vector(1024)
+      // Note: JSON.stringify gère correctement les arrays de numbers
+      const EMBEDDING_DIMENSION = 1024; // Dimension pour mistral-embed
+      const embeddingString = JSON.stringify(queryEmbedding);
+      
       let supabaseQuery = this.supabase
         .from('embeddings')
         .select(`
@@ -173,7 +181,16 @@ export class RetrievalService {
             )
           )
         `)
+        // ⭐ NOUVEAU : Tri par similarité vectorielle (distance cosinus, ascending=false = plus similaire en premier)
+        // Syntaxe: vector <=> '[...]'::vector(1024) - pgvector calcule la distance cosinus
+        .order(`vector <=> '${embeddingString}'::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
         .limit(candidateLimit);
+
+      console.info('Requête vectorielle construite', {
+        candidateLimit,
+        embeddingVectorLength: queryEmbedding.length,
+        embeddingDimension: EMBEDDING_DIMENSION,
+      });
 
       // 3. Appliquer les filtres
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
@@ -182,7 +199,7 @@ export class RetrievalService {
       const { data, error, count } = await supabaseQuery;
       
       if (error) {
-        logger.error('Erreur de requête Supabase', {
+        console.error('Erreur de requête Supabase', {
           error: error.message || 'Erreur Supabase',
           queryLength: query.length,
         });
@@ -229,7 +246,7 @@ export class RetrievalService {
         ? chunks.reduce((sum, chunk) => sum + (chunk.metadata.similarity || 0), 0) / chunks.length
         : 0;
 
-      logger.info('Recherche terminée avec succès', {
+      console.info('Recherche terminée avec succès', {
         queryLength: query.length,
         chunksFound: chunks.length,
         averageSimilarity,
@@ -244,7 +261,7 @@ export class RetrievalService {
       };
     } catch (error: any) {
       const retrievalError = this.handleError(error);
-      logger.error('Échec de la récupération des chunks', {
+      console.error('Échec de la récupération des chunks', {
         error: retrievalError.message,
         errorType: retrievalError.errorType,
         queryLength: query.length,
@@ -277,6 +294,12 @@ export class RetrievalService {
     try {
       const limit = filters.limit || 5;
       const candidateLimit = Math.max(limit * 5, 20);
+      
+      // ⭐ CORRIGÉ : Ajout de l'ordre vectoriel pour pgvector
+      // Mistral Embeddings (mistral-embed) génère des vecteurs de 1024 dimensions
+      const EMBEDDING_DIMENSION = 1024; // Dimension pour mistral-embed
+      const embeddingString = JSON.stringify(embedding);
+      
       let supabaseQuery = this.supabase
         .from('embeddings')
         .select(`
@@ -302,6 +325,8 @@ export class RetrievalService {
             )
           )
         `)
+        // ⭐ NOUVEAU : Tri par similarité vectorielle
+        .order(`vector <=> '${embeddingString}'::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
         .limit(candidateLimit);
 
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
@@ -639,7 +664,7 @@ export class RetrievalService {
     const errors: string[] = [];
     let documentsProcessed = 0;
 
-    logger.info(`Début de la re-indexation de la source: ${sourceId}`, {
+    console.info(`Début de la re-indexation de la source: ${sourceId}`, {
       client: options.client,
       documentType: options.documentType,
       userId: options.userId,
@@ -677,7 +702,7 @@ export class RetrievalService {
       }
 
       if (!documents || documents.length === 0) {
-        logger.warn(`Aucun document trouvé pour la source: ${sourceId}`);
+        console.warn(`Aucun document trouvé pour la source: ${sourceId}`);
         return { documentsProcessed: 0, errors: [] };
       }
 
@@ -692,7 +717,7 @@ export class RetrievalService {
           // 5. Stocker dans la table embeddings
           
           // Simulation pour l'instant
-          logger.info(`Traitement du document: ${doc.name}`, {
+          console.info(`Traitement du document: ${doc.name}`, {
             documentId: doc.id,
             path: doc.file_path,
           });
@@ -704,7 +729,7 @@ export class RetrievalService {
           await new Promise(resolve => setTimeout(resolve, 10));
           
         } catch (docError: any) {
-          logger.error(`Échec du traitement du document: ${doc.name}`, {
+          console.error(`Échec du traitement du document: ${doc.name}`, {
             error: docError.message,
             documentId: doc.id,
           });
@@ -714,7 +739,7 @@ export class RetrievalService {
 
       const processingTime = Date.now() - startTime;
       
-      logger.info(`Re-indexation terminée pour la source: ${sourceId}`, {
+      console.info(`Re-indexation terminée pour la source: ${sourceId}`, {
         documentsProcessed,
         errorsCount: errors.length,
         processingTime: `${processingTime}ms`,
@@ -723,7 +748,7 @@ export class RetrievalService {
       return { documentsProcessed, errors };
       
     } catch (error: any) {
-      logger.error(`Échec global de la re-indexation pour source: ${sourceId} - ${error.message}`, {
+      console.error(`Échec global de la re-indexation pour source: ${sourceId} - ${error.message}`, {
         error: error.message,
         stack: error.stack,
       });
