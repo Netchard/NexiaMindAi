@@ -40,11 +40,24 @@ async function parseErrorMessage(response: Response): Promise<string> {
   return errorData.error || response.statusText
 }
 
-export async function sendMessage(message: string, conversationId?: string): Promise<SendMessageResponse> {
+export async function sendMessage(
+  message: string, 
+  conversationId?: string,
+  filters?: {
+    theme?: string;
+    documentFormat?: string;
+    role?: string;
+    source?: string;
+  }
+): Promise<SendMessageResponse> {
   const response = await fetch('/api/chat/message', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, conversationId }),
+    body: JSON.stringify({ 
+      message, 
+      conversationId,
+      filters: filters && Object.keys(filters).length > 0 ? filters : undefined,
+    }),
   })
 
   if (!response.ok) {
@@ -55,11 +68,9 @@ export async function sendMessage(message: string, conversationId?: string): Pro
 }
 
 export async function getHistory(limit = 50, offset = 0): Promise<HistoryResponse> {
-  const url = new URL('/api/chat/history', window.location.origin)
-  url.searchParams.set('limit', String(limit))
-  url.searchParams.set('offset', String(offset))
-
-  const response = await fetch(url.toString())
+  const url = `/api/chat/history?limit=${limit}&offset=${offset}`
+  
+  const response = await fetch(url)
 
   if (!response.ok) {
     throw new Error(await parseErrorMessage(response))

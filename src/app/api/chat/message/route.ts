@@ -19,6 +19,13 @@ interface ChatMessageRequest {
   message: string;
   /** ID de la conversation (optionnel pour nouvelle conversation) */
   conversationId?: string;
+  /** Filtres de recherche pour le retrieval */
+  filters?: {
+    theme?: string;
+    documentFormat?: string;
+    role?: string;
+    source?: string;
+  };
   /** Options supplémentaires */
   options?: {
     temperature?: number;
@@ -152,18 +159,28 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Appel retrieveRelevantChunks()
+    // N'accepter que les clés de filtre documentées (theme/documentFormat/role/source) —
+    // ne jamais transmettre tel quel un body.filters non validé au service de retrieval.
+    const ALLOWED_FILTER_KEYS = ['theme', 'documentFormat', 'role', 'source'] as const;
+    const sanitizedFilters = body.filters
+      ? Object.fromEntries(
+          ALLOWED_FILTER_KEYS
+            .filter((key) => body.filters![key] !== undefined)
+            .map((key) => [key, body.filters![key]])
+        )
+      : {};
+
     let retrievalResult: RetrievalResult;
 
     try {
       retrievalResult = await retrieveRelevantChunks(body.message, {
-        client: 'nexia',
-        userId,
-        limit: 5,
+        ...sanitizedFilters,
+        limit: 8,
       });
 
       console.info('Chunks récupérés', {
         chunkCount: retrievalResult.chunks.length,
-        totalChunks: retrievalResult.totalChunks,
+        totalChunksScanned: retrievalResult.totalChunksScanned,
       });
     } catch (retrieveError) {
       console.error('Échec de la récupération des chunks', {
@@ -230,8 +247,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 7. Stockage du message assistant dans la base
+    // 7. Créer/mettre à jour la conversation EN PREMIER (nécessaire pour la clé étrangère)
     const newConversationId = conversationId || `conv_${Date.now()}_${userId}`;
+
+    // Créer ou mettre à jour la conversation AVANT d'insérer les messages
+    // `created_at` n'est fourni que pour une conversation réellement nouvelle —
+    // sinon l'upsert écraserait la date de création d'origine à chaque message.
+    try {
+      const { error: convError } = await supabaseServer
+        .from('conversations')
+        .upsert({
+          id: newConversationId,
+          user_id: userId,
+          title: body.message.substring(0, 100),
+          ...(conversationId ? {} : { created_at: new Date().toISOString() }),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (convError) {
+        console.warn('Échec de la mise à jour de la conversation', {
+          error: convError.message,
+          conversationId: newConversationId,
+        });
+      }
+    } catch (convUpdateError) {
+      console.warn('Échec de la mise à jour de la conversation', {
+        error: (convUpdateError as Error).message,
+        conversationId: newConversationId,
+      });
+    }
 
     // Stocker le message utilisateur
     const userMessageId = `msg_${Date.now()}_user_${userId}`;
@@ -243,6 +287,7 @@ export async function POST(request: NextRequest) {
         role: 'user',
         content: body.message,
         user_id: userId,
+        created_at: new Date().toISOString(),
         metadata: {
           model: body.options?.model || 'default',
           source: 'api',
@@ -281,6 +326,7 @@ export async function POST(request: NextRequest) {
         role: 'assistant',
         content: formatted.formattedContent || generationResult.response,
         user_id: userId,
+        created_at: new Date().toISOString(),
         metadata: {
           model: body.options?.model || 'default',
           citations: formatted.citations,
@@ -308,30 +354,6 @@ export async function POST(request: NextRequest) {
       console.error('Échec du stockage du message assistant', {
         error: (storeAssistantError as Error).message,
         userId,
-        conversationId: newConversationId,
-      });
-    }
-
-    // Mettre à jour la conversation (upsert pour créer ou mettre à jour)
-    try {
-      const { error: convError } = await supabaseServer
-        .from('conversations')
-        .upsert({
-          id: newConversationId,
-          user_id: userId,
-          title: body.message.substring(0, 100),
-          updated_at: new Date().toISOString(),
-        });
-
-      if (convError) {
-        console.warn('Échec de la mise à jour de la conversation', {
-          error: convError.message,
-          conversationId: newConversationId,
-        });
-      }
-    } catch (convUpdateError) {
-      console.warn('Échec de la mise à jour de la conversation', {
-        error: (convUpdateError as Error).message,
         conversationId: newConversationId,
       });
     }

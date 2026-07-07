@@ -1,9 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { ChatInput, ChatMessageList, HistoryMenu } from '@/components/Chat'
 import type { ChatMessageData, ConversationSummary } from '@/components/Chat'
-import { getHistory, sendMessage } from '@/components/Chat/api'
+import { sendMessage, getHistory } from '@/components/Chat/api'
+import { FilterBar } from '@/components/Filters'
+import { getFilterValues, convertToFilterOptions, FiltersError } from '@/lib/api/filters'
+import { FilterState, DEFAULT_FILTERS } from '@/types/filters'
 
 /**
  * Chat Page (ST-303)
@@ -15,8 +18,48 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<ConversationSummary[]>([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // État des filtres - persistant par conversation
+  const [filterState, setFilterState] = useState<FilterState>(DEFAULT_FILTERS)
+  
+  // État de chargement des valeurs de filtre
+  const [filtersLoading, setFiltersLoading] = useState<boolean>(true)
+  const [filtersError, setFiltersError] = useState<string | null>(null)
+  
+  // Valeurs possibles pour les filtres
+  const [filterOptions, setFilterOptions] = useState<ReturnType<typeof convertToFilterOptions>>({
+    themes: [],
+    documentFormats: [],
+  })
 
+  // Charger les valeurs possibles des filtres au montage
   useEffect(() => {
+    const loadFilterValues = async () => {
+      try {
+        setFiltersLoading(true)
+        setFiltersError(null)
+        
+        const filters = await getFilterValues()
+        setFilterOptions(convertToFilterOptions(filters))
+      } catch (error) {
+        const message = error instanceof FiltersError 
+          ? error.message 
+          : 'Échec du chargement des valeurs de filtre'
+        setFiltersError(message)
+        // Continuer avec des options vides pour ne pas bloquer l'interface
+        setFilterOptions({
+          themes: [],
+          documentFormats: [],
+        })
+      } finally {
+        setFiltersLoading(false)
+      }
+    }
+    
+    // Charger les valeurs de filtre
+    loadFilterValues()
+    
+    // Charger l'historique des conversations
     getHistory()
       .then((history) => {
         setConversations(
@@ -28,6 +71,19 @@ export default function ChatPage() {
       })
   }, [])
 
+  // Gestion du changement de filtre
+  const handleFilterChange = useCallback((filterType: keyof FilterState, value: string) => {
+    setFilterState(prev => ({
+      ...prev,
+      [filterType]: value,
+    }))
+  }, [])
+
+  // Gestion de la réinitialisation des filtres
+  const handleResetFilters = useCallback(() => {
+    setFilterState(DEFAULT_FILTERS)
+  }, [])
+
   const handleSend = async (content: string) => {
     setError(null)
     const userMessage: ChatMessageData = { id: `local_${Date.now()}`, role: 'user', content }
@@ -35,12 +91,26 @@ export default function ChatPage() {
     setIsSending(true)
 
     try {
-      const response = await sendMessage(content, conversationId)
+      // Les filtres actifs s'appliquent à chaque envoi, y compris le tout premier
+      // message d'une nouvelle conversation (revue de code ST-304, décision 2) —
+      // ils ne sont jamais jetés silencieusement.
+      const activeFilters: Partial<FilterState> = Object.fromEntries(
+        Object.entries(filterState).filter(([, value]) => value !== '')
+      )
+      const filtersToUse = Object.keys(activeFilters).length > 0 ? activeFilters : undefined
+
+      const response = await sendMessage(content, conversationId, filtersToUse)
+
+      // Mettre à jour la conversation
       setConversationId(response.conversationId)
+
       setMessages((prev) => [
         ...prev,
         { id: response.id, role: 'assistant', content: response.content },
       ])
+
+      // Les filtres sont conservés après l'envoi, nouvelle conversation ou non (AC #6)
+
     } catch {
       setMessages((prev) =>
         prev.map((m) => (m.id === userMessage.id ? { ...m, failed: true } : m))
@@ -56,30 +126,61 @@ export default function ChatPage() {
     // (GET /api/chat/history ne renvoie que des résumés) — on reprend la
     // conversation (les nouveaux messages s'y rattachent) sans pouvoir réafficher
     // son historique de messages.
+    
+    // Conserver les filtres quand on change de conversation existante
+    // (ne pas réinitialiser comme spécifié dans Task 3)
     setConversationId(selectedId)
     setMessages([])
     setError(null)
+    // Les filtres restent inchangés
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col rounded-chat-lg border border-chat-border bg-chat-surface-card dark:border-chat-border-dark dark:bg-chat-surface-card-dark">
-      <div className="flex items-center justify-between border-b border-chat-border px-4 py-3 dark:border-chat-border-dark">
-        <span className="font-semibold text-chat-ink dark:text-chat-ink-dark">NexiaMind AI</span>
-        <HistoryMenu conversations={conversations} onSelect={handleSelectConversation} />
-      </div>
+    <div className="flex justify-center py-1">
+      <div className="flex h-[calc(100vh-9.5rem)] w-full max-w-[880px] flex-col overflow-hidden rounded-chat-xl border border-chat-border-panel bg-chat-surface-panel shadow-[0_30px_80px_-40px_rgba(0,0,0,.8)]">
+        <div className="flex h-[60px] flex-none items-center justify-between border-b border-chat-border-header px-5">
+          <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+          <HistoryMenu conversations={conversations} onSelect={handleSelectConversation} />
+        </div>
 
-      <ChatMessageList messages={messages} isTyping={isSending} onSuggestionClick={handleSend} />
+        <ChatMessageList messages={messages} isTyping={isSending} onSuggestionClick={handleSend} />
 
-      <div className="border-t border-chat-border p-4 dark:border-chat-border-dark">
-        {error && (
-          <div
-            role="alert"
-            className="mb-3 rounded-chat-sm border border-chat-error-border bg-chat-error-surface px-3.5 py-2.5 text-sm text-chat-error dark:border-transparent dark:bg-chat-error-surface-dark dark:text-chat-error-dark"
-          >
-            {error}
-          </div>
-        )}
-        <ChatInput onSend={handleSend} disabled={isSending} />
+        {/* Filtres de recherche - au-dessus de ChatInput comme spécifié dans ST-304 */}
+        <div className="flex-none border-t border-chat-border-header p-4">
+          {/* Filtres */}
+          {filtersError ? (
+            <div
+              role="alert"
+              className="mb-3 rounded-chat-md border border-chat-error-border bg-chat-error-surface px-3.5 py-2.5 text-sm text-chat-error-soft"
+            >
+              {filtersError}
+            </div>
+          ) : (
+            <FilterBar
+              filterState={filterState}
+              filterOptions={filterOptions}
+              onFilterChange={handleFilterChange}
+              onReset={handleResetFilters}
+              isLoading={filtersLoading}
+            />
+          )}
+
+          {/* Espacement entre filtres et input */}
+          <div className="mt-4" />
+
+          {error && (
+            <div
+              role="alert"
+              className="mb-3 rounded-chat-md border border-chat-error-border bg-chat-error-surface px-3.5 py-2.5 text-sm text-chat-error-soft"
+            >
+              {error}
+            </div>
+          )}
+          <ChatInput onSend={handleSend} disabled={isSending} />
+          <p className="mt-3 text-center text-[11.5px] text-chat-ink-faint">
+            NexiaMind peut faire des erreurs. Vérifiez les sources citées.
+          </p>
+        </div>
       </div>
     </div>
   )

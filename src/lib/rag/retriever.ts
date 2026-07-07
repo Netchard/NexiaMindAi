@@ -7,7 +7,7 @@
 
 import { supabase as supabaseServer } from '../supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { Chunk, ChunkMetadata } from './types';
+import { Chunk } from './types';
 // Utilise console au lieu de logger (winston) pour éviter les problèmes
 // avec fs dans Next.js 16 + Turbopack
 import { generateEmbedding, EmbeddingService } from './embeddings';
@@ -16,12 +16,10 @@ import { generateEmbedding, EmbeddingService } from './embeddings';
  * Options de filtre pour la recherche
  */
 export interface RetrievalFilters {
-  /** Filtre par client */
-  client?: string | string[];
-  /** Filtre par type de document */
-  documentType?: string | string[];
-  /** Filtre par langage */
-  language?: string | string[];
+  /** Filtre par thème */
+  theme?: string | string[];
+  /** Filtre par format de document */
+  documentFormat?: string | string[];
   /** Filtre par rôle */
   role?: string | string[];
   /** Filtre par source */
@@ -155,7 +153,9 @@ export class RetrievalService {
       // Note: JSON.stringify gère correctement les arrays de numbers
       const EMBEDDING_DIMENSION = 1024; // Dimension pour mistral-embed
       const embeddingString = JSON.stringify(queryEmbedding);
+      //const embeddingString = `{${queryEmbedding.join(',')}}`;
       
+      /*
       let supabaseQuery = this.supabase
         .from('embeddings')
         .select(`
@@ -171,6 +171,7 @@ export class RetrievalService {
             metadata,
             documents!inner(
               id,
+              name,
               file_path,
               type,
               source,
@@ -183,20 +184,30 @@ export class RetrievalService {
         `)
         // ⭐ NOUVEAU : Tri par similarité vectorielle (distance cosinus, ascending=false = plus similaire en premier)
         // Syntaxe: vector <=> '[...]'::vector(1024) - pgvector calcule la distance cosinus
-        .order(`vector <=> '${embeddingString}'::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
+        .order(`vector <=> ${embeddingString}::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
         .limit(candidateLimit);
+            
 
+      
       console.info('Requête vectorielle construite', {
         candidateLimit,
         embeddingVectorLength: queryEmbedding.length,
         embeddingDimension: EMBEDDING_DIMENSION,
       });
+      
 
       // 3. Appliquer les filtres
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
 
       // 4. Exécuter la requête
       const { data, error, count } = await supabaseQuery;
+      */
+
+      const { data, error } = await this.supabase.rpc('match_chunks', {
+        query_embedding: queryEmbedding, // tableau de nombres, PAS une string formatée
+        match_count: EMBEDDING_DIMENSION
+      });
+      
       
       if (error) {
         console.error('Erreur de requête Supabase', {
@@ -223,9 +234,34 @@ export class RetrievalService {
 
       const scoredRows = data
         .map((item: any, index: number) => {
-          const chunkData = item?.chunks;
-          const documentData = chunkData?.documents;
-          const similarity = this.getSimilarityScore(item, queryEmbedding);
+          // La RPC match_chunks retourne une structure PLATE, pas imbriquée
+          // item.chunk_content, item.chunk_index, etc. sont au niveau racine
+          const chunkData = {
+            id: item.chunk_id,
+            content: item.chunk_content,
+            chunk_index: item.chunk_index,
+            token_count: item.token_count,
+            metadata: item.chunk_metadata,
+            document_id: item.document_id,
+          };
+
+          const documentData = {
+            id: item.document_id,
+            name: item.document_name,
+            file_path: item.file_path,
+            type: item.doc_type,
+            source: item.source,
+            client_id: item.client_id,
+            language: item.language,
+            mime_type: item.mime_type,
+            created_at: item.created_at,
+          };
+
+          if (!this.matchesFilters(chunkData, documentData, filters)) {
+            return null;
+          }
+
+          const similarity = item.similarity || this.getSimilarityScore(item, queryEmbedding);
 
           if (filters.similarityThreshold != null && similarity < filters.similarityThreshold) {
             return null;
@@ -257,7 +293,7 @@ export class RetrievalService {
         chunks,
         averageSimilarity: Math.round(averageSimilarity * 100) / 100,
         searchTime,
-        totalChunksScanned: count ?? undefined,
+        //totalChunksScanned: count ?? undefined,
       };
     } catch (error: any) {
       const retrievalError = this.handleError(error);
@@ -299,7 +335,8 @@ export class RetrievalService {
       // Mistral Embeddings (mistral-embed) génère des vecteurs de 1024 dimensions
       const EMBEDDING_DIMENSION = 1024; // Dimension pour mistral-embed
       const embeddingString = JSON.stringify(embedding);
-      
+      //const embeddingString = `{${embedding.join(',')}}`;
+      /*
       let supabaseQuery = this.supabase
         .from('embeddings')
         .select(`
@@ -315,6 +352,7 @@ export class RetrievalService {
             metadata,
             documents!inner(
               id,
+              name,
               file_path,
               type,
               source,
@@ -324,14 +362,73 @@ export class RetrievalService {
               created_at
             )
           )
-        `)
-        // ⭐ NOUVEAU : Tri par similarité vectorielle
-        .order(`vector <=> '${embeddingString}'::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
+        `)      
+        .order(`vector <=> ${embeddingString}::vector(${EMBEDDING_DIMENSION})`, { ascending: false })
         .limit(candidateLimit);
 
       supabaseQuery = this.applyFilters(supabaseQuery, filters);
-
       const { data, error, count } = await supabaseQuery;
+      */
+
+
+      // Test par fonciton rpc
+      /*
+      create or replace function match_chunks(
+        query_embedding vector(1024),
+        match_count int
+      )
+      returns table (
+        id uuid,
+        chunk_id uuid,
+        similarity float,
+        chunk_content text,
+        chunk_index int,
+        token_count int,
+        chunk_metadata jsonb,
+        document_id uuid,
+        document_name text,
+        file_path text,
+        doc_type text,
+        source text,
+        client_id text,
+        language text,
+        mime_type text,
+        created_at timestamptz
+      )
+      language sql stable
+      as $$
+        select
+          e.id,
+          e.chunk_id,
+          1 - (e.vector <=> query_embedding) as similarity,
+          c.content as chunk_content,
+          c.chunk_index,
+          c.token_count,
+          c.metadata as chunk_metadata,
+          d.id as document_id,
+          d.name as document_name,
+          d.file_path,
+          d.type as doc_type,
+          d.source,
+          d.client_id,
+          d.language,
+          d.mime_type,
+          d.created_at
+        from embeddings e
+        inner join chunks c on c.id = e.chunk_id
+        inner join documents d on d.id = c.document_id
+        order by e.vector <=> query_embedding
+        limit match_count;
+      $$;
+      +>  Créée dans éditeur sql de supabase
+      */
+     
+      const { data, error } = await this.supabase.rpc('match_chunks', {
+        query_embedding: embedding, // tableau de nombres, PAS une string formatée
+        match_count: EMBEDDING_DIMENSION
+      });
+
+      
       
       if (error) {
         throw new RetrievalError(
@@ -353,9 +450,29 @@ export class RetrievalService {
 
       const scoredRows = data
         .map((item: any, index: number) => {
-          const chunkData = item?.chunks;
-          const documentData = chunkData?.documents;
-          const similarity = this.getSimilarityScore(item, embedding);
+          // La RPC retourne une structure PLATE, pas imbriquée
+          const chunkData = {
+            id: item.chunk_id,
+            content: item.chunk_content,
+            chunk_index: item.chunk_index,
+            token_count: item.token_count,
+            metadata: item.chunk_metadata,
+            document_id: item.document_id,
+          };
+          
+          const documentData = {
+            id: item.document_id,
+            name: item.document_name,
+            file_path: item.file_path,
+            type: item.doc_type,
+            source: item.source,
+            client_id: item.client_id,
+            language: item.language,
+            mime_type: item.mime_type,
+            created_at: item.created_at,
+          };
+          
+          const similarity = item.similarity || this.getSimilarityScore(item, embedding);
 
           if (filters.similarityThreshold != null && similarity < filters.similarityThreshold) {
             return null;
@@ -380,7 +497,7 @@ export class RetrievalService {
         chunks,
         averageSimilarity: Math.round(averageSimilarity * 100) / 100,
         searchTime,
-        totalChunksScanned: count ?? undefined,
+        //totalChunksScanned: count ?? undefined,
       };
     } catch (error: any) {
       const retrievalError = this.handleError(error);
@@ -521,28 +638,20 @@ export class RetrievalService {
     query: any,
     filters: RetrievalFilters
   ): any {
-    // Filtre par client (colonne réelle de la table documents)
-    if (filters.client) {
-      const clientValues = Array.isArray(filters.client) 
-        ? filters.client 
-        : [filters.client];
-      query = query.in('documents.client_id', clientValues);
+    // Filtre par thème (colonne réelle de la table documents ou chunks)
+    if (filters.theme) {
+      const themeValues = Array.isArray(filters.theme) 
+        ? filters.theme 
+        : [filters.theme];
+      query = query.in('chunks.metadata->>theme', themeValues);
     }
 
-    // Filtre par type de document (colonne réelle de la table documents)
-    if (filters.documentType) {
-      const typeValues = Array.isArray(filters.documentType) 
-        ? filters.documentType 
-        : [filters.documentType];
-      query = query.in('documents.type', typeValues);
-    }
-
-    // Filtre par langage (colonne réelle de la table documents)
-    if (filters.language) {
-      const langValues = Array.isArray(filters.language) 
-        ? filters.language 
-        : [filters.language];
-      query = query.in('documents.language', langValues);
+    // Filtre par format de document (colonne réelle de la table documents)
+    if (filters.documentFormat) {
+      const formatValues = Array.isArray(filters.documentFormat) 
+        ? filters.documentFormat 
+        : [filters.documentFormat];
+      query = query.in('documents.type', formatValues);
     }
 
     // Filtre par rôle (métadonnée JSON stockée dans chunks.metadata)
@@ -562,6 +671,45 @@ export class RetrievalService {
     }
 
     return query;
+  }
+
+  /**
+   * Vérifier si un chunk candidat correspond aux filtres demandés.
+   *
+   * `match_chunks` (RPC pgvector) ne prend pas de paramètres de filtre — elle
+   * retourne un ensemble de candidats déjà triés par similarité. Les filtres
+   * sont donc appliqués ici, côté application, sur cet ensemble de candidats
+   * avant tri/troncature finale (voir ST-304 review — les filtres n'avaient
+   * auparavant aucun effet car `applyFilters()` n'était câblé que sur
+   * l'ancienne requête `.from('embeddings')` désormais commentée/inutilisée).
+   *
+   * [NOTE 2026-07-08] Le filtre `theme` lit `metadata.client`, pas
+   * `metadata.theme` : ce dernier n'est écrit nulle part par le pipeline
+   * d'indexation (`src/lib/supabase/storage/indexer.ts`). Décision
+   * utilisateur : rebrancher "Thème" sur le champ `client` réellement
+   * indexé plutôt que d'attendre une future story de tagging par thème
+   * métier — voir `src/app/api/chat/filters/route.ts` (même mapping).
+   */
+  private matchesFilters(
+    chunkData: { metadata?: { client?: string; role?: string; [key: string]: unknown } },
+    documentData: { type?: string; source?: string },
+    filters: RetrievalFilters
+  ): boolean {
+    const metadata = chunkData.metadata || {};
+
+    const matchesOneOf = (value: string | undefined, expected?: string | string[]): boolean => {
+      if (!expected) return true;
+      if (!value) return false;
+      const expectedValues = Array.isArray(expected) ? expected : [expected];
+      return expectedValues.includes(value);
+    };
+
+    if (!matchesOneOf(metadata.client, filters.theme)) return false;
+    if (!matchesOneOf(documentData.type, filters.documentFormat)) return false;
+    if (!matchesOneOf(metadata.role, filters.role)) return false;
+    if (!matchesOneOf(documentData.source, filters.source)) return false;
+
+    return true;
   }
 
   /**
