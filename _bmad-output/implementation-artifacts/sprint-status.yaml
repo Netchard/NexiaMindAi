@@ -83,7 +83,7 @@ development_status:
   4-302-implementer-l-authentification: done
   4-303-creer-l-interface-de-chat: done
   4-304-implementer-les-filtres-de-recherche: done
-  4-305-afficher-les-citations-de-sources: backlog
+  4-305-afficher-les-citations-de-sources: ready-for-dev
   4-306-implementer-le-mode-conversation: backlog
   4-307-ajouter-le-support-du-markdown: backlog
   4-308-implementer-l-export-des-reponses: backlog
