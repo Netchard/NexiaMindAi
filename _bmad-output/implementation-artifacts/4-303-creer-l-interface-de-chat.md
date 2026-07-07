@@ -5,7 +5,7 @@ sprint_name: "Sprint 4 - Interface Utilisateur"
 epic_id: EPIC-4
 epic_name: "Interface Utilisateur Complète"
 priority: high
-status: review
+status: done
 assignee: "Dday"
 baseline_commit: 091c20e9a56fc111bea02dd030c7c7737528189e
 tags:
@@ -17,7 +17,7 @@ tags:
 
 # Story 4.303: Créer l'Interface de Chat
 
-Status: review
+Status: done
 
 ## Story
 
@@ -142,6 +142,7 @@ Aucun fichier `project-context.md` n'existe dans le repo à ce jour — pas de r
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-04 | Amelia (Claude) | Implémentation ST-303 : fix bloquant `GET /api/chat/history` (Task 0), composants Chat (Task 1), page `/chat` + client fetch + menu historique (Task 2), lien Navbar (Task 3), accessibilité (Task 4), tests (Task 5) |
+| 2026-07-07 | Sally + Amelia (Claude) | Reprise visuelle : pivot vers le thème sombre de `docs/Maquette-ux-NexiaMind AI.html` — DESIGN.md/EXPERIENCE.md du chat réécrits (voir `ux-nexiamind-ai-2026-07-04-chat`), composants Chat/Navbar/RefreshButton restylés, `Footer` masqué sur `/chat`, panneau de chat recentré (`chat-panel`, max-width 880px). Aucune logique métier modifiée. |
 
 ## Dev Agent Record
 
@@ -164,6 +165,7 @@ Claude Sonnet 5 (create-story workflow, dev-story workflow)
   - Nouveau gap découvert en implémentant Task 2 : **aucun endpoint n'expose le contenu des messages d'une conversation passée** (`GET /api/chat/history` ne renvoie que des résumés). Sélectionner une conversation dans l'historique reprend son `conversationId` (les nouveaux messages s'y rattachent) mais n'affiche pas les anciens messages — conforme à la clause de périmètre de l'AC #6, documenté en Dev Notes avec la piste de résolution (`GET /api/chat/messages?conversationId=`, hors périmètre ST-303).
   - Vérification : `npx vitest run` → 355/380 passent (25 échecs pré-existants hors périmètre, identiques à avant cette session) ; 28 nouveaux tests tous verts (Chat ×20, page `/chat` ×5, Navbar ×2 additionnels, historique ×1). `npx tsc --noEmit` : aucune nouvelle erreur. `npx eslint` sur les fichiers touchés : 4 problèmes, tous pré-existants sur des lignes non modifiées. `npx next build` : phase de bundling réussie pour toutes les routes (dont `/chat`) — confirme qu'aucun code serveur n'a fui dans le bundle client ; l'échec de type-check qui suit porte sur `scripts/test-pdf-manual.ts`, sans rapport avec ST-303.
   - Vérification manuelle : `/chat` sans session → 307 vers `/auth/login?redirect=%2Fchat` (protection héritée de `src/proxy.ts` confirmée pour la nouvelle route). Pas de compte de test Supabase confirmé disponible pour une vérification en session authentifiée réelle (la confirmation email est activée sur ce projet) — la couverture de tests de composants (rendu réel, interactions, mocks du client fetch) sert de filet de sécurité en son absence.
+- **2026-07-07, reprise visuelle thème sombre (rework, pas une nouvelle story)** : à la demande utilisateur, Sally (UX) a d'abord réécrit `DESIGN.md`/`EXPERIENCE.md` (auth + chat) pour adopter fidèlement le thème sombre de `docs/Maquette-ux-NexiaMind AI.html`, puis l'implémentation a suivi directement sur le code existant (pas de nouvelle story créée, décision utilisateur explicite). Changements : palette `tailwind.config.ts` (`auth-*`/`chat-*`) repointée sur les valeurs sombres, police Newsreader ajoutée (titres uniquement), `Navbar` restylé en app-shell sombre (actif via `usePathname`), `Footer` masqué sur `/chat`, bulle assistant conservée volontairement claire sur fond sombre (rupture de contraste voulue), bouton d'envoi carré (plus circulaire), panneau de chat recentré à 880px. Tests des surfaces touchées (Auth/Navbar/Footer/Chat/layout) : 52/52 verts. `npx next build` : bundling Turbopack réussi ; le typecheck global échoue sur `scripts/test-pdf-manual.ts` (pré-existant, sans rapport). Échecs pré-existants et hors périmètre confirmés inchangés (indexer, routes `chat/filters`+`chat/refresh`, suite `Filters/__tests__` — contrat de props `FilterBarProps` déjà désaligné avec ses tests avant cette session).
 
 ### File List
 
@@ -192,3 +194,21 @@ Claude Sonnet 5 (create-story workflow, dev-story workflow)
 - `src/components/Navbar/Navbar.tsx` - ajout de l'entrée `{ name: 'Chat', href: '/chat' }`
 - `src/components/Navbar/__tests__/Navbar.test.tsx` - tests pour le nouveau lien Chat
 - `tailwind.config.ts` - namespace de tokens `chat` (couleurs) et `chat-sm/md/lg` (radius), indépendant du namespace `auth`
+
+**Reprise visuelle thème sombre (2026-07-07)**
+- `tailwind.config.ts` - tokens `auth-*`/`chat-*` repointés sur la palette sombre, ajout `font-display` (Newsreader), keyframes blobs
+- `src/app/globals.css` - fond/texte par défaut sombres, scrollbar `.nm-scroll`
+- `src/app/layout.tsx` - chargement `next/font/google` Newsreader
+- `src/app/MainContent.tsx` *(nouveau)* - conteneur client qui retire le `container mx-auto px-4 py-8` sur `/auth/*`
+- `src/app/chat/page.tsx` - restylage `chat-panel` (carte centrée 880px, en-tête de panneau, bandeau légal)
+- `src/components/Navbar/Navbar.tsx` - restylage app-shell sombre, état actif via `usePathname`
+- `src/components/Navbar/__tests__/Navbar.test.tsx` - assertions de classes mises à jour
+- `src/components/Auth/UserMenu.tsx` - avatar dégradé, dropdown sombre
+- `src/components/RefreshButton/RefreshButton.tsx` - sélecteur de source + bouton restylés
+- `src/components/RefreshButton/__tests__/RefreshButton.test.tsx` - assertion de classe mise à jour
+- `src/components/Footer/Footer.tsx` - masqué sur `/chat` (`usePathname`)
+- `src/components/Chat/ChatInput.tsx`, `ChatMessage.tsx`, `ChatMessageList.tsx`, `TypingIndicator.tsx`, `HistoryMenu.tsx` - restylage complet (bulle assistant claire volontaire, bouton d'envoi carré, coins de bulle asymétriques)
+- `src/components/Filters/FilterBar.tsx`, `FilterDropdown.tsx` - palette inline recolorée en sombre
+- `src/components/Filters/__tests__/FilterBar.test.tsx`, `FilterDropdown.test.tsx` - assertions de couleur mises à jour (échecs de contrat de props pré-existants non traités, hors périmètre)
+- `src/app/__tests__/layout.test.tsx` - assertions de classes mises à jour
+- `test/setup.ts` - mock `next/font/google` étendu à `Newsreader`
