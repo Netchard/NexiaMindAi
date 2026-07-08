@@ -53,8 +53,8 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Écrivez votre question…"
-        className="flex-1 resize-none rounded-chat-md border border-chat-border bg-chat-surface-card px-3.5 py-2.5 text-base text-chat-ink placeholder-chat-ink-muted focus:outline-none focus:ring-2 focus:ring-chat-ring dark:border-chat-border-dark dark:bg-chat-surface-card-dark dark:text-chat-ink-dark dark:placeholder-chat-ink-muted-dark"
-        style={{ minHeight: '44px', maxHeight: '140px' }}
+        className="flex-1 resize-none rounded-chat-md border border-chat-border bg-chat-surface-card px-3.5 py-2.5 text-base text-chat-ink placeholder-chat-ink-faint focus:outline-none focus:border-chat-primary"
+        style={{ minHeight: '48px', maxHeight: '140px' }}
         data-testid="chat-input-field"
       />
       <button
@@ -62,7 +62,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
         onClick={submit}
         disabled={disabled || !value.trim()}
         aria-label="Envoyer le message"
-        className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-chat-primary text-chat-on-primary transition-colors hover:bg-chat-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chat-ring disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-12 w-12 flex-none items-center justify-center rounded-chat-md bg-gradient-to-br from-chat-primary to-chat-primary-active text-chat-on-primary shadow-[0_8px_20px_-8px_rgba(244,105,63,.55)] transition-colors hover:from-chat-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chat-primary disabled:cursor-not-allowed disabled:opacity-50"
         data-testid="chat-send-button"
       >
         <Send size={18} />

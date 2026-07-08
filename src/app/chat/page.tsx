@@ -7,6 +7,8 @@ import { sendMessage, getHistory } from '@/components/Chat/api'
 import { FilterBar } from '@/components/Filters'
 import { getFilterValues, convertToFilterOptions, FiltersError } from '@/lib/api/filters'
 import { FilterState, DEFAULT_FILTERS } from '@/types/filters'
+import { filterAndConvertSources } from '@/lib/api/sources'
+import type { RawSource } from '@/types/citations'
 
 /**
  * Chat Page (ST-303)
@@ -32,10 +34,11 @@ export default function ChatPage() {
     documentFormats: [],
   })
 
-  // Charger les valeurs possibles des filtres au montage
+  // Charger les valeurs possibles des filtres et l'historique au montage
   useEffect(() => {
-    const loadFilterValues = async () => {
+    const loadInitialData = async () => {
       try {
+        // Charger les valeurs de filtre
         setFiltersLoading(true)
         setFiltersError(null)
         
@@ -54,21 +57,20 @@ export default function ChatPage() {
       } finally {
         setFiltersLoading(false)
       }
-    }
-    
-    // Charger les valeurs de filtre
-    loadFilterValues()
-    
-    // Charger l'historique des conversations
-    getHistory()
-      .then((history) => {
+      
+      // Charger l'historique des conversations
+      try {
+        const history = await getHistory()
         setConversations(
           history.conversations.map((c) => ({ id: c.id, title: c.title, updatedAt: c.updatedAt }))
         )
-      })
-      .catch(() => {
+      } catch (e) {
         // L'historique reste vide dans le menu ; la conversation en cours n'est pas affectée.
-      })
+        console.error('Échec du chargement de l\'historique des conversations:', e)
+      }
+    }
+    
+    loadInitialData()
   }, [])
 
   // Gestion du changement de filtre
@@ -104,18 +106,27 @@ export default function ChatPage() {
       // Mettre à jour la conversation
       setConversationId(response.conversationId)
 
+      // Parser les citations depuis la réponse API (ST-305)
+      // Normaliser null en undefined pour éviter les erreurs
+      const citations = filterAndConvertSources(response.sources ?? undefined)
+
       setMessages((prev) => [
         ...prev,
-        { id: response.id, role: 'assistant', content: response.content },
+        { 
+          id: response.id, 
+          role: 'assistant', 
+          content: response.content,
+          citations: citations.length > 0 ? citations : undefined,
+        },
       ])
 
       // Les filtres sont conservés après l'envoi, nouvelle conversation ou non (AC #6)
 
-    } catch {
+    } catch (e) {
       setMessages((prev) =>
         prev.map((m) => (m.id === userMessage.id ? { ...m, failed: true } : m))
       )
-      setError("Échec de l'envoi du message. Réessayez.")
+      setError(e instanceof Error ? e.message : "Échec de l'envoi du message. Réessayez.")
     } finally {
       setIsSending(false)
     }

@@ -43,22 +43,22 @@ export default function HistoryMenu({ conversations, onSelect }: HistoryMenuProp
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-chat-md border border-chat-border px-3 py-1.5 text-sm text-chat-ink-muted hover:text-chat-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chat-ring dark:border-chat-border-dark dark:text-chat-ink-muted-dark dark:hover:text-chat-ink-dark"
+        className="flex h-[34px] items-center gap-1.5 rounded-chat-sm border border-chat-border-soft bg-chat-surface px-3.5 text-[13px] font-medium text-chat-ink-muted hover:text-chat-ink-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-chat-primary"
         aria-label="Historique des conversations"
         aria-expanded={isOpen}
         data-testid="chat-history-trigger"
       >
-        <History size={16} />
+        <History size={15} />
         Historique
       </button>
 
       {isOpen && (
         <div
-          className="absolute right-0 z-10 mt-2 w-64 rounded-chat-md border border-chat-border bg-chat-surface-card py-1 shadow-lg dark:border-chat-border-dark dark:bg-chat-surface-card-dark"
+          className="absolute right-0 z-10 mt-2 w-64 rounded-chat-md border border-chat-border-soft bg-chat-surface-panel py-1 shadow-lg"
           data-testid="chat-history-panel"
         >
           {conversations.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-chat-ink-muted dark:text-chat-ink-muted-dark">
+            <p className="px-4 py-3 text-sm text-chat-ink-subtle">
               Aucune conversation pour l&apos;instant
             </p>
           ) : (
@@ -70,7 +70,7 @@ export default function HistoryMenu({ conversations, onSelect }: HistoryMenuProp
                   onSelect(conversation.id)
                   setIsOpen(false)
                 }}
-                className="block w-full truncate px-4 py-2 text-left text-sm text-chat-ink hover:bg-chat-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-chat-ring dark:text-chat-ink-dark dark:hover:bg-chat-border-dark"
+                className="block w-full truncate px-4 py-2 text-left text-sm text-chat-ink hover:bg-chat-surface-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-chat-primary"
               >
                 {conversation.title}
               </button>

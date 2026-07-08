@@ -5,13 +5,19 @@
  * next/server + server-only env vars, which would crash a client bundle on load).
  */
 
+import type { RawSource } from '@/types/citations';
+
 export interface SendMessageResponse {
   id: string
   conversationId: string
   role: 'assistant'
   content: string
   formattedContent?: string
-  citations?: unknown[]
+  /**
+   * Sources citées dans la réponse, telles que retournées par le backend
+   * Tableau de sources brutes à parser côté frontend (ST-305)
+   */
+  sources?: RawSource[]
   metadata: {
     model: string
     tokensUsed: number
