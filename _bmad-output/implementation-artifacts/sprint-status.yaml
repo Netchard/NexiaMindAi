@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23 22:45:00
-last_updated: 2026-07-07 23:50:00
+last_updated: 2026-07-08 15:30:00
 project: NexiaMind AI
 project_key: NOKEY
 tracking_system: file-system
@@ -83,7 +83,7 @@ development_status:
   4-302-implementer-l-authentification: done
   4-303-creer-l-interface-de-chat: done
   4-304-implementer-les-filtres-de-recherche: done
-  4-305-afficher-les-citations-de-sources: ready-for-dev
+  4-305-afficher-les-citations-de-sources: done
   4-306-implementer-le-mode-conversation: backlog
   4-307-ajouter-le-support-du-markdown: backlog
   4-308-implementer-l-export-des-reponses: backlog
