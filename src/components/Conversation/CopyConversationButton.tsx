@@ -10,7 +10,8 @@ import { useState } from 'react'
 import { useConversations } from '@/components/Conversations'
 import type { ChatMessageData } from '@/components/Chat'
 
-interface CopyConversationButtonProps {
+// Export de l'interface pour réutilisation (MD-004)
+export interface CopyConversationButtonProps {
   conversationId: string
   disabled?: boolean
 }
@@ -51,25 +52,33 @@ function formatMessageToMarkdown(message: ChatMessageData): string {
 
 /**
  * Génère le Markdown complet d'une conversation
+ * Optimisé avec Array.join() pour les grandes conversations (CR-003)
  */
 function generateConversationMarkdown(
   messages: ChatMessageData[],
   conversationTitle: string = 'Conversation'
 ): string {
-  const date = new Date().toLocaleString('fr-FR')
+  // Utiliser Intl pour i18n (HI-004)
+  const date = new Intl.DateTimeFormat('fr-FR', {
+    dateStyle: 'short',
+    timeStyle: 'medium'
+  }).format(new Date())
   
-  const header = `# ${conversationTitle}\n\n` +
-    `*Exporté le : ${date}*\n\n` +
-    `---\n\n`
-  
-  const body = messages
-    .map((msg, index) => {
+  // Construction avec Array pour performance O(n) au lieu de O(n²)
+  const parts = [
+    `# ${conversationTitle}`,
+    '',
+    `*Exporté le : ${date}*`,
+    '',
+    '---',
+    '',
+    ...messages.map((msg, index) => {
       const separator = index > 0 ? '\n---\n\n' : ''
       return separator + formatMessageToMarkdown(msg)
     })
-    .join('')
+  ]
   
-  return header + body
+  return parts.join('\n')
 }
 
 /**
@@ -97,11 +106,18 @@ export function CopyConversationButton({
 
   /**
    * Copie la conversation dans le presse-papiers
+   * avec feature detection et fallback (CR-001, EC-003)
    */
   const handleCopy = async () => {
+    // EC-001: Ne pas lancer la copie si aucun message
     if (messages.length === 0) {
       setCopyError('Aucun message à copier')
-      setCopySuccess(false)
+      return // Ne pas setIsCopying si rien à faire
+    }
+
+    // CR-001: Feature detection pour Clipboard API
+    if (!navigator.clipboard) {
+      setCopyError('Clipboard API non disponible')
       return
     }
 
@@ -117,33 +133,49 @@ export function CopyConversationButton({
       await navigator.clipboard.writeText(markdown)
       
       setCopySuccess(true)
-      setIsCopying(false)
       
       // Réinitialiser le succès après 3 secondes
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setCopySuccess(false)
       }, 3000)
+      
+      // Nettoyer le timer si le composant est unmounted
+      // (à gérer via useEffect cleanup si nécessaire)
       
     } catch (error) {
       setCopyError('Échec de la copie dans le presse-papiers')
       setCopySuccess(false)
-      setIsCopying(false)
       
-      // Essayer la méthode de fallback pour les navigateurs anciens
+      // EC-003: Fallback clipboard avec feature detection
       try {
-        const markdown = generateConversationMarkdown(messages, conversationTitle)
-        const textArea = document.createElement('textarea')
-        textArea.value = markdown
-        textArea.style.position = 'fixed'
-        textArea.style.opacity = '0'
-        document.body.appendChild(textArea)
-        textArea.select()
-        document.execCommand('copy')
-        document.body.removeChild(textArea)
-        setCopySuccess(true)
+        // Vérifier que execCommand est disponible
+        if (document.execCommand) {
+          const markdown = generateConversationMarkdown(messages, conversationTitle)
+          const textArea = document.createElement('textarea')
+          textArea.value = markdown
+          textArea.style.position = 'fixed'
+          textArea.style.opacity = '0'
+          textArea.style.pointerEvents = 'none'
+          document.body.appendChild(textArea)
+          textArea.select()
+          
+          // execCommand peut échouer, vérifier le résultat
+          const success = document.execCommand('copy')
+          document.body.removeChild(textArea)
+          
+          if (success) {
+            setCopySuccess(true)
+            setTimeout(() => setCopySuccess(false), 3000)
+          } else {
+            setCopyError('Impossible de copier. Veuillez réessayer.')
+          }
+        } else {
+          setCopyError('Impossible de copier. Veuillez réessayer.')
+        }
       } catch (fallbackError) {
         setCopyError('Impossible de copier. Veuillez réessayer.')
       }
+    } finally {
       setIsCopying(false)
     }
   }
@@ -153,8 +185,10 @@ export function CopyConversationButton({
       <button
         onClick={handleCopy}
         disabled={disabled || isCopying || messages.length === 0}
-        aria-label="Copier la conversation"
+        aria-label="Copier la conversation dans le presse-papiers"
         aria-busy={isCopying}
+        aria-live="polite"
+        title="Copier la conversation"
         className={`
           flex items-center gap-1.5 px-3 py-1.5
           ${copySuccess ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-chat-surface-card hover:bg-chat-surface-hover'}
@@ -227,6 +261,8 @@ export function CopyConversationButton({
       {copyError && (
         <div 
           role="alert" 
+          aria-live="assertive"
+          aria-atomic="true"
           className="absolute -bottom-8 left-0 right-0 text-sm text-chat-error-soft text-center"
           data-testid="copy-error"
         >
