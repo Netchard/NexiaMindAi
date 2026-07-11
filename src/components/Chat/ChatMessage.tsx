@@ -1,13 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import { SourceCitationList } from '@/components/SourceCitation';
+import { MarkdownRenderer } from '@/components/Markdown';
+import { ExportButton } from './ExportButton'
 import type { SourceCitation } from '@/types/citations';
+import type { ChatMessageData } from './types'
 
 interface ChatMessageProps {
   role: 'user' | 'assistant'
   content: string
   showAvatar: boolean
   citations?: SourceCitation[]
+  id?: string
 }
 
 /**
@@ -15,8 +20,32 @@ interface ChatMessageProps {
  * Renders a single message bubble. User bubbles are coral-gradient, right-aligned;
  * assistant bubbles stay light (deliberate contrast break, DESIGN.md > Colors) and
  * are left-aligned with an avatar shown once per group.
+ * 
+ * ST-308: Ajout de ExportButton pour l'export des réponses
  */
-export default function ChatMessage({ role, content, showAvatar, citations }: ChatMessageProps) {
+export default function ChatMessage({ role, content, showAvatar, citations, id = '' }: ChatMessageProps) {
+  // État pour le bouton Copier simple (fallback)
+  const [copied, setCopied] = useState(false)
+
+  // Gérer la copie du contenu (fallback si ExportButton non disponible)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Échec de la copie:', err)
+    }
+  }
+
+  // Construire l'objet message pour ExportButton
+  const messageData: ChatMessageData = {
+    id,
+    role,
+    content,
+    citations,
+  }
+
   if (role === 'user') {
     return (
       <div className="flex justify-end">
@@ -44,11 +73,20 @@ export default function ChatMessage({ role, content, showAvatar, citations }: Ch
         <div className="w-[26px] flex-none" aria-hidden="true" />
       )}
       <div className="flex max-w-[78%] flex-col gap-2.5">
-        <div
-          className="whitespace-pre-wrap rounded-chat-lg rounded-tl-[5px] bg-chat-assistant-bg px-[17px] py-3.5 text-[14.5px] leading-relaxed text-chat-assistant-text"
-          data-testid="chat-bubble-assistant"
-        >
-          {content}
+        {/* Conteneur du message avec bouton Export - ST-308 */}
+        <div className="relative">
+          {/* Bouton Export en haut à droite */}
+          <div className="absolute top-2 right-2 z-10">
+            <ExportButton message={messageData} />
+          </div>
+          
+          {/* Message avec Markdown */}
+          <div
+            className="rounded-chat-lg rounded-tl-[5px] bg-chat-assistant-bg px-[17px] py-3.5 pt-8 text-[14.5px] leading-relaxed text-chat-assistant-text overflow-hidden"
+            data-testid="chat-bubble-assistant"
+          >
+            <MarkdownRenderer content={content} />
+          </div>
         </div>
         {/* Affichage des citations de sources (ST-305) */}
         {citations && citations.length > 0 && (

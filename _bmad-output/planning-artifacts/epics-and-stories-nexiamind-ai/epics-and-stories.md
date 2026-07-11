@@ -841,25 +841,38 @@ export function formatResponse(rawResponse, chunks) {
 
 #### ST-308: Implémenter l'Export des Réponses
 **En tant que** Développeur Frontend  
-**Je veux** permettre d'exporter les réponses en Markdown ou CSV  
+**Je veux** permettre d'exporter les réponses en Markdown ou CSV et copier les conversations  
 **Afin de** faciliter le partage des informations.
 
 **Critères d'Acceptation :**
-- [ ] Bouton "Exporter" sur chaque réponse
-- [ ] Export en Markdown
-- [ ] Export en CSV
-- [ ] Téléchargement automatique du fichier
-- [ ] Conservation des citations de sources
+- [x] Bouton "Exporter" sur chaque réponse (ExportButton)
+- [x] Export en Markdown
+- [x] Export en CSV
+- [x] Téléchargement automatique du fichier
+- [x] Conservation des citations de sources
+- [x] Bouton "Copier la conversation" dans le header (CopyConversationButton)
+- [x] Copie du contenu complet en Markdown
+- [x] Intégration avec le presse-papiers (navigator.clipboard)
+- [x] Notification de succès/échec (toast)
 
 **Tâches Techniques :**
-- [ ] Créer le composant `ExportButton`
-- [ ] Implémenter la conversion Markdown → Markdown (nettoyage)
-- [ ] Implémenter la conversion Markdown → CSV
-- [ ] Générer le téléchargement
+- [x] Créer le composant `ExportButton` (`src/components/Chat/ExportButton.tsx`)
+- [x] Créer le composant `CopyConversationButton` (`src/components/Conversation/CopyConversationButton.tsx`)
+- [x] Implémenter la conversion Markdown → Markdown (nettoyage)
+- [x] Implémenter la conversion Markdown → CSV
+- [x] Générer le téléchargement via Blob + URL.createObjectURL
+- [x] Intégrer ExportButton dans ChatMessage
+- [x] Intégrer CopyConversationButton dans ConversationHeader
+- [x] Mettre à jour les exports dans index.tsx
+
+**Dépendances :**
+- ST-306: Mode Conversation (implémenté)
+- ST-305: Citations de sources (intégration vérifiée)
 
 **Estimation :** 3 heures  
 **Priorité :** ⭐⭐⭐  
 **Difficulté :** Faible
+**Statut :** Implémentation en cours (11/07/2026)
 
 ---
 

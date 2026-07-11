@@ -59,7 +59,7 @@ export default function ChatMessageList({ messages, isTyping, onSuggestionClick 
     <div
       role="log"
       aria-live="polite"
-      className="nm-scroll flex flex-1 flex-col gap-1.5 overflow-y-auto px-2 py-4"
+      className="nm-scroll flex-1 flex flex-col gap-1.5 px-2 py-4 overflow-y-auto"
       data-testid="chat-message-list"
     >
       {messages.map((message, index) => {
@@ -72,6 +72,7 @@ export default function ChatMessageList({ messages, isTyping, onSuggestionClick 
               content={message.content} 
               showAvatar={showAvatar}
               citations={message.citations}
+              id={message.id}
             />
             {message.role === 'user' && message.failed && (
               <p className="mt-1 text-right text-xs font-medium text-chat-error-soft">Non envoyé</p>
