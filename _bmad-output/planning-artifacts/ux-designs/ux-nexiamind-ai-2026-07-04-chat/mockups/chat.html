@@ -2,71 +2,50 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<title>NexiaMind AI — Chat (key screens)</title>
+<title>NexiaMind AI — Chat + app-shell (key screens, thème sombre)</title>
 <style>
 /*
-  Governed by: DESIGN.md (Colors, Typography, Shapes, Components)
-                EXPERIENCE.md (Component Patterns, State Patterns, Accessibility Floor)
+  Governed by: DESIGN.md (Colors, Typography, Shapes, Components: app-header, nav-item,
+               source-select, chat-panel, message-bubble-user/assistant, typing-indicator,
+               chat-input, send-button, suggested-prompt-chip, sources-placeholder, banner-error)
+               EXPERIENCE.md (Component Patterns, State Patterns, Accessibility Floor)
   Screens: 1) État vide (suggestions)  2) Conversation active (bulles + indicateur de saisie)
            3) Erreur d'envoi (inset)
-  System fonts only — production uses next/font/google Geist Sans (src/app/layout.tsx);
-  this offline mock approximates with the system UI stack.
+  Repris de docs/Maquette-ux-NexiaMind AI.html (import : imports/maquette-nexiamind-ai-dark-2026-07-07.html).
+  Identité unique sombre — plus de variante claire/toggle (contrairement à la précédente itération).
+  Newsreader via next/font/google en implémentation ; ce mock statique utilise Georgia en repli.
 */
 :root {
-  --primary: #EF6C4D;
-  --primary-hover: #E1552F;
-  --primary-active: #C8441F;
+  --primary-from: #F4693F;
+  --primary-to: #E64F2B;
+  --primary: #F4693F;
+  --primary-hover: #FF845E;
   --on-primary: #FFFFFF;
-  --ink: #1E2A3B;
-  --ink-muted: #6B7280;
-  --surface: #FAFAFA;
-  --surface-card: #FFFFFF;
-  --border: #E5E7EB;
-  --ring: #F2A084;
-  --error: #DC2626;
-  --error-surface: #FEF2F2;
-  --error-border: #FECACA;
+  --ink: #EEF2F8;
+  --ink-strong: #F2F5FA;
+  --ink-muted: #B7C3D6;
+  --ink-subtle: #8D9CB5;
+  --ink-faint: #647697;
+  --surface: #0A1524;
+  --surface-header: #0C1829;
+  --surface-panel: #0E1B2E;
+  --surface-field: #0A1524;
+  --border: #2C3E5C;
+  --border-soft: #2A3B58;
+  --border-header: #1C2A42;
+  --border-panel: #1F2E48;
+  --nav-active: #182842;
+  --error-soft: #FF7A68;
+  --error-surface: rgba(255,90,70,.1);
+  --error-border: rgba(255,90,70,.4);
+  --assistant-bg: #E9EEF6;
+  --assistant-text: #17233A;
+  --dot-muted: #9AA7BD;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #F1F5F9;
-    --ink-muted: #94A3B8;
-    --surface: #0F172A;
-    --surface-card: #1E293B;
-    --border: #334155;
-    --ring: #F2A084;
-    --error: #F87171;
-    --error-surface: rgba(220, 38, 38, 0.12);
-    --error-border: #7F1D1D;
-  }
-}
-:root[data-theme="dark"] {
-  --ink: #F1F5F9;
-  --ink-muted: #94A3B8;
-  --surface: #0F172A;
-  --surface-card: #1E293B;
-  --border: #334155;
-  --ring: #F2A084;
-  --error: #F87171;
-  --error-surface: rgba(220, 38, 38, 0.12);
-  --error-border: #7F1D1D;
-}
-:root[data-theme="light"] {
-  --ink: #1E2A3B;
-  --ink-muted: #6B7280;
-  --surface: #FAFAFA;
-  --surface-card: #FFFFFF;
-  --border: #E5E7EB;
-  --ring: #F2A084;
-  --error: #DC2626;
-  --error-surface: #FEF2F2;
-  --error-border: #FECACA;
-}
-
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  background: var(--surface);
+  background: #060b14;
   color: var(--ink);
   font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   padding: 32px;
@@ -76,52 +55,77 @@ body {
 }
 .caption {
   font-size: 13px;
-  color: var(--ink-muted);
+  color: var(--ink-subtle);
   margin: 0 0 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+
+/* ---- App shell ---- */
 .frame {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-panel);
   border-radius: 16px;
-  background: var(--surface-card);
-  width: 720px;
+  background: var(--surface);
+  width: 760px;
   max-width: 100%;
-  height: 560px;
+  height: 620px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-.frame-topbar {
+.app-header {
+  flex: none;
   height: 56px;
+  background: var(--surface-header);
+  border-bottom: 1px solid var(--border-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.app-header .brand { display: flex; align-items: center; gap: 16px; }
+.logo-mark { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, #5B8DEF, #2F66DF); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; flex: none; }
+.logo-word { font-weight: 600; font-size: 13.5px; color: var(--ink-strong); }
+.nav { display: flex; gap: 3px; }
+.nav-item { height: 26px; padding: 0 9px; border-radius: 7px; font-size: 11.5px; font-weight: 500; color: var(--ink-subtle); display: flex; align-items: center; background: transparent; }
+.nav-item.active { background: var(--nav-active); color: var(--ink-strong); font-weight: 600; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.source-select { height: 26px; padding: 0 8px; border-radius: 7px; border: 1.5px solid var(--border-soft); background: var(--surface-panel); color: var(--ink-muted); font-size: 10.5px; font-weight: 500; }
+.avatar-user { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-from), var(--primary-to)); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+.chat-panel {
+  flex: 1;
+  margin: 18px;
+  border: 1px solid var(--border-panel);
+  border-radius: 18px;
+  background: var(--surface-panel);
+  box-shadow: 0 30px 80px -40px rgba(0,0,0,.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.panel-header {
+  height: 44px;
   flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-card);
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border-header);
 }
-.frame-topbar .brand {
-  font-weight: 600;
-  font-size: 15px;
-}
+.panel-header .title { font-weight: 600; font-size: 13.5px; color: var(--ink-strong); }
 .history-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 5px;
+  font-size: 11.5px;
   color: var(--ink-muted);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 6px 12px;
-  cursor: pointer;
-}
-.history-btn:focus-visible, button:focus-visible, textarea:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--ring);
+  background: var(--surface-field);
+  border: 1.5px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 5px 10px;
 }
 
 /* ---- Empty state ---- */
@@ -131,104 +135,106 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 24px;
+  gap: 16px;
+  padding: 20px;
   text-align: center;
 }
 .empty-state h1 {
-  font-size: 28px;
-  font-weight: 700;
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0;
+  color: var(--ink-strong);
   text-wrap: balance;
 }
 .empty-state p {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 16px;
-  max-width: 42ch;
+  color: var(--ink-subtle);
+  font-size: 12.5px;
+  max-width: 38ch;
 }
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
-  max-width: 520px;
+  max-width: 460px;
 }
 .chip {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  color: var(--ink);
+  background: transparent;
+  border: 1.5px solid var(--border-soft);
+  color: var(--ink-muted);
   border-radius: 9999px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
+  padding: 8px 14px;
+  font-size: 11.5px;
 }
-.chip:hover { border-color: var(--primary); }
+.chip:hover { border-color: var(--primary); background: rgba(244,105,63,.08); }
 
 /* ---- Message list ---- */
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
-.msg-row { display: flex; gap: 10px; align-items: flex-end; }
+.msg-row { display: flex; gap: 8px; align-items: flex-end; }
 .msg-row.user { justify-content: flex-end; }
 .avatar {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 9999px;
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
   color: var(--on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 700;
   flex: none;
 }
 .bubble {
-  max-width: 70%;
-  padding: 14px;
-  border-radius: 16px;
-  font-size: 16px;
-  line-height: 1.5;
+  max-width: 78%;
+  padding: 10px 13px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.55;
   white-space: pre-wrap;
 }
 .bubble.user {
-  background: var(--primary);
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
   color: var(--on-primary);
-  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  box-shadow: 0 8px 22px -12px rgba(244,105,63,.55);
 }
 .bubble.assistant {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  color: var(--ink);
-  border-bottom-left-radius: 4px;
+  background: var(--assistant-bg);
+  color: var(--assistant-text);
+  border-top-left-radius: 4px;
 }
-.msg-col { display: flex; flex-direction: column; gap: 4px; max-width: 70%; }
+.msg-col { display: flex; flex-direction: column; gap: 4px; max-width: 78%; }
 .assistant-label {
-  font-size: 14px;
+  font-size: 10.5px;
   font-weight: 500;
-  color: var(--ink-muted);
+  color: var(--ink-subtle);
   margin-left: 2px;
 }
 .sources-placeholder {
   border: 1px dashed var(--border);
   border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 13px;
-  color: var(--ink-muted);
+  padding: 6px 9px;
+  font-size: 10.5px;
+  color: var(--ink-faint);
   margin-top: 2px;
 }
 .failed-note {
-  font-size: 12px;
-  color: var(--error);
+  font-size: 10.5px;
+  color: var(--error-soft);
   margin-top: 2px;
   text-align: right;
+  font-weight: 500;
 }
 
 /* typing indicator */
@@ -236,17 +242,17 @@ body {
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  padding: 4px 2px;
+  padding: 3px 2px;
 }
 .typing-dots span {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 9999px;
-  background: var(--ink-muted);
-  animation: pulse 1.2s infinite ease-in-out;
+  background: var(--dot-muted);
+  animation: pulse 1.1s infinite ease-in-out;
 }
-.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.18s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.36s; }
 @keyframes pulse {
   0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
   30% { opacity: 1; transform: translateY(-2px); }
@@ -258,160 +264,222 @@ body {
 /* ---- Input bar ---- */
 .input-bar {
   flex: none;
-  border-top: 1px solid var(--border);
-  padding: 16px;
+  border-top: 1px solid var(--border-header);
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 .error-banner {
+  display: flex; align-items: center; gap: 8px;
   background: var(--error-surface);
-  border: 1px solid var(--error-border);
-  color: var(--error);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 14px;
+  border: 1.5px solid var(--error-border);
+  color: var(--error-soft);
+  border-radius: 10px;
+  padding: 8px 11px;
+  font-size: 11px;
+  font-weight: 500;
 }
 .input-row {
   display: flex;
-  gap: 10px;
-  align-items: flex-end;
+  gap: 8px;
+  align-items: center;
 }
 textarea {
   flex: 1;
   resize: none;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 12px;
   color: var(--ink);
-  background: var(--surface-card);
-  border: 1px solid var(--border);
+  background: var(--surface-field);
+  border: 1.5px solid var(--border);
   border-radius: 10px;
-  padding: 10px 14px;
+  padding: 9px 12px;
   line-height: 1.4;
-  min-height: 44px;
-  max-height: 140px;
+  min-height: 36px;
+  max-height: 100px;
 }
-textarea::placeholder { color: var(--ink-muted); }
+textarea::placeholder { color: var(--ink-faint); }
 .send-btn {
   flex: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 9999px;
-  background: var(--primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary-from), var(--primary-to));
   color: var(--on-primary);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  box-shadow: 0 8px 20px -8px rgba(244,105,63,.55);
 }
-.send-btn:hover { background: var(--primary-hover); }
-.send-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.send-btn[disabled] { opacity: 0.5; }
+.disclaimer { text-align: center; font-size: 9.5px; color: var(--ink-faint); margin: 2px 0 0; }
 
 .gallery {
   display: flex;
   gap: 32px;
   flex-wrap: wrap;
 }
+
+.nav-list { display: contents; }
 </style>
 </head>
 <body>
 
-<div>
-  <p class="caption">Écran 1 — État vide (EXPERIENCE.md § State Patterns · Component Patterns "Puces de suggestion")</p>
-</div>
+<p class="caption">App-shell (DESIGN.md.Components.app-header) — header global partagé par toutes les routes authentifiées, restylé depuis Navbar.tsx existant, sans changement de structure (5 entrées, sélecteur de source, avatar).</p>
 
 <div class="gallery">
 
   <div>
     <div class="frame">
-      <div class="frame-topbar">
-        <span class="brand">NexiaMind AI</span>
-        <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
-      </div>
-      <div class="empty-state">
-        <h1>Posez votre première question</h1>
-        <p>NexiaMind AI cherche dans vos documents, tickets GitLab et bases de connaissance internes.</p>
-        <div class="chips">
-          <button class="chip">Quels sont les derniers livrables pour le client Axess ?</button>
-          <button class="chip">Résume l'architecture du module de facturation</button>
-          <button class="chip">Où trouver la doc d'intégration GitLab ?</button>
+      <div class="app-header">
+        <div class="brand">
+          <div class="logo-mark">✦</div>
+          <span class="logo-word">NexiaMind AI</span>
+          <nav class="nav">
+            <span class="nav-item">Accueil</span>
+            <span class="nav-item active">Chat</span>
+            <span class="nav-item">Recherche</span>
+            <span class="nav-item">Documents</span>
+            <span class="nav-item">Admin</span>
+          </nav>
+        </div>
+        <div class="header-actions">
+          <select class="source-select"><option>Toutes les sources</option></select>
+          <div class="avatar-user">N</div>
         </div>
       </div>
-      <div class="input-bar">
-        <div class="input-row">
-          <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
-          <button class="send-btn" disabled aria-label="Envoyer le message">➤</button>
+      <div class="chat-panel">
+        <div class="panel-header">
+          <span class="title">NexiaMind AI</span>
+          <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
+        </div>
+        <div class="empty-state">
+          <h1>Posez votre première question</h1>
+          <p>NexiaMind AI cherche dans vos documents, tickets GitLab et bases de connaissance internes.</p>
+          <div class="chips">
+            <button class="chip">Quels sont les derniers livrables pour le client Axess ?</button>
+            <button class="chip">Résume l'architecture du module de facturation</button>
+            <button class="chip">Où trouver la doc d'intégration GitLab ?</button>
+          </div>
+        </div>
+        <div class="input-bar">
+          <div class="input-row">
+            <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
+            <button class="send-btn" disabled aria-label="Envoyer le message">➤</button>
+          </div>
+          <p class="disclaimer">NexiaMind peut faire des erreurs. Vérifiez les sources citées.</p>
         </div>
       </div>
     </div>
+    <p class="caption" style="margin-top:10px;">Écran 1 — État vide</p>
   </div>
 
   <div>
     <div class="frame">
-      <div class="frame-topbar">
-        <span class="brand">NexiaMind AI</span>
-        <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
+      <div class="app-header">
+        <div class="brand">
+          <div class="logo-mark">✦</div>
+          <span class="logo-word">NexiaMind AI</span>
+          <nav class="nav">
+            <span class="nav-item">Accueil</span>
+            <span class="nav-item active">Chat</span>
+            <span class="nav-item">Recherche</span>
+            <span class="nav-item">Documents</span>
+            <span class="nav-item">Admin</span>
+          </nav>
+        </div>
+        <div class="header-actions">
+          <select class="source-select"><option>Toutes les sources</option></select>
+          <div class="avatar-user">N</div>
+        </div>
       </div>
-
-      <div class="messages" role="log" aria-live="polite">
-        <div class="msg-row user">
-          <div class="bubble user">Quels sont les derniers livrables pour le client Axess ?</div>
+      <div class="chat-panel">
+        <div class="panel-header">
+          <span class="title">NexiaMind AI</span>
+          <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
         </div>
 
-        <div class="msg-row">
-          <div class="avatar">N</div>
-          <div class="msg-col">
-            <span class="assistant-label">NexiaMind AI</span>
-            <div class="bubble assistant">Les trois derniers livrables validés pour Axess sont :
+        <div class="messages" role="log" aria-live="polite">
+          <div class="msg-row user">
+            <div class="bubble user">Quels sont les derniers livrables pour le client Axess ?</div>
+          </div>
+
+          <div class="msg-row">
+            <div class="avatar">N</div>
+            <div class="msg-col">
+              <span class="assistant-label">NexiaMind AI</span>
+              <div class="bubble assistant">Les trois derniers livrables validés pour Axess sont :
 1. Rapport d'audit sécurité (juin 2026)
 2. Migration Next.js 16 — note de cadrage
 3. Spécifications API v2 du module facturation</div>
-            <div class="sources-placeholder">Sources — disponible dans une prochaine version</div>
+              <div class="sources-placeholder">Sources — disponible dans une prochaine version</div>
+            </div>
           </div>
-        </div>
 
-        <div class="msg-row user">
-          <div class="bubble user">Et le rapport d'audit, qui l'a rédigé ?</div>
-        </div>
+          <div class="msg-row user">
+            <div class="bubble user">Et le rapport d'audit, qui l'a rédigé ?</div>
+          </div>
 
-        <div class="msg-row">
-          <div class="avatar">N</div>
-          <div class="msg-col">
-            <div class="bubble assistant">
-              <span class="typing-dots" aria-label="NexiaMind AI réfléchit"><span></span><span></span><span></span></span>
+          <div class="msg-row">
+            <div class="avatar">N</div>
+            <div class="msg-col">
+              <div class="bubble assistant">
+                <span class="typing-dots" aria-label="NexiaMind AI réfléchit"><span></span><span></span><span></span></span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="input-bar">
-        <div class="input-row">
-          <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
-          <button class="send-btn" aria-label="Envoyer le message">➤</button>
+        <div class="input-bar">
+          <div class="input-row">
+            <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
+            <button class="send-btn" aria-label="Envoyer le message">➤</button>
+          </div>
+          <p class="disclaimer">NexiaMind peut faire des erreurs. Vérifiez les sources citées.</p>
         </div>
       </div>
     </div>
-    <p class="caption" style="margin-top:10px;">Écran 2 — Conversation active : bulles regroupées, avatar affiché une fois par groupe, indicateur de saisie animé</p>
+    <p class="caption" style="margin-top:10px;">Écran 2 — Conversation active : bulle assistant claire (rupture de contraste volontaire), indicateur de saisie animé</p>
   </div>
 
   <div>
     <div class="frame">
-      <div class="frame-topbar">
-        <span class="brand">NexiaMind AI</span>
-        <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
-      </div>
-      <div class="messages" role="log" aria-live="polite">
-        <div class="msg-row user">
-          <div class="bubble user">Quel est le statut du ticket NEX-4821 ?</div>
+      <div class="app-header">
+        <div class="brand">
+          <div class="logo-mark">✦</div>
+          <span class="logo-word">NexiaMind AI</span>
+          <nav class="nav">
+            <span class="nav-item">Accueil</span>
+            <span class="nav-item active">Chat</span>
+            <span class="nav-item">Recherche</span>
+            <span class="nav-item">Documents</span>
+            <span class="nav-item">Admin</span>
+          </nav>
         </div>
-        <div class="failed-note" style="text-align:right; margin-right: 4px;">Non envoyé</div>
+        <div class="header-actions">
+          <select class="source-select"><option>Toutes les sources</option></select>
+          <div class="avatar-user">N</div>
+        </div>
       </div>
-      <div class="input-bar">
-        <div class="error-banner" role="alert">Échec de l'envoi du message. Réessayez.</div>
-        <div class="input-row">
-          <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
-          <button class="send-btn" aria-label="Envoyer le message">➤</button>
+      <div class="chat-panel">
+        <div class="panel-header">
+          <span class="title">NexiaMind AI</span>
+          <button class="history-btn" aria-label="Historique des conversations">🕘 Historique</button>
+        </div>
+        <div class="messages" role="log" aria-live="polite">
+          <div class="msg-row user">
+            <div class="bubble user">Quel est le statut du ticket NEX-4821 ?</div>
+          </div>
+          <div class="failed-note" style="margin-right: 4px;">Non envoyé</div>
+        </div>
+        <div class="input-bar">
+          <div class="error-banner" role="alert">Échec de l'envoi du message. Réessayez.</div>
+          <div class="input-row">
+            <textarea rows="1" aria-label="Votre message" placeholder="Écrivez votre question…"></textarea>
+            <button class="send-btn" aria-label="Envoyer le message">➤</button>
+          </div>
         </div>
       </div>
     </div>
@@ -422,3 +490,4 @@ textarea::placeholder { color: var(--ink-muted); }
 
 </body>
 </html>
+</content>

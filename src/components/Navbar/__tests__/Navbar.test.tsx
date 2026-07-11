@@ -21,9 +21,9 @@ function renderNavbar() {
 }
 
 describe('Navbar Component', () => {
-  it('devrait rendre le logo', () => {
+  it('devrait rendre le repère de marque', () => {
     renderNavbar();
-    expect(screen.getByAltText('NexiaMind AI Logo')).toBeInTheDocument();
+    expect(screen.getByText('NexiaMind AI')).toBeInTheDocument();
   });
 
   it('devrait avoir les liens de navigation', () => {
@@ -45,27 +45,26 @@ describe('Navbar Component', () => {
     expect(screen.getByText('Rafraîchir')).toBeInTheDocument();
   });
 
-  it('devrait être responsive', () => {
+  it('devrait porter le fond sombre de l\'app-shell (DESIGN.md chat)', () => {
     renderNavbar();
     const nav = screen.getByRole('navigation');
-    expect(nav).toHaveClass('bg-white dark:bg-gray-900');
+    expect(nav).toHaveClass('bg-chat-surface-header');
   });
 
-  it('devrait supporter le thème sombre', () => {
+  it('devrait marquer la route active avec un fond distinct (usePathname mocké sur "/")', () => {
     renderNavbar();
-    const nav = screen.getByRole('navigation');
-    expect(nav).toHaveClass('dark:bg-gray-900');
+    // usePathname() est mocké à '/' dans test/setup.ts — "Accueil" est donc l'onglet actif.
+    expect(screen.getByText('Accueil')).toHaveClass('bg-chat-nav-active');
+    expect(screen.getByText('Chat')).not.toHaveClass('bg-chat-nav-active');
   });
 
-  it('devrait avoir un contraste suffisant', () => {
+  it('devrait avoir un contraste suffisant sur les liens inactifs', () => {
     renderNavbar();
-    // Le lien logo a son propre style (flex + texte adjacent) ; on vérifie
-    // le contraste sur les liens de navigation textuels uniquement.
-    const navLinks = ['Accueil', 'Chat', 'Recherche', 'Documents', 'Admin'].map((name) =>
+    const inactiveLinks = ['Chat', 'Recherche', 'Documents', 'Admin'].map((name) =>
       screen.getByText(name)
     );
-    navLinks.forEach(link => {
-      expect(link).toHaveClass('text-gray-700 dark:text-gray-200');
+    inactiveLinks.forEach(link => {
+      expect(link).toHaveClass('text-chat-ink-subtle');
     });
   });
 

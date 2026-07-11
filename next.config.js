@@ -1,12 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Optimisation pour Vercel
-  output: 'standalone', // Pour les API Routes
+  // output: 'standalone', // Pour les API Routes
 
-  // Pour les embeddings de grande taille
-  experimental: {
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
-  },
+  // Note: La configuration expérimentale pour @supabase/supabase-js n'est pas nécessaire
+  // dans Next.js 16+ pour le client-side. Les packages externes sont supportés par défaut.
 
   // Pour éviter les erreurs CORS
   async headers() {

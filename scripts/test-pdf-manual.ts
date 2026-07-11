@@ -13,6 +13,7 @@
  *   --help, -h          Afficher cette aide
  */
 
+import 'dotenv/config';
 import { OCRService, ocrService } from '../src/lib/supabase/storage/ocr';
 import { SupabaseStorageIndexer } from '../src/lib/supabase/storage/indexer';
 import { logger } from '../src/lib/logger';

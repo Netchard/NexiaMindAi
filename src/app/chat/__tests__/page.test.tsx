@@ -12,6 +12,18 @@ vi.mock('@/components/Chat/api', () => ({
   getHistory,
 }))
 
+// Ce fichier ne teste pas les filtres (voir page-filters.test.tsx) — mocker
+// getFilterValues évite un vrai fetch (échoue en jsdom, "Failed to parse URL")
+// qui affiche une bannière d'erreur permanente et casse `findByRole('alert')`
+// dans les tests d'erreur d'envoi de message ci-dessous.
+vi.mock('@/lib/api/filters', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/api/filters')>('@/lib/api/filters')
+  return {
+    ...actual,
+    getFilterValues: vi.fn().mockResolvedValue({ themes: [], documentFormats: [] }),
+  }
+})
+
 beforeEach(() => {
   vi.clearAllMocks()
   Element.prototype.scrollIntoView = vi.fn()
@@ -90,6 +102,7 @@ describe('ChatPage', () => {
     const suggestionText = chip.textContent
     fireEvent.click(chip)
 
-    await waitFor(() => expect(sendMessage).toHaveBeenCalledWith(suggestionText, undefined))
+    // 3e argument : les filtres actifs (aucun ici, ST-304) — toujours transmis, même undefined.
+    await waitFor(() => expect(sendMessage).toHaveBeenCalledWith(suggestionText, undefined, undefined))
   })
 })

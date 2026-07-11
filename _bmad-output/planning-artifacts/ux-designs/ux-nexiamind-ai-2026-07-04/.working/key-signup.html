@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>Key screen — Inscription (NexiaMind AI)</title>
+<style>
+/*
+  Governs: DESIGN.md (Colors, Typography, Shapes, Components: illustration-panel,
+  input-field, button-primary, banner-error, link-inline, logo-lockup)
+  EXPERIENCE.md (Component Patterns "Champ email/mot de passe", "Bouton principal";
+  State Patterns "Succès — inscription"; Key Flows "Flow 2 — Première inscription")
+  Two states: canonical form, then success confirmation state.
+*/
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #ddd;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+.caption { font-size: 13px; color: #444; max-width: 1120px; }
+.frame {
+  width: 1120px;
+  height: 720px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  display: flex;
+}
+.illustration {
+  position: relative;
+  width: 55%;
+  background:
+    radial-gradient(circle at 20% 25%, #5CE1E6 0%, rgba(92,225,230,0) 45%),
+    radial-gradient(circle at 55% 55%, #F472B6 0%, rgba(244,114,182,0) 55%),
+    radial-gradient(circle at 30% 90%, #6B2D5C 0%, rgba(107,45,92,0) 60%),
+    radial-gradient(circle at 85% 95%, #EF6C4D 0%, rgba(239,108,77,0) 45%),
+    #fdfcfb;
+  display: flex;
+  align-items: flex-end;
+  padding: 56px;
+}
+.illustration::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(30,42,59,0.34) 0%, rgba(30,42,59,0.05) 45%, rgba(30,42,59,0) 65%);
+}
+.illustration-text { position: relative; z-index: 1; color: #fff; }
+.hero { font-size: 40px; font-weight: 600; line-height: 1.15; letter-spacing: 0.01em; }
+.hero-sub { font-size: 18px; font-weight: 400; line-height: 1.5; letter-spacing: 0.04em; margin-top: 8px; opacity: 0.95; }
+
+.form-panel { width: 45%; background: #FAFAFA; display: flex; align-items: center; justify-content: center; }
+.card { width: 340px; }
+.logo-row { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 24px; }
+.logo-mark { width: 32px; height: 32px; }
+.logo-word { font-size: 20px; font-weight: 700; color: #1E2A3B; letter-spacing: -0.01em; }
+.title { text-align: center; margin-bottom: 24px; }
+.display { font-size: 26px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; color: #1E2A3B; }
+.sub { font-size: 14px; color: #6B7280; margin-top: 8px; }
+
+.field { margin-bottom: 14px; }
+.label { display: block; font-size: 14px; font-weight: 500; color: #1E2A3B; margin-bottom: 6px; }
+.input-wrap { position: relative; }
+.input {
+  width: 100%; padding: 9px 14px; font-size: 15px;
+  border: 1px solid #E5E7EB; border-radius: 8px; background: #FFFFFF; color: #1E2A3B;
+}
+.help { font-size: 12px; color: #6B7280; margin-top: 5px; }
+.eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #6B7280; font-size: 13px; }
+
+.btn-primary {
+  width: 100%; padding: 11px; margin-top: 8px; border-radius: 10px; border: none;
+  background: #EF6C4D; color: #FFFFFF; font-size: 15px; font-weight: 600; text-align: center;
+}
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0 14px; color: #6B7280; font-size: 13px; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #E5E7EB; }
+.social-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.social-btn { border: 1px solid #E5E7EB; border-radius: 10px; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 500; color: #1E2A3B; background: #fff; }
+.bottom-link { text-align: center; margin-top: 20px; font-size: 14px; color: #6B7280; }
+.link { color: #EF6C4D; font-size: 14px; font-weight: 600; }
+
+/* success state */
+.success-card { text-align: center; }
+.success-card .display { margin-bottom: 12px; }
+.success-card .body { font-size: 15px; color: #374151; line-height: 1.5; }
+.success-card .email { color: #1E2A3B; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="caption">Inscription — état canonique. Titre "Rejoignez NexiaMind AI." dans le panneau (variation courte du hero, cf. Key Flows Flow 2). Formulaire complet : nom (optionnel), email, mot de passe + aide critères, confirmation, CTA, social auth, lien vers Connexion.</div>
+<div class="frame">
+  <div class="illustration">
+    <div class="illustration-text">
+      <div class="hero">Rejoignez NexiaMind.</div>
+      <div class="hero-sub">Créez votre compte pour accéder à la recherche intelligente.</div>
+    </div>
+  </div>
+  <div class="form-panel">
+    <div class="card">
+      <div class="logo-row">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#3B82F6"/><path d="M16 8L20 16L16 24L12 16L16 8Z" fill="white"/><path d="M8 16H24" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M16 8V24" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="logo-word">NexiaMind AI</span>
+      </div>
+      <div class="title">
+        <div class="display">Créer un compte NexiaMind AI</div>
+        <div class="sub">Rejoignez-nous et commencez à utiliser notre assistant IA</div>
+      </div>
+      <div class="field">
+        <label class="label">Nom complet (optionnel)</label>
+        <div class="input-wrap"><div class="input">Jean Dupont</div></div>
+      </div>
+      <div class="field">
+        <label class="label">Adresse email</label>
+        <div class="input-wrap"><div class="input">vous@entreprise.com</div></div>
+      </div>
+      <div class="field">
+        <label class="label">Mot de passe</label>
+        <div class="input-wrap"><div class="input">••••••••</div><span class="eye">👁</span></div>
+        <div class="help">Doit contenir au moins 8 caractères, une majuscule et un chiffre</div>
+      </div>
+      <div class="field">
+        <label class="label">Confirmer le mot de passe</label>
+        <div class="input-wrap"><div class="input">••••••••</div><span class="eye">👁</span></div>
+      </div>
+      <div class="btn-primary">S'inscrire</div>
+      <div class="divider">ou</div>
+      <div class="social-row">
+        <div class="social-btn">Google</div>
+        <div class="social-btn">GitHub</div>
+        <div class="social-btn">GitLab</div>
+      </div>
+      <div class="bottom-link">Déjà un compte ? <span class="link">Se connecter</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="caption">État succès (State Patterns "Succès — inscription") — remplace le formulaire, confirmation avec l'email saisi.</div>
+<div class="frame">
+  <div class="illustration">
+    <div class="illustration-text">
+      <div class="hero">Rejoignez NexiaMind AI.</div>
+      <div class="hero-sub">Créez votre compte pour accéder à la recherche intelligente.</div>
+    </div>
+  </div>
+  <div class="form-panel">
+    <div class="card success-card">
+      <div class="logo-row">
+        <svg class="logo-mark" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#3B82F6"/><path d="M16 8L20 16L16 24L12 16L16 8Z" fill="white"/><path d="M8 16H24" stroke="white" stroke-width="2" stroke-linecap="round"/><path d="M16 8V24" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="logo-word">NexiaMind AI</span>
+      </div>
+      <div class="display">Vérifiez votre email</div>
+      <div class="body">Nous avons envoyé un lien de confirmation à <span class="email">marc.dupont@entreprise.com</span>. Veuillez cliquer sur le lien pour activer votre compte.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

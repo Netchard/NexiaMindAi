@@ -3,7 +3,7 @@ story_id: ST-301
 epic: Epic 4
 title: Créer le Layout Principal
 description: Créer un layout principal avec barre de navigation et zone de contenu pour fournir une structure de base à l'application NexiaMind AI.
-status: review
+status: done
 priority: ⭐⭐⭐⭐⭐
 estimation: 5 heures
 assigned_to: Dday
@@ -769,6 +769,27 @@ touch app/layout.tsx
 - [ ] Test on various devices and browsers
 - [ ] Gather user feedback on UX/UI
 - [ ] Update status to "done" after approval
+
+### 2026-07-04 12:30:00 - Revue de code et corrections (fermeture de ST-301)
+
+La revue de code a révélé que `Navbar`/`Footer`/`RefreshButton` avaient été créés
+à la racine du projet (`./components/`) au lieu de `src/components/`, en
+contradiction avec la convention d'alias `@/*` → `./src/*` utilisée partout
+ailleurs. `src/app/layout.tsx` les important via `'components/Navbar'` (sans
+`@/`), ce qui ne fonctionnait que par un artefact de résolution `baseUrl` de
+TypeScript/webpack et faisait échouer `layout.test.tsx` sous Vitest (les tests
+annoncés dans ce document n'avaient en réalité jamais été exécutés : ils se
+trouvaient hors du dossier `src/` scanné par `vitest.config.ts`).
+
+**Corrections apportées :**
+- ✅ Déplacement de `Navbar`, `Footer`, `RefreshButton` vers `src/components/`
+- ✅ Correction des imports dans `src/app/layout.tsx` (`@/components/Navbar`, `@/components/Footer`)
+- ✅ Ajout des mocks manquants dans `test/setup.ts` (`next/font/google`, `next/navigation`, `@testing-library/jest-dom/vitest`) sans lesquels aucun test de layout/Navbar/Footer ne pouvait s'exécuter
+- ✅ Correction d'assertions de test erronées (mauvais élément ciblé) dans `Footer.test.tsx`, `Navbar.test.tsx` et `layout.test.tsx`
+- ✅ Migration du test `RefreshButton.test.tsx` (syntaxe Jest → Vitest, jamais exécutable tel quel) + 2 corrections dans `RefreshButton.tsx` (aria-label manquant, message d'erreur technique exposé à l'utilisateur au lieu du message générique)
+- ✅ Intégration de `UserMenu` (ST-302) dans la Navbar
+
+**Résultat :** tous les tests de `layout.test.tsx`, `Navbar.test.tsx`, `Footer.test.tsx` et `RefreshButton.test.tsx` passent réellement (vérifié via `npx vitest run`). Statut passé à `done`.
 
 ---
 

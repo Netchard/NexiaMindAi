@@ -3,20 +3,21 @@
  * Fait partie de ST-201 - Intégrer Supabase Storage
  */
 
+import { vi } from 'vitest'
 import { POST, GET, PUT, DELETE } from '../route';
 import { NextRequest } from 'next/server';
 import { storageIndexer } from '@/lib/supabase/storage';
 import { AuthService } from '@/lib/api/auth/service';
 
 // Mock des dépendances
-jest.mock('@/lib/supabase/storage/indexer');
-jest.mock('@/lib/api/auth/service');
+vi.mock('@/lib/supabase/storage/indexer');
+vi.mock('@/lib/api/auth/service');
 
 // Mock de logger
 const mockLogger = {
-  info: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
 };
 jest.mock('@/lib/logger', () => ({ logger: mockLogger }));
 
@@ -29,9 +30,9 @@ describe('POST /api/sources/supabase/sync', () => {
     // Mock de NextRequest
     mockRequest = {
       headers: {
-        get: jest.fn(),
+        get: vi.fn(),
       },
-      json: jest.fn(),
+      json: vi.fn(),
       nextUrl: {
         pathname: '/api/sources/supabase/sync',
       },

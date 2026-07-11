@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '@/lib/api/auth/service';
-import { createClient } from '@supabase/supabase-js';
+import { supabase as supabaseServer } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
 // Types pour les réponses
@@ -31,33 +31,25 @@ interface StatsResponse {
   byClient?: Record<string, UsageStats>;
 }
 
-// Initialiser Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  logger.error('SUPABASE_URL and SUPABASE_ANON_KEY must be defined');
-  throw new Error('Supabase configuration missing');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Utilise le client serveur standardisé
+// La validation est déjà faite dans server.ts
 
 /**
  * Récupère les statistiques pour une période donnée
  */
 async function getPeriodStats(startDate: string, endDate: string): Promise<UsageStats> {
   const [conversations, messages, tokens] = await Promise.all([
-    supabase
+    supabaseServer
       .from('conversations')
       .select('id', { head: true, count: 'exact' })
       .gte('created_at', startDate)
       .lte('created_at', endDate),
-    supabase
+    supabaseServer
       .from('messages')
       .select('id', { head: true, count: 'exact' })
       .gte('created_at', startDate)
       .lte('created_at', endDate),
-    supabase
+    supabaseServer
       .from('messages')
       .select('metadata->>tokensUsed')
       .gte('created_at', startDate)
@@ -124,10 +116,10 @@ export async function GET(request: NextRequest) {
         messagesResult,
         tokensResult,
       ] = await Promise.all([
-        supabase.from('profiles').select('id', { head: true, count: 'exact' }),
-        supabase.from('conversations').select('id', { head: true, count: 'exact' }),
-        supabase.from('messages').select('id', { head: true, count: 'exact' }),
-        supabase.from('messages').select('metadata->>tokensUsed', { head: true, count: 'exact' }),
+        supabaseServer.from('profiles').select('id', { head: true, count: 'exact' }),
+        supabaseServer.from('conversations').select('id', { head: true, count: 'exact' }),
+        supabaseServer.from('messages').select('id', { head: true, count: 'exact' }),
+        supabaseServer.from('messages').select('metadata->>tokensUsed', { head: true, count: 'exact' }),
       ]);
 
       const totalUsers = usersResult.count || 0;
@@ -151,7 +143,7 @@ export async function GET(request: NextRequest) {
       // Stats par client (optionnel)
       const byClientStats: Record<string, UsageStats> = {};
 
-      const { data: clientMessages, error: clientError } = await supabase
+      const { data: clientMessages, error: clientError } = await supabaseServer
         .from('messages')
         .select('metadata->>client, id', { head: true, count: 'exact' })
         .group('metadata->>client');

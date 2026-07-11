@@ -14,6 +14,8 @@
  *   node scripts/index-supabase-simple.js --help
  */
 
+require('dotenv').config();
+
 const fs = require('fs');
 const path = require('path');
 

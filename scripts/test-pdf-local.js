@@ -8,6 +8,8 @@
  *   OU: node scripts/test-pdf-local.js (si déjà compilé)
  */
 
+require('dotenv').config();
+
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');

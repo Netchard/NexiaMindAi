@@ -34,13 +34,16 @@ describe('Root Layout Integration', () => {
   });
 
   it('devrait avoir les métadonnées correctes', () => {
-    // Test des métadonnées (difficile à tester directement, mais on vérifie le rendu)
+    // L'export `metadata` est traité par Next.js en dehors du rendu React ;
+    // on vérifie ici l'attribut lang de la balise <html> produite par le layout.
+    // (jsdom ne permet qu'un seul <html> : React applique ses attributs
+    // directement sur document.documentElement plutôt que d'imbriquer un nœud.)
     render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
     );
-    expect(screen.getByRole('document')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('lang', 'fr');
   });
 
   it('devrait être responsive', () => {
@@ -53,24 +56,16 @@ describe('Root Layout Integration', () => {
     expect(main).toHaveClass('container mx-auto px-4 py-8');
   });
 
-  it('devrait supporter le thème sombre', () => {
-    render(
-      <RootLayout>
-        <div>Test Content</div>
-      </RootLayout>
-    );
-    const html = screen.getByRole('document').parentElement;
-    expect(html).toHaveClass('dark'); // Vérifie la classe dark
-  });
-
-  it('devrait avoir un contraste suffisant', () => {
+  it('devrait avoir une identité visuelle sombre unique', () => {
+    // Le produit n'a plus qu'un seul thème (sombre) — voir
+    // _bmad-output/planning-artifacts/ux-designs/ux-nexiamind-ai-2026-07-04-chat/DESIGN.md
     render(
       <RootLayout>
         <div>Test Content</div>
       </RootLayout>
     );
     const nav = screen.getByRole('navigation');
-    expect(nav).toHaveClass('bg-white dark:bg-gray-900');
+    expect(nav).toHaveClass('bg-chat-surface-header');
   });
 
   it('devrait être accessible (WCAG 2.1 AA)', () => {

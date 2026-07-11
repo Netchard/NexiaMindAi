@@ -6,6 +6,7 @@
  */
 
 import type { RawSource } from '@/types/citations';
+import type { ConversationMessage, MessagesResponse, RenameConversationResponse, DeleteConversationResponse } from '@/types/conversations';
 
 export interface SendMessageResponse {
   id: string
@@ -40,6 +41,9 @@ export interface HistoryResponse {
   offset: number
   limit: number
 }
+
+// Re-export types from conversations for convenience
+export type { ConversationMessage, MessagesResponse, RenameConversationResponse, DeleteConversationResponse };
 
 async function parseErrorMessage(response: Response): Promise<string> {
   const errorData = await response.json().catch(() => ({}))
@@ -83,4 +87,113 @@ export async function getHistory(limit = 50, offset = 0): Promise<HistoryRespons
   }
 
   return response.json()
+}
+
+// Timeout pour les requêtes API (10 secondes)
+const API_TIMEOUT = 10000;
+
+/**
+ * Récupère tous les messages d'une conversation spécifique
+ * Appelle GET /api/chat/messages?conversationId=...
+ */
+export async function getConversationMessages(
+  conversationId: string,
+  limit = 50,
+  offset = 0
+): Promise<MessagesResponse> {
+  const url = `/api/chat/messages?conversationId=${encodeURIComponent(conversationId)}&limit=${limit}&offset=${offset}`;
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(await parseErrorMessage(response));
+    }
+
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Requête timeout après 10 secondes');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Renomme une conversation
+ * Appelle PATCH /api/conversations/{id}/rename
+ */
+export async function renameConversation(
+  conversationId: string,
+  newTitle: string
+): Promise<RenameConversationResponse> {
+  const url = `/api/conversations/${encodeURIComponent(conversationId)}/rename`;
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newTitle }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(await parseErrorMessage(response));
+    }
+
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Requête timeout après 10 secondes');
+    }
+    throw error;
+  }
+}
+
+/**
+ * Supprime une conversation
+ * Appelle DELETE /api/conversations/{id}
+ */
+export async function deleteConversation(
+  conversationId: string
+): Promise<DeleteConversationResponse> {
+  const url = `/api/conversations/${encodeURIComponent(conversationId)}`;
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(await parseErrorMessage(response));
+    }
+
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Requête timeout après 10 secondes');
+    }
+    throw error;
+  }
 }

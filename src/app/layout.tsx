@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
-import { Navbar } from 'components/Navbar';
-import { Footer } from 'components/Footer';
+import { Navbar } from '@/components/Navbar';
+import { Footer } from '@/components/Footer';
+import { AuthProvider } from '@/components/Auth/AuthProvider';
+import { MainContent } from './MainContent';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,6 +14,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Newsreader (serif) — réservé aux titres `hero`/`display` des surfaces Auth/Chat
+// (voir DESIGN.md > Typography), jamais au corps de texte.
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -28,14 +38,14 @@ export default function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          {children}
-        </main>
-        <Footer />
+      <body className="min-h-screen flex flex-col bg-[#0a1524] text-[#eef2f8]">
+        <AuthProvider>
+          <Navbar />
+          <MainContent>{children}</MainContent>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

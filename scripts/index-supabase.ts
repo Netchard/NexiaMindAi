@@ -16,6 +16,7 @@
  *   --help, -h            Afficher cette aide
  */
 
+import 'dotenv/config';
 import { logger } from '../src/lib/logger';
 import { storageIndexer, SupabaseStorageIndexer } from '../src/lib/supabase/storage/indexer';
 import { IndexationOptions } from '../src/lib/supabase/storage/types';

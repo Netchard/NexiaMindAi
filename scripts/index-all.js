@@ -17,6 +17,8 @@
  *   --help, -h         Show help
  */
 
+require('dotenv').config();
+
 // Simple logger for script execution
 const logger = {
   info: (message, context = {}) => {

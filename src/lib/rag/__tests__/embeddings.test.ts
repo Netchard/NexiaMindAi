@@ -75,8 +75,9 @@ describe('EmbeddingService', () => {
       const originalEnv = process.env.MISTRAL_API_KEY;
       delete process.env.MISTRAL_API_KEY;
       
-      const unconfiguredService = new EmbeddingService({ apiKey: '' });
-      expect(unconfiguredService.isConfigured()).toBe(false);
+      // Vérifier que la création d'un service sans clé lève une erreur
+      expect(() => new EmbeddingService({ apiKey: '' })).toThrow(EmbeddingError);
+      expect(() => new EmbeddingService()).toThrow(EmbeddingError);
       
       // Restaurer l'env
       process.env.MISTRAL_API_KEY = originalEnv;

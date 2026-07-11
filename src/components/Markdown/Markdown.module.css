@@ -1,0 +1,338 @@
+/*
+ * Styles pour le rendu Markdown
+ * Fait partie de ST-307: Ajouter le Support du Markdown
+ * 
+ * Tokens de couleur du design system :
+ * - Primaire (corail) : #EF6C4D
+ * - Surface : #1E2A3B
+ * - Border : #4A5568
+ * - Text : #E2E8F0
+ * - Text mute : #A0AEC0
+ */
+
+/* Conteneur principal */
+.markdown-content {
+  width: 100%;
+  max-width: 100%;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #e2e8f0;
+}
+
+/* ==================== TEXTES ==================== */
+
+.markdown-paragraph {
+  margin: 0.8em 0;
+}
+
+.markdown-strong {
+  font-weight: 600;
+  color: #f7fafc;
+}
+
+.markdown-em {
+  font-style: italic;
+  color: #cbd5e0;
+}
+
+/* ==================== CODE ==================== */
+
+/* Code inline */
+.markdown-code-inline {
+  background-color: rgba(244, 105, 63, 0.15);
+  color: #ef6c4d;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+
+/* Conteneur du bloc de code */
+.code-block-container {
+  position: relative;
+  margin: 1em 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1a202c;
+  border: 1px solid #4a5568;
+}
+
+/* Header du bloc de code */
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #2d3748;
+  border-bottom: 1px solid #4a5568;
+  font-size: 0.85em;
+}
+
+.language-label {
+  color: #a0aec0;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.9em;
+}
+
+.copy-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #4a5568;
+  color: #e2e8f0;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.85em;
+}
+
+.copy-button:hover {
+  background-color: #6366f1;
+}
+
+.copy-button:active {
+  background-color: #4f46e5;
+}
+
+.copy-button svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Contenu du bloc de code avec coloration syntaxique */
+.code-block-pre {
+  margin: 0;
+  padding: 12px 16px;
+  overflow-x: auto;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  background-color: transparent;
+  color: #e2e8f0;
+}
+
+.code-block-pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Numérotation des lignes */
+.code-block-content-wrapper {
+  display: flex;
+  position: relative;
+}
+
+.code-line-numbers {
+  display: flex;
+  flex-direction: column;
+  padding-right: 12px;
+  border-right: 1px solid #4a5568;
+  margin-right: 12px;
+  user-select: none;
+  color: #718096;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.9em;
+  line-height: 1.5;
+  min-width: 40px;
+  text-align: right;
+}
+
+.code-line-number {
+  display: inline-block;
+  padding: 0 8px 0 0;
+  color: #718096;
+  user-select: none;
+}
+
+.code-block-code {
+  display: block;
+  min-width: 100%;
+}
+
+/* ==================== TABLEAUX ==================== */
+
+.markdown-table {
+  width: 100%;
+  margin: 1em 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.markdown-table th,
+.markdown-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #4a5568;
+}
+
+.markdown-table th {
+  background-color: #2d3748;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.markdown-table td {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: #e2e8f0;
+}
+
+.markdown-table tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.markdown-table tr:hover td {
+  background-color: rgba(244, 105, 63, 0.08);
+}
+
+/* Responsive : défilement horizontal sur mobile */
+@media (max-width: 768px) {
+  .markdown-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ==================== LIENS ==================== */
+
+.markdown-link {
+  color: #ef6c4d;
+  text-decoration: underline;
+  text-decoration-color: rgba(244, 105, 63, 0.4);
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.markdown-link:hover {
+  color: #f6ad55;
+  text-decoration-color: #ef6c4d;
+}
+
+.markdown-link:active {
+  color: #e53e3e;
+}
+
+/* ==================== CITATIONS ==================== */
+
+.markdown-blockquote {
+  margin: 1em 0;
+  padding-left: 14px;
+  border-left: 4px solid #ef6c4d;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+.markdown-blockquote p {
+  margin: 0.5em 0;
+}
+
+/* ==================== TITRES ==================== */
+
+.markdown-h1,
+.markdown-h2,
+.markdown-h3,
+.markdown-h4,
+.markdown-h5,
+.markdown-h6 {
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.markdown-h1 {
+  font-size: 1.8em;
+  color: #f7fafc;
+  border-bottom: 2px solid #ef6c4d;
+  padding-bottom: 8px;
+}
+
+.markdown-h2 {
+  font-size: 1.5em;
+  color: #f7fafc;
+  border-bottom: 1px solid #4a5568;
+  padding-bottom: 6px;
+}
+
+.markdown-h3 {
+  font-size: 1.3em;
+  color: #f7fafc;
+}
+
+.markdown-h4 {
+  font-size: 1.15em;
+  color: #e2e8f0;
+}
+
+.markdown-h5 {
+  font-size: 1.05em;
+  color: #cbd5e0;
+}
+
+.markdown-h6 {
+  font-size: 1em;
+  color: #a0aec0;
+}
+
+/* ==================== LISTES ==================== */
+
+.markdown-ul,
+.markdown-ol {
+  margin: 0.8em 0;
+  padding-left: 1.8em;
+}
+
+.markdown-ul {
+  list-style-type: disc;
+}
+
+.markdown-ol {
+  list-style-type: decimal;
+}
+
+.markdown-li {
+  margin: 0.4em 0;
+  line-height: 1.5;
+}
+
+.markdown-li p {
+  margin: 0.4em 0;
+}
+
+/* Listes imbriquées */
+.markdown-ul .markdown-ul,
+.markdown-ol .markdown-ol {
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
+}
+
+/* ==================== AUTRES ==================== */
+
+.markdown-hr {
+  border: none;
+  border-top: 1px solid #4a5568;
+  margin: 1.5em 0;
+}
+
+/* Images */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 0.5em 0;
+}
+
+/* Task lists (si remark-gfm est configure) */
+.markdown-content input[type="checkbox"] {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Code blocks in lists */
+.markdown-ul .code-block-container,
+.markdown-ol .code-block-container {
+  margin-left: 1.8em;
+}

@@ -85,7 +85,7 @@ development_status:
   4-304-implementer-les-filtres-de-recherche: done
   4-305-afficher-les-citations-de-sources: done
   4-306-implementer-le-mode-conversation: done
-  4-307-ajouter-le-support-du-markdown: review
+  4-307-ajouter-le-support-du-markdown: done
   4-308-implementer-l-export-des-reponses: done
   4-309-optimiser-les-performances-frontend: backlog
   epic-4-retrospective: optional

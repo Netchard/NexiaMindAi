@@ -5,16 +5,18 @@ sources:
   - _bmad-output/planning-artifacts/ux-designs/ux-nexiamind-ai-2026-07-04/EXPERIENCE.md
   - _bmad-output/implementation-artifacts/4-303-creer-l-interface-de-chat.md
   - _bmad-output/planning-artifacts/architecture-nexiamind-ai/architecture.md
-updated: 2026-07-04
+updated: 2026-07-09
 ---
 
 # NexiaMind AI — Chat Experience Spine
 
-> Périmètre : la page `/chat` (ST-303) — envoyer un message, voir les réponses, historique des conversations passées consultable. La bascule complète entre conversations multiples (route `[conversationId]`), l'affichage fonctionnel des citations/sources, les filtres de recherche et le rendu Markdown enrichi sont hors périmètre (ST-304 à ST-307) ; cette spine prépare visuellement leur arrivée sans les implémenter.
+> Périmètre : la page `/chat` et `/chat/[conversationId]` — envoyer un message, voir les réponses, basculer entre conversations multiples via une sidebar (ST-306, remplace le menu déroulant initial de ST-303). L'affichage fonctionnel des citations/sources (ST-305) et les filtres de recherche (ST-304) sont intégrés ; le rendu Markdown enrichi reste hors périmètre (ST-307).
 
 ## Foundation
 
-Web responsive, Next.js App Router + Tailwind CSS (pas de librairie de composants) — identique à l'auth. Contrairement aux pages `/auth/*`, `/chat` **conserve** `Navbar` et `Footer` du layout racine : c'est l'espace de travail principal du produit, pas un point d'entrée isolé. Protection d'accès déjà assurée par `src/proxy.ts` (redirection vers `/auth/login?redirect=%2Fchat` si non connecté) — aucune logique de garde supplémentaire dans cette spine.
+Web responsive, Next.js App Router + Tailwind CSS (pas de librairie de composants) — identique à l'auth, même pivot vers le thème sombre de `docs/Maquette-ux-NexiaMind AI.html` (voir `DESIGN.md`). Contrairement aux pages `/auth/*`, `/chat` **conserve** `Navbar` du layout racine — restylée en app-shell sombre, mêmes routes/comportements (voir `DESIGN.md.Components.app-header`) — mais **perd `Footer`** : la maquette de référence rend l'écran applicatif jusqu'au bord bas sans pied de page, et le panneau de chat centré occupe déjà tout l'espace utile sous le header. `[NOTE FOR UX]` Le sort de `Footer` sur les futures pages Accueil/Recherche/Documents/Admin (non encore spécifiées) reste ouvert — cette spine ne tranche que pour `/chat`. Protection d'accès déjà assurée par `src/proxy.ts` (redirection vers `/auth/login?redirect=%2Fchat` si non connecté) — aucune logique de garde supplémentaire dans cette spine.
+
+Toute la surface `/chat/*` (sidebar + panneau de chat) occupe exactement la hauteur restante sous `Navbar`, sans jamais excéder celle du viewport — la page elle-même ne défile jamais ; seuls la liste de messages et la liste de conversations défilent en interne. Cette contrainte garantit que la zone de saisie reste toujours atteignable, quelle que soit la taille de la fenêtre (voir `DESIGN.md.Layout & Spacing`).
 
 Public : consultants techniques, développeurs, chefs de projet — même public professionnel interne que l'auth. Un seul rôle de conversation implémenté ici (question → réponse RAG) ; le filtrage par profil et les citations de sources arrivent dans des stories ultérieures.
 
@@ -22,12 +24,13 @@ Public : consultants techniques, développeurs, chefs de projet — même public
 
 | Surface | Atteinte depuis | Objectif |
 |---|---|---|
-| Chat (`/chat`) | Lien "Chat" dans la Navbar ; redirection automatique après connexion réussie (`AuthProvider`, paramètre `?redirect=`) | Poser une question au système RAG et consulter les réponses |
-| Menu historique (overlay sur `/chat`) | Bouton dédié dans la zone de chat | Consulter la liste des conversations passées, en rouvrir une |
+| Chat (`/chat`) | Lien "Chat" dans la Navbar ; redirection automatique après connexion réussie (`AuthProvider`, paramètre `?redirect=`) ; sans conversation active, crée automatiquement une nouvelle conversation | Point d'entrée du chat, résout vers la conversation active ou son état vide |
+| Conversation (`/chat/[conversationId]`) | Sélection d'une conversation dans la sidebar, ou lien direct (URL partagée) | Poser une question au système RAG et consulter les réponses dans le contexte d'une conversation précise |
+| Sidebar de conversations (permanente `≥lg`, overlay `<lg` sur `/chat/*`) | Toujours visible à `≥lg` ; bouton dédié en dessous | Consulter, sélectionner, renommer ou supprimer une conversation passée ; créer une nouvelle conversation |
 
-Une seule route pour ST-303 — pas de sous-pages. Le menu historique est un overlay, pas une navigation.
+Le sélecteur de source (`DESIGN.md.Components.source-select`) vit dans le header global, pas dans le panneau de chat — il filtre le périmètre documentaire sur lequel porte la question suivante, sans changer de route. Les filtres actifs (thème, format) sont persistés **par conversation** — changer de conversation restaure ses filtres, une nouvelle conversation repart des filtres par défaut.
 
-→ Référence de composition (état vide, conversation active, erreur d'envoi) : `mockups/chat.html`. Spine gagne en cas de conflit. Le panneau du menu historique ouvert n'a pas de maquette dédiée — construire depuis les tableaux ci-dessous et `DESIGN.md.Components.history-menu`, même pattern que `UserMenu` de la Navbar déjà en place.
+→ Référence de composition (header, état vide, conversation active, erreur d'envoi) : `mockups/chat.html`. Spine gagne en cas de conflit. La sidebar de conversations n'a pas de maquette dédiée — construire depuis les tableaux ci-dessous et `DESIGN.md.Components.conversation-list-sidebar`/`conversation-item`.
 
 ## Voice and Tone
 
@@ -53,8 +56,13 @@ Comportemental. Les specs visuelles vivent dans `DESIGN.md.Components` (fichier 
 | Bulle de message | Chaque message, utilisateur ou assistant | Les retours à la ligne du contenu sont préservés (`whitespace-pre-wrap`) — pas de rendu Markdown enrichi (ST-307). Les bulles consécutives du même rôle se regroupent visuellement (espace réduit, avatar assistant affiché une seule fois par groupe). |
 | Indicateur de saisie assistant | Entre l'envoi d'un message et la réception de la réponse | Remplace la place où la prochaine bulle assistant apparaîtra (pas un indicateur flottant séparé) — la transition indicateur → contenu réel se fait sans saut de mise en page brusque. |
 | Puces de suggestion | Uniquement dans l'état vide (avant le premier message) | Cliquer une puce remplit la zone de saisie avec son texte et l'envoie immédiatement (pas juste un pré-remplissage à valider) — geste en un clic. Disparaissent dès le premier message envoyé, ne réapparaissent jamais dans la même session. |
-| Menu historique | Overlay déclenché par un bouton dédié | Liste des conversations triée par date de dernière activité (la plus récente en haut) — cohérent avec le tri déjà appliqué côté API (`GET /api/chat/history`, `updated_at` décroissant). Cliquer une conversation charge ses messages dans la zone de chat active et ferme le menu. Fermeture au clic extérieur ou `Échap` (même pattern que `UserMenu` de la Navbar, déjà en place). |
+| Liste de conversations (sidebar) | Permanente à `≥lg` ; overlay plein écran déclenché par un bouton à `<lg` | Conversations triées par date de dernière activité (la plus récente en haut) — cohérent avec le tri déjà appliqué côté API (`GET /api/chat/history`, `updated_at` décroissant). Cliquer une conversation charge ses messages complets (pas juste un résumé) dans la zone de chat active. En overlay mobile : fermeture au clic extérieur (même pattern que `UserMenu` de la Navbar). |
+| Titre de conversation (item de liste) | Chaque item de la sidebar | Retour à la ligne libre, jamais tronqué ni source de scroll horizontal (voir `DESIGN.md.Do's and Don'ts`) — un titre long occupe plusieurs lignes, l'item de liste grandit en conséquence. |
+| Actions de conversation (renommer / supprimer) | Bouton menu (icône ⋮) sur chaque item, ou dans l'en-tête de la conversation active | Renommer : champ inline avec validation (titre non vide, max 200 caractères). Supprimer : confirmation explicite avant suppression irréversible (voir État de chargement / State Patterns). |
+| Bouton "Nouvelle conversation" | En-tête de la sidebar et en-tête de la conversation active | Crée une conversation vide (pas de message initial), la sélectionne immédiatement, réinitialise les filtres aux valeurs par défaut (une conversation existante conserve les siens). |
 | Espace sources réservé | Sous chaque bulle assistant | Vide et neutre pour ST-303 (voir `DESIGN.md`) — ne réagit à aucune interaction tant qu'il est vide. |
+| Sélecteur de source | Header global, toutes les routes authentifiées | `<select>` natif (`FilterBar`/`FilterDropdown` existants, recolorés) — change le périmètre documentaire de la prochaine question, n'affecte pas les messages déjà affichés. Comportement de filtrage fonctionnel hors périmètre de cette itération visuelle. |
+| Navigation globale (header) | Toutes les routes authentifiées | 5 entrées (`Accueil`/`Chat`/`Recherche`/`Documents`/`Admin`), comportement inchangé de `Navbar.tsx` — seul l'onglet actif change de style (`DESIGN.md.Components.nav-item`). |
 
 ## State Patterns
 
@@ -65,7 +73,9 @@ Comportemental. Les specs visuelles vivent dans `DESIGN.md.Components` (fichier 
 | Envoi en cours | Message utilisateur ajouté immédiatement à la liste (optimistic UI) ; indicateur de saisie affiché à la place de la future bulle assistant ; bouton d'envoi désactivé ; champ de saisie reste éditable pour préparer le message suivant. |
 | Erreur d'envoi (réseau, 401, 500) | Bannière d'erreur (`banner-error`) au-dessus de la zone de saisie, `role="alert"`. Le message utilisateur déjà affiché (optimistic UI) reste visible avec un indicateur discret d'échec (ex. texte "Non envoyé" en `{colors.error}` sous la bulle) plutôt que de disparaître silencieusement — l'utilisateur ne perd jamais le texte qu'il a tapé. |
 | Réponse reçue | L'indicateur de saisie est remplacé par la bulle assistant réelle ; scroll automatique vers le bas pour révéler la nouvelle bulle. |
-| Conversation rouverte depuis l'historique | Remplace entièrement la liste de messages affichée (pas d'ajout à la suite de la conversation en cours) ; scroll positionné en bas (derniers messages visibles en premier). |
+| Conversation rouverte depuis la sidebar | Remplace entièrement la liste de messages affichée (pas d'ajout à la suite de la conversation en cours) ; scroll positionné en bas (derniers messages visibles en premier) ; les filtres de cette conversation sont restaurés. |
+| Renommage / suppression en cours | Le champ ou bouton concerné passe en état désactivé (opacité réduite) pendant l'appel réseau ; pas de double-soumission possible. Une erreur affiche un message clair sans fermer la modale/le champ, pour permettre de réessayer sans reperdre la saisie. |
+| Conversation supprimée / introuvable (URL directe vers un id invalide) | Message clair (pas de page blanche ni de crash) proposant de revenir à la liste des conversations ou d'en créer une nouvelle. |
 
 ## Interaction Primitives
 
@@ -85,6 +95,7 @@ Comportemental. Le contraste visuel vit dans `DESIGN.md`.
 - Le bouton d'envoi (icône seule) a un `aria-label` explicite ("Envoyer le message").
 - L'avatar assistant est décoratif (`aria-hidden="true"`) — l'information de rôle (qui parle) est portée par la structure/le texte, pas par l'image.
 - Le menu historique est navigable au clavier (`Tab`/`Entrée` pour ouvrir une conversation, `Échap` pour fermer), même exigence que `UserMenu` de la Navbar.
+- La sidebar de conversations est `role="list"` avec chaque item en `role="listitem"` ; chaque item porte un `aria-label` reprenant le titre complet de la conversation (même si affiché sur plusieurs lignes) et `aria-current="true"` sur la conversation active.
 
 ## Responsive & Platform
 
@@ -92,8 +103,10 @@ Pas de version native mobile — web responsive uniquement, cohérent avec l'aut
 
 | Breakpoint | Comportement |
 |---|---|
-| `≥ md` (768px+) | Bulles limitées à `{spacing.bubble-max-width}` (70%) de la largeur du conteneur de chat. |
-| `< md` | Bulles jusqu'à ~85% de la largeur (le ratio 70% deviendrait trop étroit sur petit écran) ; zone de saisie et bouton d'envoi restent côte à côte, jamais empilés. |
+| `≥ lg` (1024px+) | Sidebar de conversations permanente (`{spacing.sidebar-width}`, 280px) à gauche du panneau de chat. |
+| `< lg` | Sidebar remplacée par un bouton "Conversations" + overlay plein écran ; le panneau de chat occupe toute la largeur. |
+| `≥ md` (768px+) | Bulles limitées à `{spacing.bubble-max-width}` (78%) de la largeur du panneau de chat. |
+| `< md` | Bulles jusqu'à ~90% de la largeur (le ratio 78% deviendrait trop étroit sur petit écran) ; zone de saisie et bouton d'envoi restent côte à côte, jamais empilés. |
 
 ## Key Flows
 
@@ -111,6 +124,8 @@ Pas de version native mobile — web responsive uniquement, cohérent avec l'aut
 
 ### Flow — Retrouver une conversation de la veille (Léa, mardi matin)
 
-1. Léa se souvient avoir posé une question similaire hier. Elle clique le bouton historique dans la zone de chat.
-2. Un panneau s'ouvre avec la liste de ses conversations, la plus récente en haut ("Hier, 17h32" comme sous-titre implicite du titre de conversation).
-3. **Climax :** elle clique sur la conversation d'hier — la zone de chat active se remplace instantanément par ces messages, elle retrouve la réponse qu'elle cherchait sans avoir à reformuler sa question.
+1. Léa se souvient avoir posé une question similaire hier. Sur son écran large, la sidebar de conversations est déjà visible à gauche du panneau de chat — elle repère directement la conversation d'hier, en second dans la liste triée par activité récente.
+2. **Climax :** elle clique dessus — la zone de chat active se remplace instantanément par ces messages, elle retrouve la réponse qu'elle cherchait sans avoir à reformuler sa question. Les filtres de source qu'elle avait sélectionnés hier pour cette conversation sont restaurés automatiquement.
+3. Le titre de la conversation ("Migration base de données client X — configuration réseau") est assez long pour occuper deux lignes dans la sidebar ; il reste entièrement lisible, sans coupure ni ascenseur horizontal.
+
+Sur mobile, la même conversation se retrouve via le bouton "Conversations" qui ouvre un overlay plein écran reprenant la même liste ; le tapotement referme l'overlay et affiche la conversation sélectionnée.

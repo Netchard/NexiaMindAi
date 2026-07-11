@@ -1,5 +1,9 @@
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase as supabaseServer } from '@/lib/supabase/server';
+// Client admin (service role) : proxy.ts a déjà revalidé la session et injecté
+// x-user-id, donc l'autorisation est appliquée en code applicatif (.eq('user_id', ...))
+// plutôt que via RLS — voir src/lib/supabase/admin-client.ts.
+import { supabase as supabaseServer } from '@/lib/supabase/admin-client';
 import {
   retrieveRelevantChunks,
   generateResponse,
@@ -133,11 +137,12 @@ export async function POST(request: NextRequest) {
 
     if (conversationId) {
       // Récupérer l'historique de la conversation
+      // Pas de colonne `user_id` sur `messages` (voir architecture.md:271-282) —
+      // le scoping utilisateur se fait via `conversations.user_id`.
       const { data: messages, error: msgError } = await supabaseServer
         .from('messages')
         .select('content, role')
         .eq('conversation_id', conversationId)
-        .eq('user_id', userId)
         .order('created_at', { ascending: true });
 
       if (msgError) {
@@ -248,7 +253,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 7. Créer/mettre à jour la conversation EN PREMIER (nécessaire pour la clé étrangère)
-    const newConversationId = conversationId || `conv_${Date.now()}_${userId}`;
+    // `id` doit être un UUID valide (colonne `conversations.id UUID`) — voir
+    // architecture.md:256-268.
+    const newConversationId = conversationId || randomUUID();
 
     // Créer ou mettre à jour la conversation AVANT d'insérer les messages
     // `created_at` n'est fourni que pour une conversation réellement nouvelle —
@@ -278,7 +285,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Stocker le message utilisateur
-    const userMessageId = `msg_${Date.now()}_user_${userId}`;
+    const userMessageId = randomUUID();
 
     try {
       const { error: userMsgError } = await supabaseServer.from('messages').insert({
@@ -286,7 +293,6 @@ export async function POST(request: NextRequest) {
         conversation_id: newConversationId,
         role: 'user',
         content: body.message,
-        user_id: userId,
         created_at: new Date().toISOString(),
         metadata: {
           model: body.options?.model || 'default',
@@ -317,7 +323,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Stocker le message assistant
-    const assistantMessageId = `msg_${Date.now() + 1}_assistant_${userId}`;
+    const assistantMessageId = randomUUID();
 
     try {
       const { error: assistantMsgError } = await supabaseServer.from('messages').insert({
@@ -325,7 +331,6 @@ export async function POST(request: NextRequest) {
         conversation_id: newConversationId,
         role: 'assistant',
         content: formatted.formattedContent || generationResult.response,
-        user_id: userId,
         created_at: new Date().toISOString(),
         metadata: {
           model: body.options?.model || 'default',

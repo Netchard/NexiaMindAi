@@ -1,174 +1,278 @@
 ---
 name: NexiaMind AI — Chat
-description: Visual identity for the chat conversation interface (ST-303) of NexiaMind AI. Next.js App Router + Tailwind CSS (no component library). Extends the auth surface's brand tokens (../ux-nexiamind-ai-2026-07-04/DESIGN.md) — same values, repeated here so this file is self-contained — with chat-specific component tokens (bubbles, typing indicator, suggested prompts).
+description: Visual identity for the chat conversation interface (ST-303) of NexiaMind AI, plus the global app-shell (header, navigation, source filter, refresh, user menu) shared by every authenticated route. Next.js App Router + Tailwind CSS (no component library). Extends the auth surface's dark tokens (../ux-nexiamind-ai-2026-07-04/DESIGN.md) — same values, repeated here so this file is self-contained — with chat + shell component tokens. Remplace la précédente identité claire "Corporate Chaleureux" par le thème sombre de la maquette de référence.
 status: final
-updated: 2026-07-04
+updated: 2026-07-09
 colors:
-  primary: '#EF6C4D'
-  primary-hover: '#E1552F'
-  primary-active: '#C8441F'
+  primary: '#F4693F'
+  primary-hover: '#FF845E'
+  primary-gradient-from: '#F4693F'
+  primary-gradient-to: '#E64F2B'
   on-primary: '#FFFFFF'
-  ink: '#1E2A3B'
-  ink-muted: '#6B7280'
-  surface: '#FAFAFA'
-  surface-card: '#FFFFFF'
-  border: '#E5E7EB'
-  ring: '#F2A084'
-  error: '#DC2626'
-  error-surface: '#FEF2F2'
-  error-border: '#FECACA'
-  ink-dark: '#F1F5F9'
-  ink-muted-dark: '#94A3B8'
-  surface-dark: '#0F172A'
-  surface-card-dark: '#1E293B'
-  border-dark: '#334155'
-  ring-dark: '#F2A084'
-  error-dark: '#F87171'
-  error-surface-dark: 'rgba(220, 38, 38, 0.12)'
+  accent-blue-from: '#5B8DEF'
+  accent-blue-to: '#2F66DF'
+  ink: '#EEF2F8'
+  ink-strong: '#F2F5FA'
+  ink-muted: '#B7C3D6'
+  ink-subtle: '#8D9CB5'
+  ink-faint: '#647697'
+  ink-ghost: '#4F627E'
+  surface: '#0A1524'
+  surface-header: '#0C1829'
+  surface-panel: '#0E1B2E'
+  surface-field: '#0A1524'
+  border: '#2C3E5C'
+  border-soft: '#2A3B58'
+  border-header: '#1C2A42'
+  border-panel: '#1F2E48'
+  nav-active-bg: '#182842'
+  error: '#FF5A46'
+  error-soft: '#FF7A68'
+  error-surface: 'rgba(255, 90, 70, .1)'
+  error-border: 'rgba(255, 90, 70, .4)'
+  assistant-bubble-bg: '#E9EEF6'
+  assistant-bubble-text: '#17233A'
+  dot-muted: '#9AA7BD'
+  surface-hover: 'rgba(244,105,63,.08)'
 typography:
   display:
-    fontFamily: 'Geist Sans'
-    fontSize: 28px
-    fontWeight: '700'
+    fontFamily: 'Newsreader'
+    fontSize: 30px
+    fontWeight: '600'
     lineHeight: '1.25'
     letterSpacing: -0.01em
+  panel-title:
+    fontFamily: system-sans
+    fontSize: 15px
+    fontWeight: '600'
+    lineHeight: '1.3'
   body:
-    fontFamily: 'Geist Sans'
-    fontSize: 16px
+    fontFamily: system-sans
+    fontSize: 14.5px
     fontWeight: '400'
-    lineHeight: '1.5'
+    lineHeight: '1.6'
   label:
-    fontFamily: 'Geist Sans'
-    fontSize: 14px
+    fontFamily: system-sans
+    fontSize: 12.5px
     fontWeight: '500'
     lineHeight: '1.4'
   caption:
-    fontFamily: 'Geist Sans'
-    fontSize: 13px
+    fontFamily: system-sans
+    fontSize: 12px
     fontWeight: '400'
     lineHeight: '1.4'
+  nav-item:
+    fontFamily: system-sans
+    fontSize: 14px
+    fontWeight: '500'
+    lineHeight: '1.3'
+  nav-item-active:
+    fontFamily: system-sans
+    fontSize: 14px
+    fontWeight: '600'
+    lineHeight: '1.3'
 rounded:
-  sm: 8px
-  md: 10px
-  lg: 16px
+  sm: 9px
+  md: 13px
+  lg: 14px
+  xl: 20px
   full: 9999px
 spacing:
-  message-gap: 12px
-  bubble-padding: 14px
-  bubble-max-width: 70%
-  input-bar-padding: 16px
-  section-gap: 32px
-  gutter: 16px
+  header-height: 64px
+  panel-header-height: 60px
+  chat-max-width: 880px
+  bubble-max-width: 78%
+  message-gap: 10px
+  bubble-padding: '14px 17px'
+  composer-padding: '16px 18px'
+  gutter: 22px
+  sidebar-width: 280px
 components:
+  app-header:
+    background: '{colors.surface-header}'
+    border: '{colors.border-header}'
+    height: '{spacing.header-height}'
+  nav-item:
+    activeBackground: '{colors.nav-active-bg}'
+    activeForeground: '{colors.ink-strong}'
+    inactiveForeground: '{colors.ink-subtle}'
+    radius: '{rounded.sm}'
+  source-select:
+    background: '{colors.surface-panel}'
+    border: '{colors.border-soft}'
+    foreground: '{colors.ink-muted}'
+    radius: '{rounded.sm}'
+  refresh-button:
+    background: 'transparent'
+    border: '{colors.border-soft}'
+    foreground: '{colors.ink-muted}'
+    radius: '{rounded.sm}'
+  user-avatar:
+    background: 'linear-gradient(135deg, {colors.primary-gradient-from}, {colors.primary-gradient-to})'
+    foreground: '{colors.on-primary}'
+    radius: '{rounded.full}'
+  chat-panel:
+    background: '{colors.surface-panel}'
+    border: '{colors.border-panel}'
+    radius: '{rounded.xl}'
+    shadow: '0 30px 80px -40px rgba(0,0,0,.8)'
+  panel-header:
+    border: '{colors.border-header}'
+    height: '{spacing.panel-header-height}'
+  history-button:
+    background: '{colors.surface-field}'
+    border: '{colors.border-soft}'
+    foreground: '{colors.ink-muted}'
+    radius: '{rounded.sm}'
   message-bubble-user:
-    background: '{colors.primary}'
+    background: 'linear-gradient(135deg, {colors.primary-gradient-from}, {colors.primary-gradient-to})'
     foreground: '{colors.on-primary}'
     radius: '{rounded.lg}'
-    align: 'right'
+    radiusCorner: 'border-top-right-radius: 5px'
+    shadow: '0 8px 22px -12px rgba(244,105,63,.55)'
   message-bubble-assistant:
-    background: '{colors.surface-card}'
-    border: '{colors.border}'
-    foreground: '{colors.ink}'
+    background: '{colors.assistant-bubble-bg}'
+    foreground: '{colors.assistant-bubble-text}'
     radius: '{rounded.lg}'
-    align: 'left'
+    radiusCorner: 'border-top-left-radius: 5px'
   assistant-avatar:
-    size: 28px
+    size: 26px
+    background: 'linear-gradient(135deg, {colors.primary-gradient-from}, {colors.primary-gradient-to})'
+    foreground: '{colors.on-primary}'
     radius: '{rounded.full}'
   typing-indicator:
-    dotColor: '{colors.ink-muted}'
-    background: '{colors.surface-card}'
-    border: '{colors.border}'
+    background: '{colors.assistant-bubble-bg}'
+    dotColor: '{colors.dot-muted}'
     radius: '{rounded.lg}'
+    radiusCorner: 'border-top-left-radius: 5px'
+  suggested-prompt-chip:
+    background: 'transparent'
+    border: '{colors.border-soft}'
+    foreground: '{colors.ink-muted}'
+    radius: '{rounded.full}'
+    hoverBorder: '{colors.primary}'
+    hoverBackground: 'rgba(244,105,63,.08)'
   chat-input:
-    background: '{colors.surface-card}'
+    background: '{colors.surface-field}'
     border: '{colors.border}'
     radius: '{rounded.md}'
-    focusRing: '{colors.ring}'
+    focusBorder: '{colors.primary}'
     text: '{colors.ink}'
   send-button:
-    background: '{colors.primary}'
-    backgroundHover: '{colors.primary-hover}'
-    backgroundActive: '{colors.primary-active}'
+    background: 'linear-gradient(135deg, {colors.primary-gradient-from}, {colors.primary-gradient-to})'
     foreground: '{colors.on-primary}'
-    radius: '{rounded.full}'
-  suggested-prompt-chip:
-    background: '{colors.surface-card}'
-    border: '{colors.border}'
-    foreground: '{colors.ink}'
-    radius: '{rounded.full}'
-  history-menu:
-    background: '{colors.surface-card}'
-    border: '{colors.border}'
     radius: '{rounded.md}'
+    shadow: '0 8px 20px -8px rgba(244,105,63,.55)'
   sources-placeholder:
-    border: '{colors.border}'
-    foreground: '{colors.ink-muted}'
+    border: '{colors.border} dashed'
+    foreground: '{colors.ink-faint}'
     radius: '{rounded.sm}'
   banner-error:
     background: '{colors.error-surface}'
     border: '{colors.error-border}'
-    foreground: '{colors.error}'
-    radius: '{rounded.sm}'
+    foreground: '{colors.error-soft}'
+    radius: '{rounded.lg}'
+  conversation-list-sidebar:
+    background: '{colors.surface-header}'
+    border: '{colors.border-panel}'
+    width: '{spacing.sidebar-width}'
+  conversation-item:
+    hoverBackground: '{colors.surface-hover}'
+    foreground: '{colors.ink-muted}'
+    radius: '{rounded.md}'
+  conversation-item-active:
+    background: '{colors.surface-panel}'
+    border: '{colors.border-panel}'
+    indicatorColor: '{colors.primary}'
+    foreground: '{colors.ink-strong}'
+    radius: '{rounded.md}'
+  conversation-actions-menu:
+    background: '{colors.surface-card}'
+    border: '{colors.border}'
+    itemHoverBackground: '{colors.surface-hover}'
+    radius: '{rounded.md}'
 ---
 
 ## Brand & Style
 
-Même posture que l'auth — **Corporate Chaleureux** — mais appliquée à un espace de travail plutôt qu'à un point d'entrée : ici, pas de panneau d'illustration plein écran, la couleur de marque se retire pour laisser toute la place à la conversation elle-même. Le corail reste l'unique signal d'action et de présence (bouton d'envoi, bulle de l'utilisateur), jamais un décor. C'est un outil de travail quotidien pour des professionnels techniques — la conversation doit se lire vite, sans friction visuelle, sur des échanges qui peuvent être longs et denses.
+Même pivot que l'auth — vers le thème sombre de `docs/Maquette-ux-NexiaMind AI.html` (import archivé dans `imports/maquette-nexiamind-ai-dark-2026-07-07.html`) — appliqué ici à l'espace de travail quotidien plutôt qu'au point d'entrée. Le fond marine (`{colors.surface}`) devient la toile de fond permanente du produit ; le panneau de chat flotte dessus comme une carte unique (`chat-panel`), bordée et ombrée, plutôt que de s'étendre pleine largeur — c'est un changement de composition, pas seulement de couleur, par rapport à la précédente itération claire pleine largeur.
+
+Ce fichier porte aussi, pour la première fois, les tokens de l'**app-shell global** (`app-header`, `nav-item`, `source-select`, `refresh-button`, `user-avatar`) : la maquette de référence rend un unique en-tête sombre qui remplace visuellement le `Navbar` existant sans en changer la structure — mêmes 5 entrées de navigation (`Accueil`, `Chat`, `Recherche`, `Documents`, `Admin`, déjà câblées dans `src/components/Navbar/Navbar.tsx`), même bouton Rafraîchir, même emplacement pour le menu utilisateur. `[NOTE FOR UX]` Ces tokens sont documentés ici parce que `/chat` est aujourd'hui la seule route authentifiée réellement implémentée ; quand Accueil/Recherche/Documents/Admin auront leur propre spine, ils devront référencer `app-header`/`nav-item` par le chemin `{ux-designs/ux-nexiamind-ai-2026-07-04-chat/DESIGN.md}` plutôt que redéfinir ces tokens.
+
+Le corail reste l'unique signal d'action et de présence de l'utilisateur (bulle de ses messages, bouton d'envoi, avatar). L'assistant, lui, reste délibérément neutre — mais pas sombre : sa bulle garde un fond clair (`{colors.assistant-bubble-bg}` `#E9EEF6`) même dans un shell entièrement sombre, rupture de contraste volontaire reprise telle quelle de la maquette pour que la réponse — le contenu qu'on lit le plus longtemps — se détache visuellement de tout le reste de l'interface.
 
 ## Colors
 
-- **Corail (`{colors.primary}`)** marque tout ce que **l'utilisateur** produit activement : la bulle de ses propres messages, le bouton d'envoi. Ne s'applique jamais à un message assistant — l'assistant reste visuellement neutre (`{colors.surface-card}`), pour que l'œil distingue instantanément qui parle sans avoir à lire le contenu.
-- **Bulle assistant** : fond `{colors.surface-card}`, bordure `{colors.border}` — au même titre qu'un champ de saisie côté auth, elle *reçoit* du contenu plutôt qu'elle ne *déclare* une action.
-- **Encre (`{colors.ink}`)** pour tout le texte des messages, y compris à l'intérieur de la bulle utilisateur en négatif (`{colors.on-primary}` sur fond corail).
+- **Corail (`{colors.primary}`, dégradé vers `{colors.primary-gradient-to}`)** marque tout ce que **l'utilisateur** produit activement : la bulle de ses propres messages, le bouton d'envoi, son avatar (initiale). Ne s'applique jamais à un message assistant.
+- **Bulle assistant (`{colors.assistant-bubble-bg}` `#E9EEF6` / `{colors.assistant-bubble-text}` `#17233A`)** est la seule zone claire de toute la surface `/chat` — texte foncé sur fond clair, à l'inverse de tout le reste de l'interface. C'est un choix délibéré de la maquette, pas un oubli de thème sombre : préserver.
+- **Fond de page (`{colors.surface}`)** et **panneau de chat (`{colors.surface-panel}`)** reprennent exactement les tokens de l'auth — cohérence de marine à travers tout le produit, connecté ou non.
+- **En-tête (`{colors.surface-header}` `#0C1829`)** est légèrement plus sombre que le panneau de chat, pour ancrer visuellement la navigation tout en haut de la hiérarchie.
+- **Navigation active (`{colors.nav-active-bg}` `#182842`)** distingue l'onglet courant par un fond plein plutôt qu'un soulignement — lisible même à distance, cohérent avec l'absence générale de bordures fines dans le shell.
+- **Texte** : cascade `{colors.ink}` → `{colors.ink-muted}` → `{colors.ink-subtle}` → `{colors.ink-faint}` identique à l'auth, réutilisée pour hiérarchiser nom de l'assistant, texte de message, libellés d'aide et disclaimer légal.
 - **États d'erreur** : mêmes tokens que l'auth (`{colors.error}` / `{colors.error-surface}` / `{colors.error-border}`) — une bannière d'erreur reste visuellement identique partout dans le produit.
-- **Mode sombre** : mêmes bascules que l'auth (`surface-dark`, `surface-card-dark`, `ink-dark`, `border-dark`) — le corail reste identique en clair/sombre (déjà validé sur l'auth).
 
-Interdit : ne jamais utiliser le corail en fond de bulle assistant (romprait la lisibilité "qui parle") ; ne jamais introduire une deuxième couleur pour une seconde catégorie de message (le produit n'a que deux rôles : utilisateur, assistant).
+Interdit : ne jamais utiliser le corail en fond de bulle assistant ou de tout élément que l'utilisateur n'a pas produit lui-même ; ne jamais assombrir la bulle assistant pour la faire correspondre au reste du shell — la rupture de contraste est la fonctionnalité, pas un défaut.
 
 ## Typography
 
-Geist Sans, identique à l'auth — aucune police additionnelle. Pas de rôles `hero`/`hero-sub` ici (réservés au panneau d'illustration auth, absent de cette surface).
+Corps en pile système sans-serif, comme l'auth. **Newsreader** apparaît une seule fois sur cette surface : le rôle `display`, réservé au titre de l'état vide ("Posez votre première question"). Le titre du panneau de chat ("NexiaMind AI" dans le `panel-header`) reste en sans-serif gras (`panel-title`) — ce n'est pas un titre éditorial, c'est un libellé de zone d'interface.
 
-- **`display`** (28px/700) — titre de l'état vide ("Posez votre première question").
-- **`body`** (16px/400) — le contenu de chaque message, utilisateur comme assistant. Densité de lecture prioritaire sur tout le reste : c'est ce qu'on lit le plus longtemps dans le produit.
-- **`label`** (14px/500) — nom de l'assistant ("NexiaMind AI") au-dessus de sa première bulle d'un groupe, libellés du menu historique.
-- **`caption`** (13px/400) — titre des conversations dans le menu historique, texte des puces de suggestion.
+- **`display`** (30px/600 Newsreader) — titre de l'état vide.
+- **`panel-title`** (15px/600 sans-serif) — titre du panneau de chat.
+- **`body`** (14.5px/400) — contenu de chaque message, utilisateur comme assistant.
+- **`label`** (12.5px/500) — nom de l'assistant au-dessus de sa bulle, libellés du menu historique.
+- **`caption`** (12px/400) — disclaimer légal, texte de l'espace sources réservé.
+- **`nav-item`** / **`nav-item-active`** (14px, 500/600) — entrées de navigation du header.
 
 ## Layout & Spacing
 
-Plein largeur de la zone de contenu héritée du layout racine (`container mx-auto px-4`, `Navbar`/`Footer` visibles — contrairement à l'auth qui s'en exclut). Colonne unique verticale : liste de messages en haut (défilement propre, `overflow-y-auto`), zone de saisie fixée en bas de la zone de chat (pas `position: fixed` sur la fenêtre — reste dans le flux de la page pour respecter le padding du layout racine).
+Le header global (`{spacing.header-height}`, 64px) est fixe en haut de toutes les routes authentifiées, pleine largeur, fond `{colors.surface-header}`. En dessous, le panneau de chat est **centré** dans la page (`{spacing.chat-max-width}`, 880px) plutôt que de s'étendre pleine largeur — rupture avec la précédente itération qui héritait du conteneur `container mx-auto` pleine largeur du layout racine sans plafond propre.
 
-- `{spacing.bubble-max-width}` (70%) — une bulle ne dépasse jamais 70% de la largeur du conteneur de chat, pour garder une longueur de ligne lisible même sur grand écran.
-- `{spacing.message-gap}` (12px) — espace vertical entre deux messages consécutifs ; réduit de moitié entre deux messages du même rôle à la suite (regroupement visuel).
-- `{spacing.bubble-padding}` (14px) — padding interne de chaque bulle.
-- `{spacing.input-bar-padding}` (16px) — padding autour de la zone de saisie.
+À l'intérieur du panneau : en-tête de panneau (`{spacing.panel-header-height}`, 60px) avec titre + bouton Historique ; zone de messages scrollable (padding `{spacing.gutter}`, 22px) ; zone de composition en bas (`{spacing.composer-padding}`, 16px 18px), toujours visible, jamais recouverte par le clavier virtuel ou le scroll.
+
+- `{spacing.bubble-max-width}` (78%) — légèrement plus large que le 70% de la précédente itération, cohérent avec le panneau désormais recentré et plus étroit que la pleine page.
+- `{spacing.message-gap}` (10px) — espace vertical entre deux messages.
+
+**Contrainte de hauteur (ST-306)** : toute la surface `/chat` — sidebar (`{spacing.sidebar-width}`, 280px) comprise — occupe exactement l'espace restant sous le header global (`{spacing.header-height}`), sans jamais dépasser la hauteur du viewport. La zone de saisie doit rester atteignable sans scroll de page ; seules la liste de messages et la liste de conversations défilent en interne (`overflow-y-auto`), jamais la page entière. Un seul conteneur de scroll par zone — jamais deux `overflow-y-auto` imbriqués (le parent doit être un conteneur flex pour que le `flex-1` de son enfant ait un effet ; sinon le scroll se produit au mauvais niveau).
 
 ## Elevation & Depth
 
-Aucune ombre portée sur les bulles — la distinction se fait par couleur de fond et bordure, à l'identique du champ de saisie auth. La zone de saisie se détache légèrement du fond de page par sa bordure et son fond `{colors.surface-card}`, pas par une ombre.
+Le panneau de chat porte une ombre large et diffuse (`{components.chat-panel.shadow}`) pour se détacher du fond de page — seul élément de profondeur marqué de cette surface, à l'identique de la logique appliquée à la carte auth. Les bulles n'ont aucune ombre propre ; seule la bulle utilisateur porte une ombre teintée corail légère (`{components.message-bubble-user.shadow}`), écho du bouton d'envoi. Le header n'a pas d'ombre — seule sa bordure basse (`{colors.border-header}`) le sépare du contenu.
 
 ## Shapes
 
-`{rounded.lg}` (16px) pour les bulles de message — plus arrondi que les champs de formulaire (`{rounded.sm}`, 8px) ou les boutons (`{rounded.md}`, 10px) de l'auth : la bulle est un objet conversationnel, pas un composant de formulaire, elle peut se permettre une forme plus douce et plus "moderne". Le bouton d'envoi est circulaire (`{rounded.full}`), comme une icône d'action autonome plutôt qu'un bouton pleine largeur (différent du bouton primaire auth qui est pleine largeur de formulaire).
+`{rounded.lg}` (14px) pour les bulles de message, avec un détail signature repris de la maquette : le coin qui pointe vers l'émetteur est resserré à 5px (`border-top-right-radius` côté utilisateur, `border-top-left-radius` côté assistant) — une pointe de bulle discrète plutôt qu'une forme parfaitement symétrique. `{rounded.xl}` (20px) pour le panneau de chat englobant. Le bouton d'envoi est `{rounded.md}` (13px, carré arrondi) — **pas circulaire**, contrairement à la précédente itération ; cohérent avec la zone de saisie adjacente qui partage le même radius. Les puces de suggestion et le menu historique restent `{rounded.full}`/`{rounded.md}` respectivement, inchangés dans leur logique.
 
 ## Components
 
-- **Bulle utilisateur (`message-bubble-user`)** — fond `{colors.primary}` plein, texte `{colors.on-primary}`, alignée à droite, `{rounded.lg}`.
-- **Bulle assistant (`message-bubble-assistant`)** — fond `{colors.surface-card}`, bordure `{colors.border}`, texte `{colors.ink}`, alignée à gauche, précédée d'un petit avatar rond (`assistant-avatar`, 28px, logo NexiaMind AI existant `public/logo.svg`).
-- **Indicateur de saisie (`typing-indicator`)** — remplace temporairement la bulle assistant : mêmes fond/bordure/radius que `message-bubble-assistant`, contient trois points de couleur `{colors.ink-muted}` qui pulsent en boucle (animation légère, seule animation de cette surface).
-- **Zone de saisie (`chat-input`)** — textarea auto-grandissante (1 à ~6 lignes visibles avant scroll interne), fond `{colors.surface-card}`, bordure `{colors.border}`, radius `{rounded.md}`, focus ring `{colors.ring}` — même traitement que `input-field` de l'auth.
-- **Bouton d'envoi (`send-button`)** — icône seule (flèche/avion en papier), cercle plein `{colors.primary}`, `{rounded.full}`, désactivé (opacité réduite) si le champ est vide ou pendant l'attente de réponse — même logique de désactivation que `button-primary` de l'auth.
-- **Puce de suggestion (`suggested-prompt-chip`)** — pilule cliquable (`{rounded.full}`), fond `{colors.surface-card}`, bordure `{colors.border}`, visible uniquement dans l'état vide (avant le premier message).
-- **Menu historique (`history-menu`)** — déclenché par un bouton dans la zone de chat (pas dans la Navbar), panneau déroulant `{colors.surface-card}` / `{colors.border}` / `{rounded.md}`, liste de titres de conversation (`caption`), pas de sidebar permanente.
-- **Espace sources réservé (`sources-placeholder`)** — zone vide, bordure fine `{colors.border}` en pointillé, sous chaque bulle assistant ; invisible/sans contenu tant que ST-305 n'y insère rien — ne doit pas ressembler à un élément interactif tant qu'il est vide (pas de curseur pointer, pas de hover state).
-- **Bannière d'erreur (`banner-error`)** — identique à l'auth, positionnée au-dessus de la zone de saisie.
+- **En-tête (`app-header`)** — fond `{colors.surface-header}`, bordure basse `{colors.border-header}`, hauteur `{spacing.header-height}`. Contient logo + wordmark, navigation (`nav-item`), sélecteur de source (`source-select`), bouton Rafraîchir (`refresh-button`), avatar utilisateur (`user-avatar`).
+- **Entrée de navigation (`nav-item`)** — fond plein `{colors.nav-active-bg}` + texte `{colors.ink-strong}` si actif, transparent + `{colors.ink-subtle}` sinon. Reprend le comportement exact de `Navbar.tsx` (5 entrées, routes existantes) — seul l'habillage change.
+- **Sélecteur de source (`source-select`)** — `<select>` natif stylé, fond `{colors.surface-panel}`, bordure `{colors.border-soft}`, chevron custom. Options : "Toutes les sources", "Documents techniques", "Tickets GitLab", "Bases de connaissances" — à cabler sur `FilterBar`/`FilterDropdown` existants plutôt que recréés.
+- **Avatar utilisateur (`user-avatar`)** — cercle dégradé corail avec initiale, remplace l'affichage textuel actuel de `UserMenu` dans le header (le menu déroulant lui-même conserve son comportement, seul le déclencheur change de forme).
+- **Panneau de chat (`chat-panel`)** — carte centrée, fond `{colors.surface-panel}`, bordure `{colors.border-panel}`, radius `{rounded.xl}`, ombre portée.
+- **Bulle utilisateur (`message-bubble-user`)** — dégradé corail plein, texte `{colors.on-primary}`, alignée à droite, coin supérieur droit resserré.
+- **Bulle assistant (`message-bubble-assistant`)** — fond clair `{colors.assistant-bubble-bg}`, texte foncé `{colors.assistant-bubble-text}`, alignée à gauche, coin supérieur gauche resserré, précédée du nom "NexiaMind AI" (`label`) et d'un avatar rond 26px.
+- **Indicateur de saisie (`typing-indicator`)** — remplace temporairement la bulle assistant : mêmes fond/radius, trois points `{colors.dot-muted}` qui pulsent en boucle (`nmDot`, 1.1s, décalage 0.18s/0.36s).
+- **Zone de saisie (`chat-input`)** — fond `{colors.surface-field}`, bordure `{colors.border}`, radius `{rounded.md}`, bordure corail au focus (pas de glow flouté ici, contrairement à l'auth — la zone de saisie reste dense parmi les messages).
+- **Bouton d'envoi (`send-button`)** — carré arrondi `{rounded.md}` (pas circulaire), dégradé corail, icône flèche seule, désactivé (opacité réduite) si champ vide ou réponse en attente.
+- **Puce de suggestion (`suggested-prompt-chip`)** — pilule transparente à bordure, devient bordure + fond corail translucide au survol.
+- **Bouton Historique (`history-button`)** — bordure `{colors.border-soft}`, fond `{colors.surface-field}`, dans l'en-tête du panneau (pas dans le header global).
+- **Espace sources réservé (`sources-placeholder`)** — bordure pointillée `{colors.border}`, texte `{colors.ink-faint}`, sous chaque bulle assistant, neutre tant que ST-305 n'y insère rien.
+- **Bannière d'erreur (`banner-error`)** — identique à l'auth, au-dessus de la zone de saisie.
+- **Sidebar de conversations (`conversation-list-sidebar`, ST-306)** — fond `{colors.surface-header}` (même ton que la Navbar — ancre la sidebar comme un élément structurel, pas une carte de contenu), bordure droite `{colors.border-panel}`, largeur `{spacing.sidebar-width}` (280px). Permanente à `lg:` et au-delà ; en dessous, devient un overlay plein écran déclenché par un bouton (même fond).
+- **Item de conversation (`conversation-item`)** — titre en retour à la ligne libre, sans troncature (jamais de `truncate`/ellipse — un titre long prend plusieurs lignes plutôt que de déborder horizontalement). Survol : fond `{colors.surface-hover}` (corail translucide, même valeur que `suggested-prompt-chip.hoverBackground`). Sélectionné (`conversation-item-active`) : fond `{colors.surface-panel}`, bordure `{colors.border-panel}`, barre verticale corail (`{colors.primary}`) à gauche — traitement distinct du survol, ne jamais les confondre.
+- **Menu d'actions de conversation (`conversation-actions-menu`)** — renommer/supprimer, fond `{colors.surface-card}`, bordure `{colors.border}`, items en survol `{colors.surface-hover}`. Réutilise les mêmes tokens que la zone de saisie du chat (`chat-input`), pas de tokens `surface-input`/`border-input` dédiés.
 
 ## Do's and Don'ts
 
 | Do | Don't |
 |---|---|
-| Corail réservé aux messages/actions de l'utilisateur (sa bulle, le bouton d'envoi) | Utiliser le corail sur une bulle assistant ou tout élément que l'utilisateur n'a pas produit lui-même |
-| Bulles `{rounded.lg}`, distinctes des radius de formulaire | Réutiliser le radius `{rounded.sm}` des champs auth pour les bulles |
-| Un seul indicateur de chargement (points animés dans la bulle) | Superposer un spinner ET des points animés |
-| Espace "Sources" réservé mais visuellement neutre tant que vide | Donner un style interactif (hover, curseur) à l'espace sources vide |
-| Menu historique en overlay à la demande | Sidebar permanente qui réduit la largeur de la zone de conversation (hors périmètre ST-303) |
+| Bulle assistant claire (`{colors.assistant-bubble-bg}`) même sur fond sombre | Assombrir la bulle assistant pour "matcher" le thème |
+| Corail réservé aux messages/actions de l'utilisateur | Utiliser le corail sur un élément que l'utilisateur n'a pas produit lui-même |
+| Bouton d'envoi carré arrondi (`{rounded.md}`), aligné visuellement sur la zone de saisie | Rendre le bouton d'envoi circulaire (ancienne itération) |
+| Panneau de chat centré, plafonné à `{spacing.chat-max-width}` | Étendre le panneau pleine largeur de l'écran |
+| Réutiliser `Navbar`/`RefreshButton`/`FilterBar`/`UserMenu` existants, recolorés | Recréer ces composants depuis zéro |
+| Newsreader réservé au titre de l'état vide | Étendre Newsreader au corps des messages ou aux libellés d'interface |
+| Titre de conversation en retour à la ligne libre dans la sidebar | Tronquer (`truncate`/ellipse) ou laisser déborder horizontalement (scroll-x) |
+| Zone de saisie toujours atteignable dans la hauteur du viewport, sans scroll de page | Laisser le panneau `/chat` dépasser 100vh (composer poussé hors écran) |
+</content>

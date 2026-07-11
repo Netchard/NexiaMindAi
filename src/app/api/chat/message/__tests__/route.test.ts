@@ -197,6 +197,48 @@ describe('POST /api/chat/message', () => {
       
       expect(response.status).toBe(200);
     });
+
+    it('devrait accepter les requêtes avec filtres dans le body (contrat theme/documentFormat)', async () => {
+      const testFilters = {
+        theme: 'Facture',
+        documentFormat: 'pdf',
+      };
+
+      mockRequest = createMockRequest(
+        {
+          message: 'Test message avec filtres',
+          filters: testFilters,
+        },
+        { 'x-user-id': 'user_123', 'x-user-email': 'test@example.com' }
+      );
+
+      const response = await POST(mockRequest);
+
+      expect(response.status).toBe(200);
+
+      // Vérifier que retrieveRelevantChunks a été appelé avec les filtres
+      expect(mockRetrieveRelevantChunks).toHaveBeenCalledWith(
+        'Test message avec filtres',
+        expect.objectContaining(testFilters)
+      );
+    });
+
+    it('ne devrait transmettre que les clés de filtre autorisées (allow-list)', async () => {
+      mockRequest = createMockRequest(
+        {
+          message: 'Test message',
+          filters: { theme: 'Facture', similarityThreshold: 0, evilKey: 'x' } as any,
+        },
+        { 'x-user-id': 'user_123', 'x-user-email': 'test@example.com' }
+      );
+
+      await POST(mockRequest);
+
+      const callArgs = mockRetrieveRelevantChunks.mock.calls[0][1];
+      expect(callArgs).toEqual({ theme: 'Facture', limit: 8 });
+      expect(callArgs).not.toHaveProperty('similarityThreshold');
+      expect(callArgs).not.toHaveProperty('evilKey');
+    });
   });
 
   describe('Pipeline RAG', () => {
@@ -213,9 +255,7 @@ describe('POST /api/chat/message', () => {
       expect(mockRetrieveRelevantChunks).toHaveBeenCalledWith(
         'Test message',
         expect.objectContaining({
-          client: 'nexia',
-          userId: 'user_123',
-          limit: 5,
+          limit: 8,
         })
       );
     });

@@ -12,13 +12,13 @@ Le layout principal de NexiaMind AI fournit une structure cohérente pour toutes
 
 ```
 ┌─────────────────────────────────────┐
-│               Navbar                  │
+│               Navbar                │
 ├─────────────────────────────────────┤
 │                                     │
-│          Zone de Contenu Principal    │
+│          Zone de Contenu Principal  │
 │                                     │
 ├─────────────────────────────────────┤
-│               Footer                  │
+│               Footer                │
 └─────────────────────────────────────┘
 ```
 

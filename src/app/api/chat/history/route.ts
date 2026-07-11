@@ -5,7 +5,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+// Client admin (service role) : proxy.ts a déjà revalidé la session et injecté
+// x-user-id, donc l'autorisation est appliquée en code applicatif (.eq('user_id', ...))
+// plutôt que via RLS — voir src/lib/supabase/admin-client.ts.
+import { supabase as supabaseServer } from '@/lib/supabase/admin-client';
 import { logger } from '@/lib/logger';
 
 // Types pour les réponses
@@ -24,16 +27,8 @@ interface HistoryResponse {
   limit: number;
 }
 
-// Initialiser Supabase
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  logger.error('SUPABASE_URL and SUPABASE_ANON_KEY must be defined');
-  throw new Error('Supabase configuration missing');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Utilise le client serveur standardisé
+// La validation est déjà faite dans server.ts
 
 /**
  * Endpoint GET /api/chat/history
@@ -91,7 +86,7 @@ export async function GET(request: NextRequest) {
     });
 
     // 3. Récupération depuis Supabase
-    let query = supabase
+    let query = supabaseServer
       .from('conversations')
       .select('id, title, created_at, updated_at', { count: 'exact' })
       .eq('user_id', userId)
@@ -124,7 +119,7 @@ export async function GET(request: NextRequest) {
     const messageCounts: Record<string, number> = {};
 
     if (conversationIds.length > 0) {
-      const { data: messages, error: msgError } = await supabase
+      const { data: messages, error: msgError } = await supabaseServer
         .from('messages')
         .select('conversation_id')
         .in('conversation_id', conversationIds);
