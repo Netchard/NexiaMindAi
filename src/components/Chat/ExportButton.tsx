@@ -89,7 +89,7 @@ function downloadFile(content: string, filename: string, mimeType: string) {
 /**
  * Bouton pour exporter une réponse individuelle
  */
-export default function ExportButton({ message, disabled = false }: ExportButtonProps) {
+export function ExportButton({ message, disabled = false }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false)
   const [exportFormat, setExportFormat] = useState<ExportFormat>('markdown')
   const [showDropdown, setShowDropdown] = useState(false)

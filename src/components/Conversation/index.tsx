@@ -5,4 +5,4 @@
  */
 
 export { default as ConversationHeader } from './ConversationHeader'
-export { default as CopyConversationButton } from './CopyConversationButton'
+export { CopyConversationButton } from './CopyConversationButton'

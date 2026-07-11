@@ -8,7 +8,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useConversations } from '@/components/Conversations'
-import { CopyConversationButton } from './CopyConversationButton'
+import { CopyConversationButton } from './'
 import { CONVERSATION_ACTION_LABELS, CONVERSATION_CONFIRMATIONS } from '@/types/conversations'
 
 interface ConversationHeaderProps {

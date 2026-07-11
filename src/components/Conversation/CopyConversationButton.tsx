@@ -75,7 +75,7 @@ function generateConversationMarkdown(
 /**
  * Bouton pour copier une conversation entière dans le presse-papiers
  */
-export default function CopyConversationButton({
+export function CopyConversationButton({
   conversationId,
   disabled = false,
 }: CopyConversationButtonProps) {

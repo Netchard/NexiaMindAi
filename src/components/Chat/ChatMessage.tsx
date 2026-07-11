@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { SourceCitationList } from '@/components/SourceCitation';
 import { MarkdownRenderer } from '@/components/Markdown';
-import { ExportButton } from './ExportButton'
+import { ExportButton } from './'
 import type { SourceCitation } from '@/types/citations';
 import type { ChatMessageData } from './types'
 
