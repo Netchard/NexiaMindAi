@@ -141,7 +141,7 @@ async function testPdfExtraction(pdfPath: string): Promise<void> {
     }
 
     // Si c'est un PDF, donner des informations supplémentaires
-    if (result.contentType === 'pdf') {
+    if (result.contentType === 'pdf' && result.pageCount !== undefined) {
       console.log('\n📊 Statistiques PDF:');
       console.log(`   - Pages: ${result.pageCount}`);
       console.log(`   - Texte moyen par page: ${result.pageCount > 0 ? (result.text.length / result.pageCount).toFixed(0) : 0} caractères`);

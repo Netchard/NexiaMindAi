@@ -1,11 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import dynamic from 'next/dynamic'
 import { SourceCitationList } from '@/components/SourceCitation';
-import { MarkdownRenderer } from '@/components/Markdown';
-import { ExportButton } from './'
+import { MarkdownLoadingSpinner } from '@/components/common';
 import type { SourceCitation } from '@/types/citations';
 import type { ChatMessageData } from './types'
+
+// Lazy loading des composants lourds pour ST-309
+const MarkdownRenderer = dynamic(
+  () => import('@/components/Markdown').then((mod) => mod.MarkdownRenderer),
+  {
+    loading: () => <MarkdownLoadingSpinner />,
+    ssr: false, // Désactiver SSR pour éviter les erreurs de hydration
+  }
+)
+
+const ExportButton = dynamic(
+  () => import('./').then((mod) => mod.ExportButton),
+  {
+    loading: () => null, // Pas de spinner pour le bouton
+    ssr: false,
+  }
+)
 
 interface ChatMessageProps {
   role: 'user' | 'assistant'

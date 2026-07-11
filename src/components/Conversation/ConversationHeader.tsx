@@ -4,12 +4,22 @@
  * Composant ConversationHeader
  * Affiche le titre et les actions de la conversation active
  * Fait partie de ST-306: Implémenter le Mode Conversation
+ * Optimisé avec lazy loading pour ST-309
  */
 
 import { useState, useRef, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { useConversations } from '@/components/Conversations'
-import { CopyConversationButton } from './'
 import { CONVERSATION_ACTION_LABELS, CONVERSATION_CONFIRMATIONS } from '@/types/conversations'
+
+// Lazy loading du bouton lourd pour ST-309
+const CopyConversationButton = dynamic(
+  () => import('./').then((mod) => mod.CopyConversationButton),
+  {
+    loading: () => null, // Pas de spinner pour le bouton
+    ssr: false,
+  }
+)
 
 interface ConversationHeaderProps {
   conversationId: string | null

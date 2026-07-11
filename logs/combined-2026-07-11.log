@@ -58,3 +58,41 @@
 {"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 11:39:19"}
 {"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"157ms","timestamp":"2026-07-11 11:39:19","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
 {"authCheckMs":60,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 11:39:19","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":57,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-11 11:57:35","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":68,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 11:57:36","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 11:57:37"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"217ms","timestamp":"2026-07-11 11:57:37","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":56,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 11:57:37","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":123,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 11:58:57","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 11:58:57"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"256ms","timestamp":"2026-07-11 11:58:57","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":65,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 11:58:58","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 11:58:58"}
+{"authCheckMs":165,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 11:58:58","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"163ms","timestamp":"2026-07-11 11:58:58","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":69,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 11:58:58","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":62,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 11:58:59","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":115,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 12:03:13","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 12:03:14"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"467ms","timestamp":"2026-07-11 12:03:14","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":69,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 12:03:14","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 12:03:14"}
+{"authCheckMs":144,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:03:14","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"173ms","timestamp":"2026-07-11 12:03:14","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":96,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:03:15","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":72,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:03:15","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":498,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-11 12:04:11","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":68,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 12:04:12","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 12:04:13"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"462ms","timestamp":"2026-07-11 12:04:13","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":128,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:04:14","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":62,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-11 12:14:25","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":61,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 12:14:26","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 12:14:26"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"272ms","timestamp":"2026-07-11 12:14:26","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":58,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:14:26","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":202,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-11 12:15:25","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":66,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-11 12:15:25","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-11 12:15:26"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"180ms","timestamp":"2026-07-11 12:15:26","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":61,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-11 12:15:26","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}

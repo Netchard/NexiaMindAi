@@ -5,6 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/components/Auth/AuthProvider';
 import { MainContent } from './MainContent';
+import { QueryClientProvider } from '@/providers/QueryClientProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +42,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col bg-[#0a1524] text-[#eef2f8]">
-        <AuthProvider>
-          <Navbar />
-          <MainContent>{children}</MainContent>
-          <Footer />
-        </AuthProvider>
+        <QueryClientProvider>
+          <AuthProvider>
+            <Navbar />
+            <MainContent>{children}</MainContent>
+            <Footer />
+          </AuthProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

@@ -5,8 +5,8 @@ sprint_name: "Sprint 4 - Interface Utilisateur"
 epic_id: EPIC-4
 epic_name: "Frontend (Interface Utilisateur)"
 priority: high
-status: ready-for-dev
-assignee: ""
+status: in-progress
+assignee: "Mistral Vibe"
 baseline_commit: "68dfaef68dfa21e4eaa1316b98f4a83bf4264d922e032e5"
 tags:
   - frontend
@@ -28,7 +28,7 @@ related_artifacts:
 
 # Story 4.309: Optimiser les Performances Frontend
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Story
 
@@ -99,35 +99,39 @@ Afin d'**offrir une bonne expérience utilisateur**.
 ## Tasks / Subtasks
 
 ### Task 0 - Analyse de Performance Initiale
-- [ ] Exécuter `next build` et analyser la sortie
-- [ ] Mesurer le bundle size actuel avec `npx @next/bundle-analyzer`
-- [ ] Exécuter Lighthouse audit sur la page de chat
-- [ ] Identifier les principaux goulots d'étranglement
+- [x] Exécuter `next build` et analyser la sortie (compilation réussie, erreurs TypeScript pré-existantes identifiées)
+- [x] Configurer `next.config.js` avec bundle-analyzer
+- [x] Créer `BUNDLE_ANALYSIS.md` avec analyse initiale
+- [ ] Mesurer le bundle size actuel avec `ANALYZE=true npm run build` (bloqué par erreurs TS)
+- [ ] Exécuter Lighthouse audit sur la page de chat (à faire après build)
+- [ ] Identifier les principaux goulots d'étranglement (documenté dans BUNDLE_ANALYSIS.md)
 - [ ] Documenter les métriques de base (avant optimisation)
 
-### Task 1 - Configuration de React Query
-- [ ] Installer `@tanstack/react-query` : `npm install @tanstack/react-query@^5.0.0`
-- [ ] Créer `src/providers/QueryClientProvider.tsx` pour envelopper l'application
-- [ ] Configurer le QueryClient avec les options par défaut
-- [ ] Ajouter le provider dans `src/app/layout.tsx`
-- [ ] Créer des hooks personnalisés : `useConversationsQuery`, `useMessagesQuery`
-- [ ] Configurer le cache time (5 minutes pour les conversations, 1 minute pour les messages)
-- [ ] Implémenter la gestion des erreurs globales
+### Task 1 - Configuration de React Query ✅ DONE
+- [x] Installer `@tanstack/react-query` : déjà installé
+- [x] Créer `src/providers/QueryClientProvider.tsx` pour envelopper l'application
+- [x] Configurer le QueryClient avec les options par défaut (staleTime: 5min, gcTime: 10min)
+- [x] Ajouter le provider dans `src/app/layout.tsx`
+- [x] Créer `src/lib/api/queries.ts` avec hooks personnalisés
+- [x] Créer des hooks : `useConversationsQuery`, `useConversationQuery`, `useMessagesQuery`, `useSendMessageMutation`, etc.
+- [x] Configurer le cache time (5 minutes pour les conversations, 1 minute pour les messages)
+- [x] Implémenter la gestion des erreurs globales
 
-### Task 2 - Implémentation du Lazy Loading
-- [ ] Identifier les composants lourds à charger paresseusement
-- [ ] Créer `src/components/common/LoadingSpinner.tsx` pour le fallback
-- [ ] Charger dynamiquement `MarkdownRenderer` dans `ChatMessage.tsx`
-- [ ] Charger dynamiquement `CodeBlock` (déjà intégré dans MarkdownRenderer)
-- [ ] Charger dynamiquement `ExportButton` et `CopyConversationButton`
-- [ ] Vérifier qu'aucun composant critique n'est lazy-loaded (pour éviter le FOUC)
+### Task 2 - Implémentation du Lazy Loading ✅ DONE
+- [x] Identifier les composants lourds à charger paresseusement (MarkdownRenderer, CodeBlock, ExportButton, CopyConversationButton)
+- [x] Créer `src/components/common/LoadingSpinner.tsx` pour le fallback
+- [x] Créer `src/components/common/index.ts` (barrel export)
+- [x] Charger dynamiquement `MarkdownRenderer` dans `ChatMessage.tsx` avec Suspense
+- [x] Charger dynamiquement `ExportButton` dans `ChatMessage.tsx`
+- [x] Charger dynamiquement `CopyConversationButton` dans `ConversationHeader.tsx`
+- [x] Vérifier qu'aucun composant critique n'est lazy-loaded (pour éviter le FOUC)
 
 ### Task 3 - Optimisation des Images
 - [ ] Remplacer toutes les `<img>` par `<Image />` de Next.js
-- [ ] Configurer `next.config.js` pour l'optimisation des images
-- [ ] Ajouter les domaines autorisés pour les images externes
-- [ ] Configurer les tailles et qualités adaptatives
-- [ ] Vérifier le support WebP
+- [x] Configurer `next.config.js` pour l'optimisation des images
+- [x] Ajouter les domaines autorisés pour les images externes (Supabase)
+- [x] Configurer les tailles et qualités adaptatives
+- [x] Vérifier le support WebP
 
 ### Task 4 - Analyse du Bundle
 - [ ] Installer `@next/bundle-analyzer` : `npm install --save-dev @next/bundle-analyzer`
@@ -305,29 +309,46 @@ npm install --save-dev lighthouse
 - **Accessibilité** : Les optimisations ne doivent pas dégrader l'accessibilité
 
 ### Debug Log
-- **To be populated during implementation**
+- **Task 0**: Build bloquée par erreurs TypeScript pré-existantes dans `scripts/test-pdf-manual.ts` et `src/app/api/admin/stats/route.ts` - corrigé `test-pdf-manual.ts` ligne 147 (guard sur pageCount)
+- **Task 0**: bundle-analyzer configuré dans next.config.js, BUNDLE_ANALYSIS.md créé
+- **Task 1**: @tanstack/react-query déjà installé, QueryClientProvider créé avec staleTime: 5min, gcTime: 10min
+- **Task 1**: 11 hooks React Query créés dans queries.ts (conversations, conversation, messages, sendMessage, etc.)
+- **Task 2**: LoadingSpinner créé avec 3 variantes (default, MarkdownLoadingSpinner, ButtonLoadingSpinner)
+- **Task 2**: Lazy loading appliqué à MarkdownRenderer, ExportButton, CopyConversationButton
+- **Task 2**: ssr: false utilisé pour éviter les erreurs de hydration avec Next.js 16
+- **Task 3**: Optimisation des images configurée dans next.config.js (WebP/AVIF, deviceSizes, imageSizes)
 
 ### Completion Notes
-- **To be populated during implementation**
+- **Task 1 (100% complété)**: React Query intégré avec QueryClientProvider et 11 hooks personnalisés
+- **Task 2 (100% complété)**: Lazy loading implémenté pour tous les composants lourds identifiés
+- **Task 3 (80% complété)**: Configuration images terminée, reste le remplacement des <img> par <Image />
+- **Task 0 (60% complété)**: Analyse initiale documentée, build bloquée par erreurs TS externes
+- **Prochaines étapes**: Terminer Task 0 (build + Lighthouse), Task 3 (remplacement <img>), puis Tasks 4-8
 
 ---
 
 ## File List
 
-### Nouveaux Fichiers à Créer
+### Nouveaux Fichiers Créés ✅
 - `src/providers/QueryClientProvider.tsx` - Provider React Query
-- `src/components/common/LoadingSpinner.tsx` - Composant de chargement
-- `src/lib/api/queries.ts` - Hooks React Query personnalisés
+- `src/providers/index.ts` - Barrel export des providers
+- `src/components/common/LoadingSpinner.tsx` - Composant de chargement avec variantes
+- `src/components/common/index.ts` - Barrel export des composants communs
+- `src/lib/api/queries.ts` - Hooks React Query personnalisés (11 hooks)
 - `src/lib/utils/performance.ts` - Utilitaires de performance
-- `.lighthouserc.js` - Configuration Lighthouse
+- `.lighthouserc.js` - Configuration Lighthouse CI
 - `BUNDLE_ANALYSIS.md` - Rapport d'analyse du bundle
-- `PERFORMANCE_OPTIMIZATION.md` - Documentation des optimisations
 
-### Fichiers Modifiés
-- `src/app/layout.tsx` - Ajout de QueryClientProvider
-- `src/components/Chat/ChatMessage.tsx` - Lazy loading de MarkdownRenderer
-- `next.config.js` - Configuration de bundle-analyzer
-- `package.json` - Ajout des dépendances
+### Fichiers Modifiés ✅
+- `src/app/layout.tsx` - Ajout de QueryClientProvider autour de AuthProvider
+- `src/components/Chat/ChatMessage.tsx` - Lazy loading de MarkdownRenderer et ExportButton
+- `src/components/Conversation/ConversationHeader.tsx` - Lazy loading de CopyConversationButton
+- `src/lib/api/index.ts` - Ajout des exports pour queries.ts
+- `next.config.js` - Configuration de bundle-analyzer et optimisation des images
+
+### Fichiers à Créer/Modifier (Restants)
+- `PERFORMANCE_OPTIMIZATION.md` - Documentation des optimisations
+- Remplacer `<img>` par `<Image />` dans les composants existants
 
 ---
 
@@ -337,6 +358,15 @@ npm install --save-dev lighthouse
 |------|------------|--------|------|
 | 2026-07-11 | Création de la story ST-309 | Mistral Vibe | NEW |
 | 2026-07-11 | Définition des tâches et critères | Mistral Vibe | NEW |
+| 2026-07-11 | Task 1: Configuration React Query (QueryClientProvider, 11 hooks) | Mistral Vibe | NEW |
+| 2026-07-11 | Task 1: Intégration QueryClientProvider dans layout.tsx | Mistral Vibe | MOD |
+| 2026-07-11 | Task 2: Création LoadingSpinner avec variantes | Mistral Vibe | NEW |
+| 2026-07-11 | Task 2: Lazy loading MarkdownRenderer dans ChatMessage.tsx | Mistral Vibe | MOD |
+| 2026-07-11 | Task 2: Lazy loading ExportButton dans ChatMessage.tsx | Mistral Vibe | MOD |
+| 2026-07-11 | Task 2: Lazy loading CopyConversationButton dans ConversationHeader.tsx | Mistral Vibe | MOD |
+| 2026-07-11 | Task 3: Optimisation images dans next.config.js | Mistral Vibe | MOD |
+| 2026-07-11 | Task 0: Configuration bundle-analyzer | Mistral Vibe | MOD |
+| 2026-07-11 | Création BUNDLE_ANALYSIS.md et .lighthouserc.js | Mistral Vibe | NEW |
 
 ---
 

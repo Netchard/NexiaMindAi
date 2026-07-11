@@ -1,0 +1,188 @@
+# Bundle Analysis - NexiaMind AI
+
+> **Fait partie de ST-309: Optimiser les Performances Frontend**
+
+*Date: 11/07/2026*
+*Statut: Analyse Initiale (Avant Optimisation)*
+
+---
+
+## 📊 Métriques de Base (Pré-Optimisation)
+
+### Bundle Size Actuel
+
+| Métrique | Valeur | Cible ST-309 | Statut |
+|----------|--------|---------------|--------|
+| **Bundle Principal** | À mesurer | < 5MB | ⏳ |
+| **Bundle Page Chat** | À mesurer | < 1MB | ⏳ |
+| **Total Assets** | À mesurer | - | ⏳ |
+
+### Performance Actuelle
+
+| Métrique | Valeur | Cible ST-309 | Statut |
+|----------|--------|---------------|--------|
+| **Lighthouse Score** | À mesurer | > 80 | ⏳ |
+| **Performance** | À mesurer | > 80 | ⏳ |
+| **Accessibilité** | À mesurer | > 90 | ⏳ |
+| **TTI Mobile** | À mesurer | < 3.5s | ⏳ |
+| **FCP Desktop** | À mesurer | < 1.0s | ⏳ |
+
+---
+
+## 📦 Analyse des Dépendances
+
+### Dépendances Lourdes Identifiées
+
+D'après `package.json` et l'analyse du code :
+
+| Dépendance | Version | Taille Estimée | Utilisation | Optimisation Possible |
+|------------|---------|----------------|-------------|---------------------|
+| `react-markdown` | ^10.1.0 | ~50KB | Markdown rendering (ST-307) | ✅ Déjà lazy-loadé |
+| `highlight.js` | ^11.11.1 | ~300KB | Coloration syntaxique (ST-307) | ✅ Charger à la demande |
+| `@supabase/supabase-js` | ^2.108.2 | ~200KB | Client Supabase | ⚠️ Tree-shaking |
+| `next` | 16.2.9 | ~10MB (dev) | Framework | ❌ Nécessaire |
+| `react` | 19.2.4 | ~45KB | Core | ❌ Nécessaire |
+| `tailwindcss` | ^4.0.0 | ~20KB | Styles | ❌ Nécessaire |
+
+### Composants Lourds à Optimiser (ST-307/ST-308)
+
+| Composant | Fichier | Taille | Statut |
+|-----------|---------|--------|--------|
+| `MarkdownRenderer` | `src/components/Markdown/MarkdownRenderer.tsx` | ~6KB | ⏳ À lazy-loader |
+| `CodeBlock` | `src/components/Markdown/CodeBlock.tsx` | ~4KB | ⏳ À lazy-loader |
+| `ExportButton` | `src/components/Chat/ExportButton.tsx` | ~8KB | ⏳ À lazy-loader |
+| `CopyConversationButton` | `src/components/Conversation/CopyConversationButton.tsx` | ~7KB | ⏳ À lazy-loader |
+
+---
+
+## 🎯 Recommandations d'Optimisation
+
+### Priorité Élevée (P0)
+
+1. **Lazy Loading des Composants Lourds**
+   - `MarkdownRenderer` + `CodeBlock` (ST-307)
+   - `ExportButton` + `CopyConversationButton` (ST-308)
+   - **Impact estimé:** -15-20% du bundle initial
+
+2. **React Query pour le Caching**
+   - Éviter les re-fetch inutiles des conversations
+   - Cache time: 5 minutes pour les conversations
+   - **Impact estimé:** -30-40% des requêtes API
+
+3. **Optimisation des Images**
+   - Remplacer `<img>` par `<Image />` Next.js
+   - Formats WebP/AVIF
+   - **Impact estimé:** -40-60% de la taille des images
+
+### Priorité Moyenne (P1)
+
+4. **Bundle Analyzer**
+   - Identifier les dépendances inutilisées
+   - Tree-shaking des imports
+   - **Impact estimé:** -5-10% du bundle
+
+5. **Code Splitting par Route**
+   - Séparer le code par page
+   - Charger uniquement ce qui est nécessaire
+   - **Impact estimé:** -10-15% du bundle initial
+
+---
+
+## 🔧 Configuration pour l'Analyse
+
+### Commande pour Analyser le Bundle
+
+```bash
+# Avec bundle-analyzer
+ANALYZE=true npm run build
+
+# Le rapport sera généré dans .next/analyze/
+# Ouvrir browser.html pour voir la visualisation
+```
+
+### Configuration Lighthouse
+
+```bash
+# Audit manuel
+npx lighthouse http://localhost:3000/chat --output=json --output-path=./lighthouse-report.json
+
+# Audit automatisé
+npx lighthouse http://localhost:3000/chat --chrome-flags="--headless"
+```
+
+### Configuration Actuelle (next.config.js)
+
+```javascript
+// Optimisation des images activée
+images: {
+  remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
+  formats: ['image/avif', 'image/webp'],
+  deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+  imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+}
+
+// Bundle analyzer configuré
+module.exports = process.env.ANALYZE === 'true'
+  ? withBundleAnalyzer({ ...nextConfig, analyzeBrowser: ['browser', 'both'] })
+  : nextConfig;
+```
+
+---
+
+## 📈 Résultats Attendus Après Optimisation
+
+### Objectifs ST-309
+
+| Métrique | Avant | Après | Amélioration |
+|----------|-------|-------|--------------|
+| Bundle Size | ~8-10MB | < 5MB | -40-50% |
+| Lighthouse Score | ~50-70 | > 80 | +10-30 |
+| TTI Mobile | ~5-8s | < 3.5s | -30-50% |
+| FCP Desktop | ~1.5-3s | < 1.0s | -30-60% |
+
+### Impact par Optimisation
+
+| Optimisation | Réduction Bundle | Amélioration Perf |
+|--------------|------------------|-------------------|
+| Lazy Loading Composants | -15-20% | +10-20% |
+| React Query Caching | -0% | +30-40% |
+| Optimisation Images | -5-10% | +10-15% |
+| Bundle Analyzer + Cleanup | -5-10% | +5-10% |
+| **Total** | **-25-40%** | **+55-85%** |
+
+---
+
+## 📝 Prochaines Étapes
+
+### Task 0 - Analyse Initiale ✅ EN COURS
+- [x] Configurer bundle-analyzer dans next.config.js
+- [ ] Exécuter `ANALYZE=true npm run build`
+- [ ] Mesurer le bundle size actuel
+- [ ] Exécuter Lighthouse audit
+- [ ] Documenter les métriques de base
+
+### Task 1 - Configuration React Query
+- [ ] Installer @tanstack/react-query
+- [ ] Créer QueryClientProvider
+- [ ] Configurer les hooks personnalisés
+- [ ] Intégrer dans layout.tsx
+
+### Task 2 - Lazy Loading
+- [ ] Créer LoadingSpinner
+- [ ] Lazy-load MarkdownRenderer
+- [ ] Lazy-load ExportButton/CopyConversationButton
+- [ ] Vérifier pas de FOUC
+
+---
+
+## 🔗 Liens Utiles
+
+- [Next.js Bundle Analyzer](https://github.com/vercel/next.js/tree/canary/examples/with-bundle-analyzer)
+- [Lighthouse Documentation](https://developer.chrome.com/docs/lighthouse/overview/)
+- [React Query Documentation](https://tanstack.com/query/latest)
+- [Next.js Image Optimization](https://nextjs.org/docs/api-reference/next/image)
+
+---
+
+*Document généré pour ST-309 - Optimiser les Performances Frontend*
+*À compléter avec les métriques réelles après exécution des analyses*

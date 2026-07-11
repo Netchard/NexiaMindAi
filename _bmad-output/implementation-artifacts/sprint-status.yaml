@@ -87,7 +87,7 @@ development_status:
   4-306-implementer-le-mode-conversation: done
   4-307-ajouter-le-support-du-markdown: done
   4-308-implementer-l-export-des-reponses: done
-  4-309-optimiser-les-performances-frontend: ready-for-dev
+  4-309-optimiser-les-performances-frontend: in-progress
   epic-4-retrospective: optional
 
   # Epic 5: Base de Donnees & Optimisation
