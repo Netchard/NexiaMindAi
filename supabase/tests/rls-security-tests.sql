@@ -66,6 +66,7 @@
 -- Create test profiles for each role
 -- Note: Replace user_id values with actual UUIDs from your auth.users table
 -- These are example UUIDs - use your own or create users first
+-- Using ON CONFLICT (id) since id is the primary key
 INSERT INTO public.profiles (id, user_id, email, full_name, role, created_at, updated_at)
 VALUES 
   (gen_random_uuid(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', 'Admin User', 'admin', NOW(), NOW()),
@@ -73,7 +74,7 @@ VALUES
   (gen_random_uuid(), 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', 'Project Lead User', 'project_lead', NOW(), NOW()),
   (gen_random_uuid(), 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', 'Developer User', 'developer', NOW(), NOW()),
   (gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', 'Consultant User', 'consultant', NOW(), NOW())
-ON CONFLICT (user_id) DO NOTHING;
+ON CONFLICT (id) DO NOTHING;
 
 -- Set current client for testing
 -- Note: Without current_setting, client_id filtering is simplified
