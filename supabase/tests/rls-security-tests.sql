@@ -41,32 +41,82 @@
 -- ============================================================================
 
 -- ============================================================================
--- TEST SETUP: Create Test Data
+-- TEST SETUP: Create Test Users and Data
 -- ============================================================================
 
--- IMPORTANT: To properly test RLS, you need authenticated users in auth.users.
--- 
--- Option 1: Use existing users (RECOMMENDED)
---   - Use Supabase Dashboard to create test users
---   - Note their UUIDs from auth.users
---   - Replace the user_id values below with those UUIDs
---
--- Option 2: Create test users via API (requires service role key)
---   - Use Supabase Auth API: https://supabase.com/docs/guides/auth/managing-user-data
---   - Or use: supabase.auth.admin.createUser() in JavaScript
---
--- Option 3: Manual testing (SIMPLEST)
---   - Simply execute the policies from rls-policies.sql
---   - Test manually in your application with real users
---   - No need to run this test script
---
--- For this script to work, you MUST have users in auth.users with these IDs:
--- If you don't, the RLS policies using auth.uid() will not work correctly
+-- IMPORTANT: RLS policies use auth.uid() which requires users in auth.users
+-- This section creates test users in auth.users (requires superuser privileges)
 
--- Create test profiles for each role
--- Note: Replace user_id values with actual UUIDs from your auth.users table
--- These are example UUIDs - use your own or create users first
--- Using ON CONFLICT (id) since id is the primary key
+-- ============================================================================
+-- STEP 1: Create Test Users in auth.users
+-- ============================================================================
+
+-- Define test user UUIDs (use these throughout the script)
+-- These are fixed UUIDs for reproducibility
+
+-- Attempt to create users in auth.users
+-- This requires SUPERUSER privileges in Supabase
+-- If this fails, you must create users via:
+--   1. Supabase Dashboard (Auth -> Users -> Create User)
+--   2. Supabase Auth API with service role key
+--   3. Manual user creation
+
+DO $$
+BEGIN
+  -- Try to insert test users with standard Supabase auth.users structure
+  -- Note: Column names may vary based on Supabase version
+  -- We'll try multiple approaches
+  
+  -- Approach 1: Try with minimal required columns (most common structure)
+  BEGIN
+    INSERT INTO auth.users (id, email, created_at, updated_at)
+    VALUES 
+      ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', NOW(), NOW()),
+      ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID, 'manager@nexiamind.ai', NOW(), NOW()),
+      ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', NOW(), NOW()),
+      ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', NOW(), NOW()),
+      ('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', NOW(), NOW())
+    ON CONFLICT (id) DO NOTHING;
+    
+    RAISE NOTICE '✅ Test users created successfully in auth.users';
+  EXCEPTION WHEN OTHERS THEN
+    -- If minimal approach fails, try with more columns
+    BEGIN
+      INSERT INTO auth.users (id, email, encrypted_password, email_confirmed, created_at, updated_at)
+      VALUES 
+        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', NULL, false, NOW(), NOW()),
+        ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID, 'manager@nexiamind.ai', NULL, false, NOW(), NOW()),
+        ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', NULL, false, NOW(), NOW()),
+        ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', NULL, false, NOW(), NOW()),
+        ('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', NULL, false, NOW(), NOW())
+      ON CONFLICT (id) DO NOTHING;
+      
+      RAISE NOTICE '✅ Test users created successfully in auth.users (with extended columns)';
+    EXCEPTION WHEN OTHERS THEN
+      -- If still failing, the user likely doesn't have superuser privileges
+      RAISE WARNING '⚠️ Could not create users in auth.users - you need SUPERUSER privileges';
+      RAISE WARNING '   Please create users via Supabase Dashboard or API, then run this script again';
+      RAISE WARNING '   Required user UUIDs:';
+      RAISE WARNING '     - a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11 (admin)';
+      RAISE WARNING '     - b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12 (manager)';
+      RAISE WARNING '     - c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13 (project_lead)';
+      RAISE WARNING '     - d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14 (developer)';
+      RAISE WARNING '     - e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15 (consultant)';
+    END;
+  END;
+END $$;
+
+-- ============================================================================
+-- STEP 2: Create Test Profiles
+-- ============================================================================
+
+-- Create profiles for each test user
+-- Note: If auth.users creation failed above, you must:
+-- 1. Create users manually via Supabase Dashboard
+-- 2. Note their UUIDs
+-- 3. Update the user_id values below to match your actual user UUIDs
+-- 4. Re-run this script
+
 INSERT INTO public.profiles (id, user_id, email, full_name, role, created_at, updated_at)
 VALUES 
   (gen_random_uuid(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', 'Admin User', 'admin', NOW(), NOW()),
