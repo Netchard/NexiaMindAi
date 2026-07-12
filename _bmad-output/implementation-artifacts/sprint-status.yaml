@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23 22:45:00
-last_updated: 2026-07-12 17:00:00
+last_updated: 2026-07-12 18:00:00
 project: NexiaMind AI
 project_key: NOKEY
 tracking_system: file-system
@@ -92,7 +92,7 @@ development_status:
 
   # Epic 5: Base de Donnees & Optimisation
   epic-5: in-progress
-  5-401-configurer-les-politiques-de-securite-rls: ready-for-dev
+  5-401-configurer-les-politiques-de-securite-rls: review
   5-402-optimiser-l-index-vectoriel: backlog
   5-403-implementer-le-cache-des-embeddings: backlog
   5-404-creer-les-index-classiques: backlog
