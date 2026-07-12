@@ -33,8 +33,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Generated analysis artefacts (ST-402)
+scripts/analysis/vector-index-analysis-report.json
+scripts/analysis/vector-index-analysis.log
+scripts/benchmark/vector-index-benchmark-report.json
+scripts/benchmark/vector-index-benchmark.log
+scripts/optimization/optimal-vector-index-config.json
+scripts/optimization/optimization-decision-log.md
+
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel

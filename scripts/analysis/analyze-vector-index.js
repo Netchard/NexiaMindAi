@@ -13,19 +13,30 @@ const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 const path = require('path');
 
+// Charger les variables d'environnement depuis .env
+require('dotenv').config();
+
 // Chemins des fichiers de sortie
 const REPORT_PATH = path.join(__dirname, 'vector-index-analysis-report.json');
 const LOG_PATH = path.join(__dirname, 'vector-index-analysis.log');
 
-// Logger simple
+// Logger simple avec protection des E/S et masquage des données sensibles
 function log(message, data = null) {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}`;
   console.log(logMessage, data || '');
   
-  // Écrire dans le fichier de log
-  const logContent = `${logMessage}\n${data ? JSON.stringify(data, null, 2) + '\n' : ''}\n`;
-  fs.appendFileSync(LOG_PATH, logContent, 'utf8');
+  // Écrire dans le fichier de log avec protection try/catch
+  try {
+    // Masquer les données sensibles (URL, clés)
+    const safeMessage = logMessage.replace(/https?:\/\/[^\s]+/g, '[URL_MASKED]');
+    const safeData = data ? (typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data)) : '';
+    const logContent = `${safeMessage}\n${safeData}\n`;
+    fs.appendFileSync(LOG_PATH, logContent, 'utf8');
+  } catch (logError) {
+    // Ne pas faire crash le script si le log échoue
+    console.error('[LOG ERROR]', logError.message);
+  }
 }
 
 /**
@@ -37,19 +48,18 @@ function initAdminClient() {
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl) {
-    const error = new Error('[ANALYSE-VECTOR] SUPABASE_URL non défini dans les variables d\'environnement');
+    const error = new Error('[ANALYSE-VECTOR] SUPABASE_URL non défini dans les variables d\'environnement. Veuillez créer un fichier .env avec SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY');
     log('ERREUR: ' + error.message);
     throw error;
   }
 
   if (!supabaseServiceKey) {
-    const error = new Error('[ANALYSE-VECTOR] SUPABASE_SERVICE_ROLE_KEY non défini dans les variables d\'environnement');
+    const error = new Error('[ANALYSE-VECTOR] SUPABASE_SERVICE_ROLE_KEY non défini dans les variables d\'environnement. Veuillez créer un fichier .env avec SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY');
     log('ERREUR: ' + error.message);
     throw error;
   }
 
   log('Initialisation du client Supabase Admin', {
-    url: supabaseUrl.replace(/https?:\/\//, ''),
     timestamp: new Date().toISOString()
   });
 
@@ -72,182 +82,112 @@ async function analyzeEmbeddingsTable(client) {
     dimensionValid: false,
     currentIndex: null,
     estimatedFutureSize: 0,
-    tableStructure: null
+    tableExists: false,
+    vectorColumnExists: false
   };
 
   try {
-    // 1. Obtenir la structure de la table
-    log('Récupération de la structure de la table...');
-    const { data: tableInfo, error: tableError } = await client
-      .from('information_schema.columns')
-      .select('column_name, data_type, character_maximum_length, numeric_precision, numeric_scale')
-      .eq('table_name', 'embeddings')
-      .eq('table_schema', 'public')
-      .order('ordinal_position', { ascending: true });
+    // 0. Vérifier que la table existe et est accessible
+    log('Vérification de l\'existence de la table...');
+    const { data: tableCheck, error: tableCheckError } = await client
+      .from('embeddings')
+      .select('*')
+      .limit(1);
 
-    if (tableError) {
-      log('ERREUR lors de la récupération de la structure:', tableError);
-      throw tableError;
+    if (tableCheckError) {
+      log('ERREUR: Impossible d\'accéder à la table embeddings:', tableCheckError.message);
+      throw new Error(`Impossible d'accéder à la table embeddings: ${tableCheckError.message}`);
     }
-
-    report.tableStructure = tableInfo;
-    log('Structure de la table récupérée', tableInfo.map(c => ({ column: c.column_name, type: c.data_type })));
-
-    // 2. Trouver la colonne vector et sa dimension
-    const vectorColumn = tableInfo.find(col => col.column_name === 'vector');
-    if (!vectorColumn) {
-      log('ERREUR: Colonne "vector" non trouvée dans la table embeddings');
-      report.dimensionValid = false;
-      return report;
-    }
-
-    // Le type devrait être "USER-DEFINED" pour vector, mais on peut aussi vérifier
-    // En réalité, pgvector crée un type vector(n), donc data_type pourrait être "vector"
-    // On peut essayer de récupérer la dimension via une requête directe
-    log('Analyse de la dimension du vecteur...');
     
-    // Méthode 1: Essayer de récupérer directement depuis la table
+    report.tableExists = true;
+    log('✅ Table embeddings accessible');
+
+    // 1. Détecter la dimension du vecteur (MÉTHODE UNIQUE FIABLE)
+    //    On utilise une requête directe sur embeddings avec LIMIT 1
+    //    C'est la SEULE méthode qui fonctionne avec PostgREST
+    //    NOTE: information_schema et pg_indexes ne sont PAS exposés par PostgREST
+    log('Détection de la dimension du vecteur...');
     const { data: sampleData, error: sampleError } = await client
       .from('embeddings')
       .select('vector')
       .limit(1);
 
-    if (sampleData && sampleData.length > 0 && sampleData[0].vector) {
-      // Si on a un échantillon, on peut déterminer la dimension
-      const vector = sampleData[0].vector;
-      if (Array.isArray(vector)) {
-        report.vectorDimension = vector.length;
-        report.dimensionValid = vector.length === 384;
-        log(`Dimension du vecteur détectée: ${report.vectorDimension}`);
-      } else {
-        // vector pourrait être un objet ou un string
-        log('Format du vecteur inattendu:', typeof vector, vector);
+    if (sampleError) {
+      log('ERREUR: Impossible de récupérer un échantillon:', sampleError.message);
+      throw new Error(`Impossible de détecter la dimension: ${sampleError.message}`);
+    }
+
+    if (!sampleData || sampleData.length === 0) {
+      log('ERREUR: Aucune donnée dans la table embeddings');
+      throw new Error('La table embeddings est vide. Impossible de détecter la dimension.');
+    }
+
+    const firstRow = sampleData[0];
+    
+    // Vérifier que la colonne vector existe
+    if (!firstRow || !firstRow.vector) {
+      report.vectorColumnExists = false;
+      log('ERREUR: Colonne "vector" non trouvée dans la table embeddings');
+      throw new Error('Colonne "vector" non trouvée. La structure de la table a peut-être changé.');
+    }
+    
+    report.vectorColumnExists = true;
+
+    // Détecter la dimension
+    const vector = firstRow.vector;
+    let detectedDimension = null;
+    
+    if (Array.isArray(vector)) {
+      detectedDimension = vector.length;
+      log(`Dimension du vecteur détectée (Array): ${detectedDimension}`);
+    } else if (vector && typeof vector === 'object') {
+      // vector pourrait être un objet avec des propriétés numérotées (format pgvector)
+      const keys = Object.keys(vector);
+      // Vérifier si les clés sont des indices numériques
+      const numericKeys = keys.filter(k => !isNaN(parseInt(k)));
+      if (numericKeys.length > 0) {
+        detectedDimension = numericKeys.length;
+        log(`Dimension du vecteur détectée (Object): ${detectedDimension} (clés: ${numericKeys.length})`);
       }
     }
 
-    // Méthode 2: Si la méthode 1 échoue, essayer via une requête SQL brute
-    if (!report.vectorDimension) {
-      try {
-        // Utiliser pgvector pour obtenir la dimension
-        const { data: dimData, error: dimError } = await client.rpc('get_vector_dimension')
-          .catch(() => ({ data: null, error: { message: 'Fonction non disponible' } }));
-
-        if (dimData) {
-          report.vectorDimension = dimData;
-          report.dimensionValid = dimData === 384;
-          log(`Dimension via RPC: ${report.vectorDimension}`);
-        }
-      } catch (rpcError) {
-        log('RPC get_vector_dimension non disponible, essence avec requête directe');
-      }
+    if (detectedDimension === null) {
+      log('ERREUR: Impossible de déterminer la dimension du vecteur. Format inconnu:', typeof vector, vector);
+      throw new Error(`Format de vecteur inconnu: ${typeof vector}. Attendu: Array ou Object avec clés numériques.`);
     }
 
-    // Méthode 3: Requête SQL brute pour obtenir la dimension depuis pgvector
-    if (!report.vectorDimension) {
-      const { data: dimResult, error: dimError } = await client
-        .from('embeddings')
-        .select(`vector[1:1] as first_element`)  // Essayer d'accéder au premier élément
-        .limit(1);
-
-      if (dimResult && dimResult.length > 0) {
-        // Si on peut accéder, on essaie une autre approche
-        // Compter le nombre d'éléments dans un vecteur
-        const { data: countResult, error: countError } = await client
-          .rpc('vector_dim', { vector_col: 'vector', table_name: 'embeddings' })
-          .catch(() => ({ data: null, error: null }));
-        
-        if (countResult) {
-          report.vectorDimension = countResult;
-          report.dimensionValid = countResult === 384;
-        }
-      }
+    report.vectorDimension = detectedDimension;
+    report.dimensionValid = validateDimension(detectedDimension);
+    
+    if (!report.dimensionValid) {
+      log(`⚠️ ATTENTION: Dimension détectée (${detectedDimension}) ne correspond PAS à la dimension attendue (384)`);
+      log('Ceci est une VIOLATION CRITIQUE de la contrainte ST-401!');
+      log('La dimension DOIT être 384. Vérifiez votre configuration de base de données.');
+    } else {
+      log(`✅ Dimension valide: ${detectedDimension}`);
     }
 
-    // Si on n'a toujours pas la dimension, essayer une approche différente
-    if (!report.vectorDimension) {
-      // Essayer de créer une requête SQL brute
-      const { data: rawResult, error: rawError } = await client
-        .from('embeddings')
-        .select(`vector`)
-        .limit(1);
-
-      if (rawResult && rawResult.length > 0) {
-        const vec = rawResult[0].vector;
-        if (vec && typeof vec === 'object' && Array.isArray(vec)) {
-          report.vectorDimension = vec.length;
-          report.dimensionValid = vec.length === 384;
-        } else if (vec && typeof vec === 'object') {
-          // vector pourrait être un objet avec des propriétés numérotées
-          const keys = Object.keys(vec);
-          if (keys.length > 0 && !isNaN(parseInt(keys[0]))) {
-            report.vectorDimension = keys.length;
-            report.dimensionValid = keys.length === 384;
-          }
-        }
-      }
-    }
-
-    // Par défaut, on suppose 384 (d'après l'architecture)
-    if (!report.vectorDimension) {
-      log('⚠️ Impossible de détecter automatiquement la dimension, utilisation de la valeur par défaut: 384');
-      report.vectorDimension = 384;
-      report.dimensionValid = true;
-    }
-
-    // 3. Compter le nombre total d'embeddings
+    // 2. Compter le nombre total d'embeddings
     log('Comptage du nombre total d\'embeddings...');
     const { count, error: countError } = await client
       .from('embeddings')
       .select('*', { count: 'exact', head: true });
 
     if (countError) {
-      log('ERREUR lors du comptage:', countError);
+      log('ERREUR lors du comptage:', countError.message);
       throw countError;
+    }
+
+    // Vérifier que count est un nombre (G2-M-002)
+    if (typeof count !== 'number' || isNaN(count)) {
+      log('ERREUR: Le comptage a retourné une valeur non numérique:', count);
+      throw new Error(`Comptage invalide: attendu number, obtenu ${typeof count}`);
     }
 
     report.totalEmbeddings = count;
     log(`Nombre total d'embeddings: ${count}`);
 
-    // 4. Obtenir les informations sur l'index actuel
-    log('Récupération des informations sur l\'index...');
-    const { data: indexData, error: indexError } = await client
-      .from('pg_indexes')
-      .select('indexname, indexdef')
-      .eq('tablename', 'embeddings')
-      .eq('schemaname', 'public')
-      .like('indexname', '%vector%');
-
-    if (indexData && indexData.length > 0) {
-      const vectorIndex = indexData.find(idx => 
-        idx.indexname === 'idx_embeddings_vector' || 
-        idx.indexdef.includes('ivfflat')
-      );
-
-      if (vectorIndex) {
-        report.currentIndex = {
-          indexName: vectorIndex.indexname,
-          indexDef: vectorIndex.indexdef,
-          indexType: vectorIndex.indexdef.includes('ivfflat') ? 'ivfflat' : 'unknown',
-          lists: extractListsFromIndexDef(vectorIndex.indexdef)
-        };
-        log('Index actuel trouvé:', report.currentIndex);
-      } else {
-        log('⚠️ Index vectoriel non trouvé avec le nom attendu, recherche plus large...');
-        // Chercher tous les index sur embeddings
-        const allIndexes = await client
-          .from('pg_indexes')
-          .select('indexname, indexdef')
-          .eq('tablename', 'embeddings');
-
-        if (allIndexes.data && allIndexes.data.length > 0) {
-          log('Tous les index sur embeddings:', allIndexes.data.map(i => i.indexname));
-        }
-      }
-    } else if (indexError) {
-      log('ERREUR lors de la récupération des index:', indexError);
-    }
-
-    // 5. Estimer la taille future
+    // 3. Estimer la taille future
     // D'après l'architecture, on a des sources multiples : Supabase Storage, GitLab, Nexia GED
     // On va estimer en fonction de la taille actuelle
     const currentSize = report.totalEmbeddings;
@@ -262,13 +202,12 @@ async function analyzeEmbeddingsTable(client) {
     
     log(`Taille actuelle: ${currentSize}, Estimation future: ${report.estimatedFutureSize}`);
 
-    // 6. Valider la dimension
-    if (report.vectorDimension !== 384) {
-      log(`⚠️ ATTENTION: Dimension détectée (${report.vectorDimension}) ne correspond pas à la dimension attendue (384)`);
-      report.dimensionValid = false;
-    } else {
-      report.dimensionValid = true;
-    }
+    // 4. Note sur l'index: 
+    //    On ne peut PAS accéder à pg_indexes via PostgREST (schéma non exposé)
+    //    L'information sur l'index sera obtenue via la migration SQL (Groupe 1)
+    //    qui a accès direct à PostgreSQL
+    log('Note: Les informations sur l\'index seront récupérées via les scripts SQL (Groupe 1)');
+    log('PostgREST ne permet pas d\'accéder à pg_indexes/information_schema');
 
     return report;
 
@@ -276,6 +215,20 @@ async function analyzeEmbeddingsTable(client) {
     log('ERREUR lors de l\'analyse:', error.message);
     throw error;
   }
+}
+
+/**
+ * Valide que la dimension détectée correspond à la dimension attendue (384)
+ * Cette validation est CRITIQUE pour éviter une récidive de ST-401
+ * où la dimension était incorrectement définie à 8 au lieu de 384.
+ * 
+ * @param {number} detectedDimension - Dimension détectée
+ * @returns {boolean} true si la dimension est valide (384), false sinon
+ */
+function validateDimension(detectedDimension) {
+  // La contrainte architecturale de ST-401: la dimension DOIT être 384
+  // Ne PAS utiliser de fallback silencieux - échouer explicitement si non-384
+  return detectedDimension === 384;
 }
 
 /**
@@ -313,16 +266,21 @@ function saveReport(report) {
  * Initialise les fichiers de log
  */
 function initLogs() {
-  const timestamp = new Date().toISOString();
-  const header = `
+  try {
+    const timestamp = new Date().toISOString();
+    const header = `
 ========================================
 Analyse de l'Index Vectoriel - ST-402
 Date: ${timestamp}
 ========================================
 
 `;
-  fs.writeFileSync(LOG_PATH, header, 'utf8');
-  log('Début de l\'analyse de l\'index vectoriel');
+    fs.writeFileSync(LOG_PATH, header, 'utf8');
+    log('Début de l\'analyse de l\'index vectoriel');
+  } catch (error) {
+    console.error('[INIT LOGS ERROR]', error.message);
+    // Ne pas faire crash le script si l'initialisation des logs échoue
+  }
 }
 
 /**
@@ -364,6 +322,7 @@ module.exports = {
   initAdminClient,
   analyzeEmbeddingsTable,
   extractListsFromIndexDef,
+  validateDimension,
   saveReport,
   initLogs,
   REPORT_PATH,

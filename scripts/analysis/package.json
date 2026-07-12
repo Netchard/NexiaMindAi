@@ -5,9 +5,11 @@
   "main": "analyze-vector-index.js",
   "scripts": {
     "analyze": "node analyze-vector-index.js",
-    "test": "jest analyze-vector-index.test.js --detectOpenHandles",
-    "test:watch": "jest analyze-vector-index.test.js --watch",
-    "test:coverage": "jest analyze-vector-index.test.js --coverage"
+    "test": "jest analyze-vector-index.test.js analyze-vector-index.green.test.js --detectOpenHandles",
+    "test:red": "jest analyze-vector-index.test.js --detectOpenHandles",
+    "test:green": "jest analyze-vector-index.green.test.js --detectOpenHandles",
+    "test:watch": "jest analyze-vector-index.test.js analyze-vector-index.green.test.js --watch",
+    "test:coverage": "jest analyze-vector-index*.test.js --coverage"
   },
   "keywords": [
     "supabase",
@@ -19,7 +21,8 @@
   "author": "NexiaMind AI Team",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

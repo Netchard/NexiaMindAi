@@ -42,14 +42,15 @@ describe('ST-402: Tâche 1 - Analyser la charge de données actuelle', () => {
     });
 
     describe('Fonction d\'analyse', () => {
-      it('DOIT échouer car analyseVectorIndex n\'existe pas encore', async () => {
-        // Cela DOIT échouer avant l'implémentation
+      it('DOIT échouer car SUPABASE_URL n\'est pas défini', async () => {
+        // Cela DOIT échouer avant l'implémentation ou si la configuration est manquante
+        // L'erreur réelle levée par initAdminClient est sur SUPABASE_URL non défini
         const { analyzeVectorIndex } = require('./analyze-vector-index');
         
         // Si on arrive ici, c'est que le module existe déjà
-        // On vérifie qu'il lève une erreur ou retourne null
+        // On vérifie qu'il lève une erreur sur la configuration manquante
         await expect(analyzeVectorIndex()).rejects.toThrow(
-          'Implémentation manquante: analyseVectorIndex non implémentée'
+          'SUPABASE_URL non défini'
         );
       });
     });
