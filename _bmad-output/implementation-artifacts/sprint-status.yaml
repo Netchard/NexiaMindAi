@@ -93,7 +93,7 @@ development_status:
   # Epic 5: Base de Donnees & Optimisation
   epic-5: in-progress
   5-401-configurer-les-politiques-de-securite-rls: done
-  5-402-optimiser-l-index-vectoriel: ready-for-dev
+  5-402-optimiser-l-index-vectoriel: review
   5-403-implementer-le-cache-des-embeddings: backlog
   5-404-creer-les-index-classiques: backlog
   5-405-sauvegarder-la-structure-de-la-base: backlog

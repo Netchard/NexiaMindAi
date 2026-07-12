@@ -4,6 +4,7 @@ import React, { useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import hljs from 'highlight.js'
+import Image from 'next/image'
 import { configureHighlighting } from '@/lib/markdown'
 import { CodeBlock } from './CodeBlock'
 
@@ -31,15 +32,28 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
 
   // Configuration des composants personnalises
   const components = useMemo(() => ({
+    // pre transparent : CodeBlock rend deja son propre <pre> pour les blocs
+    // de code — sans ca, react-markdown enveloppe CodeBlock dans un <pre>
+    // par defaut, produisant un <pre><pre>...</pre></pre> invalide.
+    pre({ children }: any) {
+      return children
+    },
+
     // Blocs de code avec coloration syntaxique
-    code({ node, inline, className, children, ...props }: any) {
+    code({ node, className, children, ...props }: any) {
       const match = /language-(\w+)/.exec(className || '')
       const codeContent = String(children).replace(/\n$/, '')
 
+      // react-markdown v9+ ne fournit plus la prop `inline` — un span de
+      // code inline (une seule ligne source) se distingue d'un bloc de code
+      // clos par des balises ``` (au moins 3 lignes sources : ouverture,
+      // contenu, fermeture) via node.position.
+      const isInline = !node?.position || node.position.start.line === node.position.end.line
+
       // Code inline (pas de coloration syntaxique)
-      if (inline) {
+      if (isInline) {
         return (
-          <code className={className} {...props}>
+          <code className={`markdown-code-inline ${className || ''}`.trim()} {...props}>
             {children}
           </code>
         )
@@ -109,9 +123,28 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
       return <blockquote className="markdown-blockquote">{children}</blockquote>
     },
 
-    // Images
+    // Images - Utilisation de Next.js Image pour l'optimisation (ST-309)
     img({ node, src, alt, ...props }: any) {
-      return <img src={src} alt={alt || ''} loading="lazy" {...props} />
+      // Vérifier si src est une URL valide
+      if (!src || typeof src !== 'string') {
+        return null;
+      }
+      
+      // Pour les images markdown, utiliser Next.js Image avec fill
+      // Le conteneur doit avoir position: relative
+      return (
+        <div className="markdown-image-container" style={{ position: 'relative', width: '100%', height: 'auto' }}>
+          <Image
+            src={src}
+            alt={alt || ''}
+            fill
+            style={{ objectFit: 'contain' }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            loading="lazy"
+            {...props}
+          />
+        </div>
+      );
     },
 
     // Paragraphes
@@ -156,15 +189,6 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
     },
     em({ children }: any) {
       return <em className="markdown-em">{children}</em>
-    },
-
-    // Code inline
-    code({ className, children, ...props }: any) {
-      return (
-        <code className={`markdown-code-inline ${className || ''}`} {...props}>
-          {children}
-        </code>
-      )
     },
 
     // Horizontale rule

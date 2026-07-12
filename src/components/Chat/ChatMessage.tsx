@@ -24,6 +24,14 @@ const ExportButton = dynamic(
   }
 )
 
+const ListenButton = dynamic(
+  () => import('./').then((mod) => mod.ListenButton),
+  {
+    loading: () => null,
+    ssr: false, // Web Speech API n'existe pas côté serveur
+  }
+)
+
 interface ChatMessageProps {
   role: 'user' | 'assistant'
   content: string
@@ -90,13 +98,14 @@ export default function ChatMessage({ role, content, showAvatar, citations, id =
         <div className="w-[26px] flex-none" aria-hidden="true" />
       )}
       <div className="flex max-w-[78%] flex-col gap-2.5">
-        {/* Conteneur du message avec bouton Export - ST-308 */}
+        {/* Conteneur du message avec boutons Export/Écouter - ST-308 */}
         <div className="relative">
-          {/* Bouton Export en haut à droite */}
-          <div className="absolute top-2 right-2 z-10">
+          {/* Boutons Export + Écouter en haut à droite */}
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1.5">
+            <ListenButton text={content} />
             <ExportButton message={messageData} />
           </div>
-          
+
           {/* Message avec Markdown */}
           <div
             className="rounded-chat-lg rounded-tl-[5px] bg-chat-assistant-bg px-[17px] py-3.5 pt-8 text-[14.5px] leading-relaxed text-chat-assistant-text overflow-hidden"

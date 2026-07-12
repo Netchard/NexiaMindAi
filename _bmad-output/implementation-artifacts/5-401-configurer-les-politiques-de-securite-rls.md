@@ -4,7 +4,7 @@ baseline_commit: 331e7ee44528ac888f5641c45cdb31abd0019af0
 
 # Story 5.401: Configurer les Politiques de Sécurité (RLS)
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -76,6 +76,29 @@ Status: review
   - [x] Tester chaque politique avec chaque rôle
   - [x] Documenter les résultats
   - [x] Corriger les problèmes identifiés
+
+### Review Findings
+
+**Code review (ST-401, 2026-07-12)** — 3 parallel adversarial layers (Blind Hunter, Edge Case Hunter, Acceptance Auditor) against `supabase/rls-policies.sql`, `supabase/tests/create-test-users.sql`, `supabase/tests/rls-security-tests.sql`.
+
+- [x] [Review][Patch] Profiles UPDATE/INSERT policies allow self-escalation to admin role — `USING (auth.uid() = user_id)` on the profiles UPDATE/INSERT policies places no restriction on the `role` column itself, so any authenticated user can run `UPDATE profiles SET role='admin' WHERE user_id=auth.uid()` and gain admin-level access across every other table. **Resolution:** add a `BEFORE UPDATE` trigger on `public.profiles` that blocks changes to `role` unless the caller already has `role = 'admin'`.
+- [x] [Review][Patch] Security tests never actually exercise RLS under a real `auth.uid()`/role context (AC #5 unvalidated) — every test calls `SELECT set_config('app.current_role', ...)`, but no delivered policy reads `app.current_role`; the script also runs as superuser/service-role, which bypasses RLS entirely. **Resolution:** rewrite `rls-security-tests.sql` to simulate each role via `SET request.jwt.claims = '{"sub": "<uuid>", "role": "authenticated"}'` + `SET ROLE authenticated` before each assertion, so `auth.uid()` actually resolves per test user.
+- [x] [Review][Defer] Consultant (and reused pattern in chunks/embeddings) client access is not scoped to the consultant's own client — checks only `client_id IS NOT NULL`, never compared to the consultant's assigned client, so any consultant can read every client's documents/chunks/embeddings. No client-to-user mapping currently exists on `profiles`. — deferred: faible risque à court terme (peu de consultants actifs actuellement); nécessitera l'ajout d'un mapping consultant→client au schéma.
+- [x] [Review][Defer] "Project leads can view project documents" policy is a tautology — `(client_id IS NULL OR client_id IS NOT NULL)` always evaluates true, granting unrestricted document access instead of project-scoped access. — deferred: même cause racine et même raison que le finding consultant ci-dessus (faible risque à court terme, nécessite un mapping project_lead→client/projet).
+- [x] [Review][Resolved] Admins/managers can INSERT messages into any user's conversation with no marker of on-whose-behalf the message was posted — résolu: comportement intentionnel (usage support/admin), aucun changement nécessaire.
+- [x] [Review][Defer] `documents` table has RLS enabled but no UPDATE/DELETE policy at all, contradicting the story's completion checklist ("Politiques INSERT/UPDATE/DELETE créées où nécessaire"). — deferred: pas de cas d'usage actuel (aucune fonctionnalité applicative ne modifie/supprime des documents via le rôle authentifié ; le service role suffit pour l'instant). Checklist à corriger pour refléter l'absence de politiques UPDATE/DELETE.
+- [x] [Review][Patch] Invalid `NEW.conversation_id` in the messages INSERT `WITH CHECK` clause — `NEW`/`OLD` pseudo-records don't exist in RLS policies (only in triggers); this will fail `CREATE POLICY` and, since the script has no transaction wrapper, silently skips every statement after it. [supabase/rls-policies.sql:332]
+- [x] [Review][Patch] Chunks/embeddings SELECT policy default-allows any authenticated user when `metadata->>'allowed_roles'` is absent — this is the actual default state for every chunk (`metadata JSONB NOT NULL DEFAULT '{}'::jsonb` per architecture.md), so the role filter is bypassed by default instead of failing closed. [supabase/rls-policies.sql:260-262,296-298]
+- [x] [Review][Patch] `sync_logs` test-data INSERT references columns that don't exist in the real schema (`records_processed`, `errors` vs actual `documents_processed`, `chunks_created`, `embeddings_created`, `documents_deleted`, `error_message`) — this crashes test setup before any of the 10 test scenarios run. [supabase/tests/rls-security-tests.sql]
+- [x] [Review][Patch] `sync_logs` INSERT policy allows any authenticated user (not just admins) to write into an admin-only-readable audit log table. [supabase/rls-policies.sql, Section 9]
+- [x] [Review][Patch] `metadata->>'allowed_roles' ? 'developer'` uses the jsonb `?` (key/element exists) operator on a `->>` (text) result — type error, crashes Tests 5b/6b. Should use `metadata->'allowed_roles' ? 'developer'`. [supabase/tests/rls-security-tests.sql:987,1016]
+- [x] [Review][Patch] Chunks/embeddings policy drops the array-based `allowed_roles` membership check specified in Task 3 (`metadata->>'allowed_roles' ? current_setting('app.current_role')`) — the JOIN-based replacement never tests array membership, making the seeded array-form test data unreachable. [supabase/rls-policies.sql, Section 6-7]
+- [x] [Review][Patch] Messages SELECT/INSERT policies JOIN `profiles` before checking conversation ownership — a user with no `profiles` row yet (e.g. signup race) is locked out of their own conversation's messages, even though true ownership lives in `conversations.user_id`. [supabase/rls-policies.sql, Section 8]
+- [x] [Review][Patch] Re-running `rls-security-tests.sql` duplicates all seed rows — `chunks`/`conversations`/`messages`/`embeddings` use `gen_random_uuid()` for `id` with `ON CONFLICT (id) DO NOTHING`, so the conflict target never matches on rerun. [supabase/tests/rls-security-tests.sql]
+- [x] [Review][Patch] No `DROP POLICY IF EXISTS` / idempotency guard — re-running `rls-policies.sql` fails with "policy already exists". [supabase/rls-policies.sql]
+- [x] [Review][Patch] No transaction wrapper around `rls-policies.sql` — a mid-script failure (e.g. the `NEW.conversation_id` bug above) leaves RLS partially configured with no rollback. [supabase/rls-policies.sql]
+- [x] [Review][Patch] Duplicate/overlapping permissive SELECT policies (standalone "admin can view all X" policy plus an admin branch re-embedded inside other policies on the same table) — same net access but harder to audit. [supabase/rls-policies.sql, Sections 4-8]
+- [x] [Review][Patch] `get_user_role()` is unused dead code and, as a `SECURITY DEFINER` function, lacks `SET search_path` hardening. [supabase/rls-policies.sql, Section 1]
 
 ## Dev Notes
 
@@ -342,11 +365,17 @@ SELECT COUNT(*) FROM conversations WHERE user_id = 'user2-uuid';
   - Toutes les tâches marquées complètes
   - Statut mis à jour: in-progress → review
 
+- **2026-07-12** - Code review complétée (3 couches adversariales) et patches appliqués
+  - 6 decision-needed tranchées avec l'utilisateur (2 → patch, 3 → defer, 1 → résolu sans changement)
+  - 14 patches appliqués : trigger anti-escalade de rôle sur `profiles`, tests RLS réécrits avec simulation réelle de `auth.uid()` (`request.jwt.claims` + `SET ROLE authenticated`), correction du bug `NEW.conversation_id` invalide, fermeture de la faille d'accès par défaut sur `chunks`/`embeddings`, restriction de l'INSERT `sync_logs` aux admins, correction des colonnes `sync_logs` dans les tests, correction de l'opérateur jsonb `?`, ajout du filtre `allowed_roles` par tableau, correction du verrouillage `messages` sans ligne `profiles`, UUID fixes pour l'idempotence des tests, `DROP POLICY IF EXISTS` partout, wrapper transactionnel, dédoublonnage des politiques admin, hardening `search_path` de `get_user_role()`
+  - 3 items reportés (voir Review Findings / deferred-work.md) : scoping client `consultant`, tautologie `project_lead`, absence de politiques UPDATE/DELETE sur `documents`
+  - Statut mis à jour: review → done
+
 ## 🎯 Story Completion Checklist
 
 - [x] Toutes les tables ont RLS activé (7 tables: profiles, documents, chunks, embeddings, conversations, messages, sync_logs)
 - [x] Politiques SELECT créées pour toutes les tables (25+ politiques au total)
-- [x] Politiques INSERT/UPDATE/DELETE créées où nécessaire (INSERT/UPDATE/DELETE pour chaque table selon les besoins)
+- [x] Politiques INSERT/UPDATE/DELETE créées où nécessaire (INSERT/UPDATE/DELETE pour chaque table selon les besoins, à l'exception de `documents` UPDATE/DELETE — reporté, voir Review Findings)
 - [x] Tests de sécurité effectués et documentés (10 scénarios de test dans rls-security-tests.sql)
 - [x] Script SQL de déploiement créé (rls-policies.sql)
 - [x] Documentation mise à jour (commentaires détaillés dans les scripts SQL)

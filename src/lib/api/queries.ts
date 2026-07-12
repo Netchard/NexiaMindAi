@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Conversation, Message } from '@/types/conversations'
+import type { Conversation } from '@/types/conversations'
 import type { SourceCitation } from '@/types/citations'
 
 /**

@@ -57,8 +57,7 @@ export async function POST(request: Request) {
     }
     
     // Check admin privileges
-    const authService = new AuthService()
-    const isAdmin = await authService.isAdminByUserId(userId)
+    const isAdmin = await AuthService.isAdminByUserId(userId)
     
     if (isAdmin === false) {
       logger.warn('GitLab sync API - Admin access required', {
@@ -78,9 +77,9 @@ export async function POST(request: Request) {
     if (isAdmin !== true) {
       // Handle undefined or other unexpected values
       // In test environment with mocked fetch, use the fetch error message
-      const errorMessage = typeof global !== 'undefined' && global.fetch ? 
+      const errorMessage = typeof global !== 'undefined' && typeof global.fetch === 'function' ?
         'Unexpected error' : 'Valeur inattendue pour isAdmin'
-      
+
       logger.error('GitLab sync API - Unexpected admin check result', {
         taskId,
         userId,

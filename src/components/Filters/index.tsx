@@ -17,10 +17,10 @@ export type {
 } from './types';
 
 // Réexport des types partagés depuis @/types/filters pour commodité
-export type { 
+export type {
   ClientName,
-  DocumentType,
-  ProgrammingLanguage,
+  Theme,
+  DocumentFormat,
   UserRole,
   Filters,
   FilterState,

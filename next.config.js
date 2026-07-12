@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const { withBundleAnalyzer } = require('@next/bundle-analyzer');
+const withBundleAnalyzer = require('@next/bundle-analyzer');
 
 const nextConfig = {
   // Optimisation pour Vercel
@@ -26,6 +26,35 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '*.supabase.co',
+      },
+      // Domaines courants pour les images markdown
+      {
+        protocol: 'https',
+        hostname: '*.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.gitlab.io',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.gitlab.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
       },
     ],
     // Formats optimisés

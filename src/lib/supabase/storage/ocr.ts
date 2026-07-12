@@ -257,7 +257,12 @@ export class OCRService {
             // @ts-ignore - Contourner les problèmes de typage avec officeparser
             const officeparser = await import('officeparser');
             // @ts-ignore
-            const result = await officeparser.parseOffice(buffer);
+            const result = await new Promise((resolve, reject) => {
+              officeparser.parseOffice(buffer, (err: Error | null, data: any) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
+            });
             // @ts-ignore
             text = result?.text || result?.content || result?.data || result?.value || String(result) || '';
           } catch (importError: unknown) {
@@ -275,7 +280,12 @@ export class OCRService {
             // @ts-ignore - Contourner les problèmes de typage avec officeparser
             const officeparser = await import('officeparser');
             // @ts-ignore
-            const result = await officeparser.parseOffice(buffer);
+            const result = await new Promise((resolve, reject) => {
+              officeparser.parseOffice(buffer, (err: Error | null, data: any) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
+            });
             // @ts-ignore
             text = result?.text || result?.content || result?.data || result?.value || String(result) || '';
           } catch (importError: unknown) {
@@ -293,7 +303,12 @@ export class OCRService {
             // @ts-ignore - Contourner les problèmes de typage avec officeparser
             const officeparser = await import('officeparser');
             // @ts-ignore
-            const result = await officeparser.parseOffice(buffer);
+            const result = await new Promise((resolve, reject) => {
+              officeparser.parseOffice(buffer, (err: Error | null, data: any) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
+            });
             // @ts-ignore
             text = result?.text || result?.content || result?.data || result?.value || String(result) || '';
           } catch (importError: unknown) {
@@ -311,7 +326,12 @@ export class OCRService {
             // @ts-ignore - Contourner les problèmes de typage avec officeparser
             const officeparser = await import('officeparser');
             // @ts-ignore
-            const result = await officeparser.parseOffice(buffer);
+            const result = await new Promise((resolve, reject) => {
+              officeparser.parseOffice(buffer, (err: Error | null, data: any) => {
+                if (err) reject(err);
+                else resolve(data);
+              });
+            });
             // @ts-ignore
             text = result?.text || result?.content || result?.data || result?.value || String(result) || '';
           } catch (importError: unknown) {

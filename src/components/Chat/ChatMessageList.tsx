@@ -56,10 +56,15 @@ export default function ChatMessageList({ messages, isTyping, onSuggestionClick 
   }
 
   return (
+    // Seul conteneur de scroll de la zone d'échanges — le wrapper dans
+    // page.tsx/[conversationId]/page.tsx reste overflow-hidden (borné, ne
+    // scrolle pas lui-même) pour que chat-message-list soit l'unique div
+    // qui défile entre conversation-header et le composer (voir DESIGN.md >
+    // Layout & Spacing).
     <div
       role="log"
       aria-live="polite"
-      className="nm-scroll flex-1 flex flex-col gap-1.5 px-2 py-4 overflow-y-auto"
+      className="nm-scroll flex-1 flex flex-col gap-1.5 px-2 py-4 overflow-y-auto min-h-0"
       data-testid="chat-message-list"
     >
       {messages.map((message, index) => {

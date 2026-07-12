@@ -5,9 +5,12 @@ import hljs from 'highlight.js'
 /**
  * Configuration de highlight.js pour la coloration syntaxique
  * Fait partie de ST-307: Ajouter le Support du Markdown
+ * 
+ * Note: Avec highlight.js v11+, tous les langages sont inclus dans le package principal
+ * et registerLanguage n'est plus nécessaire. On utilise directement hljs.getLanguage().
  */
 
-// Liste des langages a supporter
+// Liste des langages supportés
 const SUPPORTED_LANGUAGES = [
   'javascript',
   'typescript',
@@ -42,23 +45,15 @@ const SUPPORTED_LANGUAGES = [
 ]
 
 /**
- * Configure highlight.js avec les langages supportes
+ * Configure highlight.js avec les langages supportés
  * Appelé une seule fois au chargement de l'application
+ * 
+ * Avec highlight.js v11+, plus besoin de registerLanguage manuellement.
+ * Le package inclut déjà tous les langages.
  */
 export function configureHighlighting(): typeof hljs {
-  // Enregistrer tous les langages supportes
-  SUPPORTED_LANGUAGES.forEach(lang => {
-    try {
-      // @ts-expect-error - hljs.registerLanguage a une signature flexible
-      if (hljs.getLanguage(lang) === undefined) {
-        // @ts-expect-error - Signature flexible
-        hljs.registerLanguage(lang, require(`highlight.js/lib/languages/${lang}`))
-      }
-    } catch (error) {
-      console.warn(`[Markdown] Impossible de charger le langage highlight.js: ${lang}`, error)
-    }
-  })
-
+  // Avec highlight.js v11+, tous les langages sont déjà enregistrés
+  // On vérifie juste que hljs est prêt
   return hljs
 }
 

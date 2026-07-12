@@ -1,0 +1,62 @@
+
+========================================
+Benchmark de l'Index Vectoriel - ST-402 (MOCK)
+Date: 2026-07-12T15:17:26.845Z
+========================================
+
+Configuration:
+- Itérations par config: 5
+- Requêtes de réchauffement: 3
+- Limite de résultats: 10
+- Configurations testées: [50, 100, 200, 400]
+
+[2026-07-12T15:17:26.847Z] 🚀 Démarrage du benchmark MOCK pour ST-402
+"blue"
+
+[2026-07-12T15:17:26.858Z] Tâche 2: Créer le script de benchmark (MOCK)
+
+[2026-07-12T15:17:26.861Z] ✅ Rapport de benchmark sauvegardé: C:\VibeCoding\nexiamind-ai\scripts\benchmark\vector-index-benchmark-report.json
+
+[2026-07-12T15:17:26.862Z] 
+✅ Benchmark MOCK terminé avec succès !
+"green"
+
+[2026-07-12T15:17:26.863Z] 
+Résumé:
+{
+  "totalConfigurations": 4,
+  "successfulConfigurations": 4,
+  "failedConfigurations": 0,
+  "bestConfiguration": {
+    "lists": 400,
+    "avgTime": 680.4,
+    "description": "Configuration la plus rapide"
+  },
+  "recommendations": [
+    {
+      "type": "vitesse",
+      "configuration": 400,
+      "avgTime": 680.4,
+      "description": "Configuration la plus rapide"
+    },
+    {
+      "type": "stabilité",
+      "configuration": 400,
+      "stdDev": 31.071530377501524,
+      "description": "Configuration la plus stable"
+    },
+    {
+      "type": "compromis",
+      "configuration": 400,
+      "compositeScore": 0.01038138731606594,
+      "description": "Meilleur compromis vitesse/stabilité"
+    },
+    {
+      "type": "critère",
+      "configuration": 50,
+      "avgTime": 1386.2,
+      "description": "Respecte le critère < 3s"
+    }
+  ]
+}
+

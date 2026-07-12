@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth, Loader2, Eye, EyeOff } from '@/components/Auth'
@@ -17,7 +17,8 @@ import { useAuth, Loader2, Eye, EyeOff } from '@/components/Auth'
  * un simple message centré, sans formulaire, tant que la vérification n'est pas
  * résolue — pour éviter un flash de formulaire invalide.
  */
-export default function ResetPasswordPage() {
+
+function ResetPasswordContent() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -253,5 +254,13 @@ export default function ResetPasswordPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<p className="text-center text-auth-ink-subtle">Vérification du lien...</p>}>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }

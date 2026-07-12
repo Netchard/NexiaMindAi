@@ -44,7 +44,8 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-import { POST, triggerRefresh } from '../route';
+import { POST } from '../route';
+import { triggerRefresh } from '@/lib/api/chat/refresh';
 
 // Helper pour créer un mock de NextRequest
 function createMockRequest(body: any, headers: Record<string, string> = {}): any {

@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useConversations } from '@/components/Conversations'
 import { ChatInput, ChatMessageList } from '@/components/Chat'
+import { HistoryMenu } from '@/components/Chat'
 import type { ChatMessageData } from '@/components/Chat'
 
 /**
@@ -27,8 +28,7 @@ export default function ChatPage() {
     isLoading,
     error,
     onSendMessage,
-    onCreateNewConversation,
-    getFiltersForConversation,
+    onSelectConversation,
   } = useConversations()
 
   // Si une conversation est déjà sélectionnée et que nous sommes sur /chat, rediriger
@@ -39,12 +39,13 @@ export default function ChatPage() {
     }
   }, [currentConversationId, conversations, router])
 
-  // Gérer l'envoi de message (créera une nouvelle conversation)
+  // Gérer l'envoi de message — onSendMessage(null, ...) crée la conversation,
+  // y navigue et envoie le message lui-même (voir layout.tsx). L'ancienne
+  // version appelait onCreateNewConversation() directement puis naviguait
+  // sans jamais transmettre `content` : le message tapé était perdu en
+  // silence pour toute première question depuis l'état vide/chargement.
   const handleSend = async (content: string) => {
-    const newConversationId = await onCreateNewConversation()
-    if (newConversationId) {
-      router.push(`/chat/${newConversationId}`)
-    }
+    await onSendMessage(null, content, {})
   }
 
   // Obtenir l'état de la conversation active (si elle existe)
@@ -57,18 +58,23 @@ export default function ChatPage() {
   // Si on est en train de charger et qu'il n'y a pas encore de conversation
   if (isLoading && conversations.length === 0 && currentConversationId === null) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-none border-b border-chat-border-header px-5 py-3">
-          <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+      <div className="flex flex-col h-full min-h-0">
+        <div className="flex-none border-b border-chat-border-header h-[60px] px-5 bg-chat-surface-panel">
+          <div className="flex items-center justify-between max-w-full h-full">
+            <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+            {conversations.length > 0 && (
+              <HistoryMenu 
+                conversations={conversations.map(c => ({ id: c.id, title: c.title, updatedAt: c.updatedAt }))}
+                onSelect={onSelectConversation}
+              />
+            )}
+          </div>
         </div>
         <div className="flex-1 flex items-center justify-center overflow-y-auto">
           <div className="text-chat-ink-muted">Chargement des conversations...</div>
         </div>
         <div className="flex-none border-t border-chat-border-header p-4 bg-chat-surface-panel">
           <ChatInput onSend={handleSend} disabled={isLoading} />
-          <p className="mt-3 text-center text-[11.5px] text-chat-ink-faint">
-            NexiaMind peut faire des erreurs. Vérifiez les sources citées.
-          </p>
         </div>
       </div>
     )
@@ -77,9 +83,17 @@ export default function ChatPage() {
   // Si aucune conversation n'existe, afficher un état vide
   if (!isLoading && conversations.length === 0 && currentConversationId === null) {
     return (
-      <div className="flex flex-col h-full">
-        <div className="flex-none border-b border-chat-border-header px-5 py-3">
-          <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+      <div className="flex flex-col h-full min-h-0">
+        <div className="flex-none border-b border-chat-border-header h-[60px] px-5 bg-chat-surface-panel">
+          <div className="flex items-center justify-between max-w-full h-full">
+            <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+            {conversations.length > 0 && (
+              <HistoryMenu 
+                conversations={conversations.map(c => ({ id: c.id, title: c.title, updatedAt: c.updatedAt }))}
+                onSelect={onSelectConversation}
+              />
+            )}
+          </div>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-5 px-6 text-center overflow-y-auto">
           <h1 className="font-display text-[30px] font-semibold tracking-tight text-chat-ink-strong">
@@ -91,9 +105,6 @@ export default function ChatPage() {
         </div>
         <div className="flex-none border-t border-chat-border-header p-4 bg-chat-surface-panel">
           <ChatInput onSend={handleSend} disabled={false} />
-          <p className="mt-3 text-center text-[11.5px] text-chat-ink-faint">
-            NexiaMind peut faire des erreurs. Vérifiez les sources citées.
-          </p>
         </div>
       </div>
     )
@@ -101,12 +112,18 @@ export default function ChatPage() {
 
   // Si nous avons une conversation active, c'est que le layout a déjà chargé les messages
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-none border-b border-chat-border-header px-5 py-3">
-        <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex-none border-b border-chat-border-header h-[60px] px-5 bg-chat-surface-panel">
+        <div className="flex items-center justify-between max-w-full h-full">
+          <span className="text-[15px] font-semibold text-chat-ink-strong">NexiaMind AI</span>
+          <HistoryMenu
+            conversations={conversations.map(c => ({ id: c.id, title: c.title, updatedAt: c.updatedAt }))}
+            onSelect={onSelectConversation}
+          />
+        </div>
       </div>
 
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {error ? (
           <div
             role="alert"
@@ -132,13 +149,10 @@ export default function ChatPage() {
             {conversationState.error}
           </div>
         )}
-        <ChatInput 
-          onSend={handleSend} 
+        <ChatInput
+          onSend={handleSend}
           disabled={isLoading}
         />
-        <p className="mt-3 text-center text-[11.5px] text-chat-ink-faint">
-          NexiaMind peut faire des erreurs. Vérifiez les sources citées.
-        </p>
       </div>
     </div>
   )

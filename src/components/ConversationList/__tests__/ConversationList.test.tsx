@@ -7,6 +7,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { vi } from 'vitest'
 import ConversationList from '../ConversationList'
 import { ConversationsContext } from '@/components/Conversations/ConversationsContext'
+import { DictationProvider } from '@/components/Dictation'
 
 // Mock des composants enfants
 vi.mock('../ConversationItem', () => ({
@@ -45,7 +46,9 @@ describe('ConversationList', () => {
   const renderComponent = (contextValue = mockContext) => {
     return render(
       <ConversationsContext.Provider value={contextValue}>
-        <ConversationList />
+        <DictationProvider>
+          <ConversationList />
+        </DictationProvider>
       </ConversationsContext.Provider>
     )
   }

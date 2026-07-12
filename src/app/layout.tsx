@@ -41,7 +41,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="min-h-screen flex flex-col bg-[#0a1524] text-[#eef2f8]">
+      {/* h-full (pas min-h-screen) : borne le body à la hauteur du viewport
+          (comme html ci-dessus) plutôt qu'un plancher sans plafond — sans ça,
+          le flex-1/overflow-hidden de MainContent (voir MainContent.tsx) n'a
+          aucune hauteur définie contre laquelle se résoudre, et /chat défile
+          au niveau de la page entière au lieu de gérer son scroll interne.
+          Les autres routes gardent leur scroll de page normal : body reste
+          overflow visible (pas hidden), seul /chat clippe explicitement. */}
+      <body className="h-full flex flex-col bg-[#0a1524] text-[#eef2f8]">
         <QueryClientProvider>
           <AuthProvider>
             <Navbar />

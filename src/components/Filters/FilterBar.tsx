@@ -6,9 +6,9 @@
  */
 
 import React from 'react';
-import { FilterBarProps, FilterState } from './types';
+import { FilterBarProps } from './types';
 import { FilterDropdown } from './FilterDropdown';
-import { FILTER_LABELS, FILTER_PLACEHOLDERS, DEFAULT_FILTERS } from '@/types/filters';
+import { FILTER_LABELS, FILTER_PLACEHOLDERS, DEFAULT_FILTERS, FilterState } from '@/types/filters';
 
 // Couleurs du design system sombre (docs/Maquette-ux-NexiaMind AI.html)
 // voir _bmad-output/planning-artifacts/ux-designs/ux-nexiamind-ai-2026-07-04-chat/DESIGN.md

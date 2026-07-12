@@ -1,0 +1,28 @@
+{
+  "name": "nexiamind-vector-analysis",
+  "version": "1.0.0",
+  "description": "Scripts d'analyse de l'index vectoriel pour ST-402",
+  "main": "analyze-vector-index.js",
+  "scripts": {
+    "analyze": "node analyze-vector-index.js",
+    "test": "jest analyze-vector-index.test.js --detectOpenHandles",
+    "test:watch": "jest analyze-vector-index.test.js --watch",
+    "test:coverage": "jest analyze-vector-index.test.js --coverage"
+  },
+  "keywords": [
+    "supabase",
+    "pgvector",
+    "vector-index",
+    "performance",
+    "benchmark"
+  ],
+  "author": "NexiaMind AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0"
+  }
+}

@@ -28,22 +28,12 @@ function formatMessageToMarkdown(message: ChatMessageData): string {
   // Ajouter les citations si elles existent
   if (message.citations && message.citations.length > 0) {
     const citationsMarkdown = message.citations
-      .map((citation, index) => {
-        // Format basé sur le type SourceCitation
-        const sourceInfo = citation.source
-          ? `[$${citation.source}]`
-          : citation.filePath
-            ? `\`${citation.filePath}\``
-            : `[Source ${index + 1}]`
-        const contentPreview = citation.contentPreview
-          ? ` \"${citation.contentPreview}\"`
-          : ''
-        const pageInfo = citation.pageNumber ? ` (p.${citation.pageNumber})` : ''
-        
-        return `\n\n> **Source ${index + 1}** : ${sourceInfo}${pageInfo}${contentPreview}`
+      .map((citation) => {
+        const fileName = citation.path.split(/[/\\]/).pop() || citation.path
+        return `\n\n> **Source ${citation.index}** (${citation.type}) : [${fileName}](${citation.url})`
       })
       .join('\n')
-    
+
     content = `${content}\n\n---${citationsMarkdown}`
   }
   
@@ -196,7 +186,6 @@ export function CopyConversationButton({
           transition-colors disabled:opacity-50 disabled:cursor-not-allowed
         `}
         data-testid="copy-conversation-button"
-        title="Copier la conversation"
       >
         {isCopying ? (
           <>

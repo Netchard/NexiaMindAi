@@ -7,11 +7,19 @@ import { MarkdownRenderer } from '../MarkdownRenderer'
 // Mock de highlight.js
 import { vi } from 'vitest'
 
-vi.mock('highlight.js', () => ({
-  highlight: vi.fn((code: string, options: any) => ({
-    value: `<pre><code class="hljs ${options?.language || 'text'}">${code}</code></pre>`,
-  })),
-}))
+vi.mock('highlight.js', () => {
+  const hljsMock = {
+    highlight: vi.fn((code: string, options: any) => ({
+      value: `<pre><code class="hljs ${options?.language || 'text'}">${code}</code></pre>`,
+    })),
+    getLanguage: vi.fn(() => undefined),
+    registerLanguage: vi.fn(),
+  }
+  return {
+    default: hljsMock,
+    ...hljsMock,
+  }
+})
 
 describe('MarkdownRenderer', () => {
   describe('Rendu de base', () => {
@@ -48,7 +56,7 @@ describe('MarkdownRenderer', () => {
 
     it('rend le texte barré', () => {
       render(<MarkdownRenderer content="~~barré~~" />)
-      expect(screen.getByText('barré')).toHaveClass('markdown-code-inline')
+      expect(screen.getByText('barré').tagName.toLowerCase()).toBe('del')
     })
 
     it('rend les citations', () => {
@@ -59,7 +67,7 @@ describe('MarkdownRenderer', () => {
 
   describe('Listes', () => {
     it('rend les listes non ordonnées', () => {
-      render(<MarkdownRenderer content="- item 1\n- item 2" />)
+      render(<MarkdownRenderer content={"- item 1\n- item 2"} />)
       const listItems = screen.getAllByRole('listitem')
       expect(listItems).toHaveLength(2)
       expect(listItems[0]).toHaveTextContent('item 1')
@@ -67,7 +75,7 @@ describe('MarkdownRenderer', () => {
     })
 
     it('rend les listes ordonnées', () => {
-      render(<MarkdownRenderer content="1. premier\n2. deuxième" />)
+      render(<MarkdownRenderer content={"1. premier\n2. deuxième"} />)
       const listItems = screen.getAllByRole('listitem')
       expect(listItems).toHaveLength(2)
       expect(listItems[0]).toHaveTextContent('premier')
@@ -82,19 +90,21 @@ describe('MarkdownRenderer', () => {
     })
 
     it('rend les blocs de code avec langage', () => {
-      render(<MarkdownRenderer content="```javascript\nconst x = 1;\n```" />)
-      expect(screen.getByTestId('code-block')).toBeInTheDocument()
-      expect(screen.getByText(/Bloc de code javascript/i)).toBeInTheDocument()
+      render(<MarkdownRenderer content={"```javascript\nconst x = 1;\n```"} />)
+      const codeBlock = screen.getByTestId('code-block')
+      expect(codeBlock).toBeInTheDocument()
+      expect(codeBlock).toHaveAttribute('aria-label', 'Bloc de code javascript')
     })
 
     it('rend les blocs de code sans langage', () => {
-      render(<MarkdownRenderer content="```\nconst x = 1;\n```" />)
-      expect(screen.getByTestId('code-block')).toBeInTheDocument()
-      expect(screen.getByText(/Bloc de code text/i)).toBeInTheDocument()
+      render(<MarkdownRenderer content={"```\nconst x = 1;\n```"} />)
+      const codeBlock = screen.getByTestId('code-block')
+      expect(codeBlock).toBeInTheDocument()
+      expect(codeBlock).toHaveAttribute('aria-label', 'Bloc de code text')
     })
 
     it('affiche le bouton Copier', () => {
-      render(<MarkdownRenderer content="```javascript\ncode\n```" />)
+      render(<MarkdownRenderer content={"```javascript\ncode\n```"} />)
       expect(screen.getByTestId('code-copy-button')).toBeInTheDocument()
     })
   })
@@ -159,7 +169,7 @@ describe('MarkdownRenderer', () => {
 
   describe('Accessibilité', () => {
     it('les blocs de code ont aria-label avec le langage', () => {
-      render(<MarkdownRenderer content="```javascript\ncode\n```" />)
+      render(<MarkdownRenderer content={"```javascript\ncode\n```"} />)
       const codeBlock = screen.getByTestId('code-block')
       expect(codeBlock).toHaveAttribute('aria-label', 'Bloc de code javascript')
     })

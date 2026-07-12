@@ -9,6 +9,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useConversations } from '@/components/Conversations'
 import ConversationItem from './ConversationItem'
+import AvatarPanel from './AvatarPanel'
 import type { Conversation } from '@/types/conversations'
 
 interface ConversationListProps {
@@ -112,13 +113,18 @@ export default function ConversationList({ onClose }: ConversationListProps) {
         <div className="lg:hidden fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm" />
       )}
 
-      {/* Conteneur principal de la liste */}
+      {/* Conteneur principal de la liste — flex-col sur toute la hauteur
+          disponible (mobile : plein écran via inset-0 ; desktop : hérite du
+          h-full du wrapper dans layout.tsx) pour que la liste ait un flex-1
+          borné qui scrolle et que AvatarPanel reste fixe en bas, hors du
+          flux scrollable. lg:flex (pas lg:block) est essentiel ici : un
+          conteneur non-flex rend le flex-1 de l'enfant inerte. */}
       <div
         ref={overlayRef}
         role="list"
         aria-label="Liste des conversations"
-        className={`fixed inset-0 z-50 flex flex-col bg-chat-surface-header p-4 lg:static lg:block lg:bg-transparent lg:p-0 lg:z-auto ${
-          isOverlayOpen ? 'block' : 'hidden lg:block'
+        className={`fixed inset-0 z-50 flex flex-col h-full bg-chat-surface-header p-4 lg:static lg:flex lg:h-full lg:bg-transparent lg:p-0 lg:z-auto ${
+          isOverlayOpen ? 'flex' : 'hidden lg:flex'
         }`}
         data-testid="conversation-list"
       >
@@ -169,6 +175,9 @@ export default function ConversationList({ onClose }: ConversationListProps) {
             </div>
           )}
         </div>
+
+        {/* Panel Avatar : zone 3D réservée + contrôles micro (dictée) */}
+        <AvatarPanel />
       </div>
     </>
   )

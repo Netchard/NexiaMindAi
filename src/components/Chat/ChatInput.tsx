@@ -1,7 +1,8 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Send } from './icons'
+import { useDictation } from '@/components/Dictation'
 
 interface ChatInputProps {
   onSend: (message: string) => void
@@ -15,6 +16,37 @@ interface ChatInputProps {
 export default function ChatInput({ onSend, disabled }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const { isListening, transcript, clearTranscript } = useDictation()
+  const dictationBaseRef = useRef('')
+  const wasListeningRef = useRef(false)
+
+  const resize = () => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 140)}px`
+  }
+
+  // Dictée (micro bascule/maintien, voir EXPERIENCE.md > Component Patterns) :
+  // capture le texte déjà présent au démarrage de l'écoute, puis le complète
+  // en direct avec le transcript reconnu — jamais d'envoi automatique.
+  useEffect(() => {
+    if (isListening && !wasListeningRef.current) {
+      dictationBaseRef.current = value
+    }
+    if (!isListening && wasListeningRef.current) {
+      clearTranscript()
+    }
+    wasListeningRef.current = isListening
+  }, [isListening, value, clearTranscript])
+
+  useEffect(() => {
+    if (!isListening) return
+    const base = dictationBaseRef.current
+    const needsSpace = base.length > 0 && !/\s$/.test(base)
+    setValue(transcript ? `${base}${needsSpace ? ' ' : ''}${transcript}` : base)
+    resize()
+  }, [transcript, isListening])
 
   const submit = () => {
     const trimmed = value.trim()
@@ -28,9 +60,7 @@ export default function ChatInput({ onSend, disabled }: ChatInputProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value)
-    const el = e.target
-    el.style.height = 'auto'
-    el.style.height = `${Math.min(el.scrollHeight, 140)}px`
+    resize()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

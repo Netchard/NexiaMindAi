@@ -25,7 +25,7 @@ export function MainContent({ children }: { children: React.ReactNode }) {
   }
 
   if (isChatRoute) {
-    return <main className="flex-1 overflow-hidden">{children}</main>;
+    return <main className="flex-1 overflow-hidden min-h-0">{children}</main>;
   }
 
   return <main className="flex-1 container mx-auto px-4 py-8">{children}</main>;

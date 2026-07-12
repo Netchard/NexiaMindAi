@@ -1111,3 +1111,38 @@ J'ai corrigé **les 6 tests mineurs de ST-306** et implémenté la fonctionnalit
 
 ---
 **✅ Toutes les corrections sont terminées et vérifiées !**
+
+✅ **Modifications terminées !** Le div `chat-message-list` va maintenant scroller entre le `conversation-header` et le footer.
+
+## Ce que j'ai modifié :
+
+### **Structure CSS corrigée :**
+```
+┌─────────────────────────────────┐
+│  ConversationHeader (fixed)       │
+├─────────────────────────────────┤
+│  ✅ Conteneur avec overflow-y-auto  │ ← Scroll activé
+│     └── ChatMessageList           │
+├─────────────────────────────────┤
+│  Footer/ChatInput (fixed)         │
+└─────────────────────────────────┘
+```
+
+### **Fichiers modifiés :**
+
+1. **`src/app/chat/[conversationId]/page.tsx`** (ligne 78)
+   - `overflow-hidden` → **`overflow-y-auto`**
+
+2. **`src/app/chat/page.tsx`** (4 corrections)
+   - Ligne 60 : Suppression de `overflow-hidden` sur le conteneur racine
+   - Ligne 64 : `overflow-hidden` → **`overflow-y-auto`**
+   - Ligne 84 : `overflow-hidden` → **`overflow-y-auto`**
+   - Ligne 109 : `overflow-hidden` → **`overflow-y-auto`**
+
+### **Résultat :**
+- ✅ Le header reste fixe en haut
+- ✅ Le footer reste fixe en bas
+- ✅ La zone des messages défile verticalement entre les deux
+- ✅ La barre de défilement apparaît automatiquement quand nécessaire
+
+Le problème de non-changement lors du test frontend devrait être résolu. Les conteneurs parents permettaient le scroll, maintenant les zones de messages peuvent défiler librement entre le header et le footer fixes.

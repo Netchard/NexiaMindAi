@@ -30,6 +30,8 @@ export interface ConversationMessage {
   sources?: SourceCitation[];
   /** Date de création du message */
   createdAt: string;
+  /** Échec d'envoi (message utilisateur optimiste dont l'appel API a échoué) */
+  failed?: boolean;
 }
 
 /**

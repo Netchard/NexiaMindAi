@@ -79,7 +79,8 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-import { GET, getAdminStats } from '../route';
+import { GET } from '../route';
+import { getAdminStats } from '@/lib/api/admin/stats';
 
 // Helper pour créer un mock de NextRequest
 function createMockRequest(url: string = 'http://localhost/api/admin/stats', headers: Record<string, string> = {}): any {

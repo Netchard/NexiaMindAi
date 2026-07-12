@@ -141,22 +141,20 @@ export async function GET(request: NextRequest) {
       ]);
 
       // Stats par client (optionnel)
-      const byClientStats: Record<string, UsageStats> = {};
+      // Stats par client - En Supabase v2, on utilise une requête RPC ou on utilise count
+      // sans group pour éviter l'erreur TypeScript. On utilise une approche alternative.
+      const { data: allMessages, error: clientError } = await supabaseServer
+      .from('messages')
+      .select('metadata->>client')
 
-      const { data: clientMessages, error: clientError } = await supabaseServer
-        .from('messages')
-        .select('metadata->>client, id', { head: true, count: 'exact' })
-        .group('metadata->>client');
-
-      if (!clientError && clientMessages) {
-        for (const cm of clientMessages as any[]) {
-          const client = cm.client || 'unknown';
-          if (!byClientStats[client]) {
-            byClientStats[client] = { conversations: 0, messages: 0, tokensUsed: 0 };
-          }
-          byClientStats[client].messages = cm.count || 0;
+      const byClientStats: Record<string, UsageStats> = {}
+      allMessages?.forEach((msg: any) => {
+        const client = msg.client || 'unknown'
+        if (!byClientStats[client]) {
+          byClientStats[client] = { conversations: 0, messages: 0, tokensUsed: 0 }
         }
-      }
+        byClientStats[client].messages++
+      })
 
       // 4. Formattage de la réponse
       const response: StatsResponse = {
@@ -207,25 +205,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Fonction utilitaire pour appeler l'endpoint depuis le frontend
-export async function getAdminStats(): Promise<StatsResponse> {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
-  const url = new URL('/api/admin/stats', baseUrl);
-
-  const response = await fetch(url.toString(), {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      `Erreur ${response.status}: ${errorData.error || response.statusText}`
-    );
-  }
-
-  return response.json();
 }

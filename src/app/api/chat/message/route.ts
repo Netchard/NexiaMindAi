@@ -204,17 +204,18 @@ export async function POST(request: NextRequest) {
     let generationResult: GenerationResult;
 
     try {
+      // Note: generateResponse n'accepte que userRole, conversationId, temperature, maxTokens
+      // Les propriétés model, conversationContext ne sont pas dans le type
       generationResult = await generateResponse(body.message, retrievalResult.chunks, {
         userRole: 'user',
-        conversationContext: conversationContext || undefined,
-        model: body.options?.model || 'default',
+        conversationId: body.conversationId,
         temperature: body.options?.temperature,
         maxTokens: body.options?.maxTokens,
       });
 
       console.info('Réponse générée', {
         responseLength: generationResult.response.length,
-        tokensUsed: generationResult.tokensUsed,
+        tokenCount: generationResult.tokenCount,
       });
     } catch (generateError) {
       console.error('Échec de la génération de la réponse', {
@@ -336,7 +337,7 @@ export async function POST(request: NextRequest) {
           model: body.options?.model || 'default',
           citations: formatted.citations,
           processingTime: Date.now() - startTime,
-          tokensUsed: generationResult.tokensUsed,
+          tokenCount: generationResult.tokenCount,
           source: 'rag-pipeline',
         },
       });
@@ -375,7 +376,7 @@ export async function POST(request: NextRequest) {
       citations: formatted.citations,
       metadata: {
         model: body.options?.model || 'default',
-        tokensUsed: generationResult.tokensUsed,
+        tokensUsed: generationResult.tokenCount || 0,
         processingTime,
         timestamp: new Date().toISOString(),
       },
@@ -385,7 +386,7 @@ export async function POST(request: NextRequest) {
       conversationId: newConversationId,
       userId,
       processingTime: `${processingTime}ms`,
-      tokensUsed: generationResult.tokensUsed,
+      tokensUsed: generationResult.tokenCount || 0,
       citationCount: formatted.citationCount,
     });
 

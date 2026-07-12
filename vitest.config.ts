@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  
   test: {
     globals: true,
     environment: 'jsdom',
@@ -19,9 +20,7 @@ export default defineConfig({
       '@/*': '<rootDir>/src/*',
     },
     // Timeout pour les tests asynchrones
-    testTimeout: 10000,
-    // Nombre de threads pour l'exécution parallèle
-    threads: true,
+    testTimeout: 10000,    
     // Ne pas arrêter au premier échec
     passWithNoTests: true,
   },

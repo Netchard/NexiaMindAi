@@ -10,6 +10,7 @@
 import { useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useConversations } from '@/components/Conversations'
+import { HistoryMenu } from '@/components/Chat'
 import { CONVERSATION_ACTION_LABELS, CONVERSATION_CONFIRMATIONS } from '@/types/conversations'
 
 // Lazy loading du bouton lourd pour ST-309
@@ -27,6 +28,7 @@ interface ConversationHeaderProps {
   onRename?: (newTitle: string) => Promise<void>
   onDelete?: () => Promise<void>
   isLoading?: boolean
+  conversations?: Array<{id: string; title: string; updatedAt: string}>
 }
 
 /**
@@ -39,8 +41,19 @@ export default function ConversationHeader({
   onRename,
   onDelete,
   isLoading = false,
+  conversations = [],
 }: ConversationHeaderProps) {
-  const { onCreateNewConversation } = useConversations()
+  const { onCreateNewConversation, conversations: allConversations, onSelectConversation } = useConversations()
+  
+  // Utiliser les conversations passées en props ou celles du contexte
+  const displayConversations = conversations.length > 0 ? conversations : allConversations
+  
+  // Handler pour la sélection depuis l'historique
+  const handleHistorySelect = async (conversationId: string) => {
+    if (onSelectConversation) {
+      await onSelectConversation(conversationId)
+    }
+  }
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(title)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -140,9 +153,9 @@ export default function ConversationHeader({
   }
 
   return (
-    <div className="flex-none border-b border-chat-border-header px-5 py-3 bg-chat-surface-panel" data-testid="conversation-header">
-      <div className="flex items-center justify-between max-w-full">
-        {/* Titre de la conversation */}
+    <div className="flex-none border-b border-chat-border-header h-[60px] px-5 bg-chat-surface-panel" data-testid="conversation-header">
+      <div className="flex items-center justify-between max-w-full h-full">
+        {/* Titre de la conversation et bouton Historique */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {isEditing ? (
             <form onSubmit={handleRename} className="flex-1 min-w-0">
@@ -176,6 +189,14 @@ export default function ConversationHeader({
                 {title}
               </h1>
             </button>
+          )}
+          
+          {/* Bouton Historique - selon DESIGN.md */}
+          {conversationId && (
+            <HistoryMenu 
+              conversations={displayConversations.map(c => ({ id: c.id, title: c.title, updatedAt: c.updatedAt }))}
+              onSelect={handleHistorySelect}
+            />
           )}
         </div>
 

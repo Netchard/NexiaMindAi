@@ -33,10 +33,10 @@ export class AuthService {
   /**
    * Déconnexion
    */
-  static async logout(accessToken: string) {
+  static async logout(_accessToken: string) {
     console.info('Tentative de logout');
-    
-    const { error } = await supabaseServer.auth.signOut(accessToken);
+
+    const { error } = await supabaseServer.auth.signOut();
     
     if (error) {
       console.error('Logout échoué', { error: error.message });

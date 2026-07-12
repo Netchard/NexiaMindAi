@@ -30,6 +30,7 @@ export default function ConversationPage({
   const { conversationId } = use(params)
 
   const {
+    conversations,
     currentMessages,
     conversationStates,
     isLoading,
@@ -64,7 +65,7 @@ export default function ConversationPage({
   const messages: ChatMessageData[] = currentMessages
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       {/* Header de la conversation */}
       <ConversationHeader
         conversationId={conversationId}
@@ -72,10 +73,13 @@ export default function ConversationPage({
         onRename={handleRename}
         onDelete={handleDelete}
         isLoading={conversationState?.isLoading}
+        conversations={conversations}
       />
 
-      {/* Liste des messages — conteneur entre le header et le footer */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      {/* Liste des messages — conteneur entre le header et le footer ; ne
+          scrolle pas lui-même, ChatMessageList (data-testid=chat-message-list)
+          est l'unique div qui défile ici. */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
         {isLoading && currentMessages.length === 0 ? (
           <div className="flex flex-1 items-center justify-center">
             <div className="text-chat-ink-muted">Chargement des messages...</div>
@@ -110,9 +114,6 @@ export default function ConversationPage({
           onSend={handleSend}
           disabled={conversationState?.isLoading ?? false}
         />
-        <p className="mt-3 text-center text-[11.5px] text-chat-ink-faint">
-          NexiaMind peut faire des erreurs. Vérifiez les sources citées.
-        </p>
       </div>
     </div>
   )

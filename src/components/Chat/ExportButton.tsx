@@ -30,30 +30,20 @@ function messageToMarkdown(message: ChatMessageData): string {
   }).format(new Date())
   
   let content = `### ${roleLabel}\n\n${message.content}\n`
-  
+
   // Guard contre undefined + validation (CR-002)
-  if (message.citations?.length > 0) {
+  if (message.citations && message.citations.length > 0) {
     content += '\n---\n\n**Sources :**\n\n'
-    
-    message.citations.forEach((citation, index) => {
+
+    message.citations.forEach((citation) => {
       // Sécurité : vérifier que citation existe
       if (!citation) return
-      
-      const sourceInfo = citation.source
-        ? `Source ${index + 1}: ${citation.source}`
-        : citation.filePath
-          ? `Fichier: \`${citation.filePath}\``
-          : `Source ${index + 1}`
-      
-      const contentPreview = citation.contentPreview 
-        ? `\n> ${citation.contentPreview}`
-        : ''
-      const pageInfo = citation.pageNumber ? ` (page ${citation.pageNumber})` : ''
-      
-      content += `- ${sourceInfo}${pageInfo}${contentPreview}\n\n`
+
+      const fileName = citation.path.split(/[/\\]/).pop() || citation.path
+      content += `- Source ${citation.index} (${citation.type}) : [${fileName}](${citation.url})\n`
     })
   }
-  
+
   return content
 }
 
@@ -71,15 +61,13 @@ function messageToCSV(message: ChatMessageData): string {
   const content = `"${message.content.replace(/"/g, '""')}"`
   
   // Formater les citations pour CSV avec guard (CR-002)
-  const sources = message.citations?.length
+  const sources = message.citations && message.citations.length > 0
     ? message.citations
         .filter(c => c != null) // Filtrer null/undefined
-        .map((c, i) => {
-          const source = c.source || c.filePath || `Source ${i + 1}`
-          const preview = c.contentPreview || ''
-          const page = c.pageNumber ? `|p.${c.pageNumber}` : ''
+        .map((c) => {
+          const fileName = c.path.split(/[/\\]/).pop() || c.path
           // Double escape pour CSV
-          return `"${(source + page + '|' + preview).replace(/"/g, '""')}"`
+          return `"${(c.type + '|' + fileName + '|' + c.url).replace(/"/g, '""')}"`
         })
         .join(';')
     : ''

@@ -87,8 +87,11 @@ const config: Config = {
           'error-soft': '#FF7A68',
           'error-surface': 'rgba(255, 90, 70, .1)',
           'error-border': 'rgba(255, 90, 70, .4)',
-          'assistant-bg': '#E9EEF6',
-          'assistant-text': '#17233A',
+          // Bulle assistant sombre (2026-07-11) — remplace l'ancienne rupture de
+          // contraste claire ; réutilise surface-header/ink pour rester dans la
+          // palette existante (voir DESIGN.md > Colors).
+          'assistant-bg': '#0C1829',
+          'assistant-text': '#EEF2F8',
           'dot-muted': '#9AA7BD',
         },
       },

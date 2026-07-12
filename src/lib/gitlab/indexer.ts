@@ -212,7 +212,7 @@ export class GitLabIndexer {
       
       // Chunk the document
       const chunkingResult = await chunkDocument({
-        text: extractedText.text,
+        content: extractedText.text,
         metadata: {
           source: 'gitlab',
           sourceId: String(options.projectId),
@@ -220,7 +220,10 @@ export class GitLabIndexer {
           fileName: fileInfo.name,
           projectName: options.client || 'gitlab',
           documentType: options.documentType || 'code',
-          contentType: extractedText.contentType,
+          // extractedText.contentType classe le format source du fichier
+          // ('pdf'|'image'|'office'|'other'|'text') — pas le même vocabulaire
+          // que ContentType (RAG). Seul 'text' a un équivalent direct.
+          contentType: extractedText.contentType === 'text' ? 'text' : 'unknown',
           pageCount: extractedText.pageCount
         }
       })
@@ -237,21 +240,20 @@ export class GitLabIndexer {
       
       // Save to database (unless dry run)
       if (!options.dryRun) {
-        await reindexSource({
-          source: 'gitlab',
-          sourceId: String(options.projectId),
-          filePath: fileInfo.path,
-          chunks: chunks,
-          embeddings: embeddingResults.embeddings,
-          metadata: {
-            projectId: options.projectId,
-            fileName: fileInfo.name,
-            fileSize: fileInfo.size,
-            contentType: extractedText.contentType,
-            documentType: options.documentType || 'code',
-            client: options.client,
-            processedAt: new Date().toISOString()
-          }
+        // TODO: reindexSource(sourceId, options) est un wrapper autour de
+        // RetrievalService.reindexSource, qui est un stub ("Simulation pour
+        // l'instant", voir src/lib/rag/retriever.ts) — il ne persiste pas
+        // réellement les `chunks`/`embeddingResults` calculés ci-dessus, et
+        // son rôle (re-scanner les documents déjà en base pour un sourceId)
+        // ne correspond pas à "sauvegarder ce fichier fraîchement traité".
+        // Aucune fonction de persistance chunk+embedding n'existe encore
+        // dans le codebase — à implémenter séparément (hors périmètre
+        // ST-309). Appel conservé, avec la signature correcte, pour ne pas
+        // régresser le comportement observable (déclenchement d'un
+        // re-index best-effort) en attendant.
+        await reindexSource(String(options.projectId), {
+          client: options.client,
+          documentType: options.documentType || 'code',
         })
       } else {
         logger.info('Dry run - skipping database save', {

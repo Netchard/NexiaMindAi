@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     
     // TODO: Récupérer la liste depuis Supabase
     // Pour l'instant, retourner une liste vide
-    const documents = [];
+    const documents: any[] = [];
     
     logger.info(`Liste des documents retournée (${documents.length} documents)`);
     

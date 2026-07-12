@@ -1,0 +1,529 @@
+{"error":"Cannot coerce the result to a single JSON object","level":"error","message":"Erreur de vérification du document: Cannot coerce the result to a single JSON object 00000006..pdf","timestamp":"2026-07-11 18:54:34"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000006..pdf","timestamp":"2026-07-11 18:54:34"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 18:54:34"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 18:54:34"}
+{"error":"Cannot coerce the result to a single JSON object","level":"error","message":"Erreur de vérification du document: Cannot coerce the result to a single JSON object 00000168..pdf","timestamp":"2026-07-11 18:54:35"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000168..pdf","timestamp":"2026-07-11 18:54:35"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 18:54:35"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 18:54:35"}
+{"error":"Cannot coerce the result to a single JSON object","level":"error","message":"Erreur de vérification du document: Cannot coerce the result to a single JSON object 00000178.pdf","timestamp":"2026-07-11 18:54:36"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000178.pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"Cannot coerce the result to a single JSON object","level":"error","message":"Erreur de vérification du document: Cannot coerce the result to a single JSON object 00000376..pdf","timestamp":"2026-07-11 18:54:36"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000376..pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 18:54:36"}
+{"error":"Cannot coerce the result to a single JSON object","level":"error","message":"Erreur de vérification du document: Cannot coerce the result to a single JSON object 00000778.pdf","timestamp":"2026-07-11 18:54:38"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000778.pdf","timestamp":"2026-07-11 18:54:38"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 18:54:38"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 18:54:38"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000006..pdf","timestamp":"2026-07-11 19:03:36"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:03:36"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:03:36"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000168..pdf","timestamp":"2026-07-11 19:03:37"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:03:37"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:03:37"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000178.pdf","timestamp":"2026-07-11 19:03:37"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:03:37"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:03:37"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000376..pdf","timestamp":"2026-07-11 19:03:38"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:03:38"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:03:38"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000778.pdf","timestamp":"2026-07-11 19:03:38"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:03:38"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:03:38"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000006..pdf","timestamp":"2026-07-11 19:06:07"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:06:07"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:06:07"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000168..pdf","timestamp":"2026-07-11 19:06:08"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:06:08"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:06:08"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000178.pdf","timestamp":"2026-07-11 19:06:10"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:06:10"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:06:10"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000376..pdf","timestamp":"2026-07-11 19:06:10"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:06:10"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:06:10"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000778.pdf","timestamp":"2026-07-11 19:06:11"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:06:11"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:06:11"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000935.doc","timestamp":"2026-07-11 19:06:13"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000935.doc","timestamp":"2026-07-11 19:06:13"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000935.doc","timestamp":"2026-07-11 19:06:13"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000946..pdf","timestamp":"2026-07-11 19:06:17"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000946..pdf","timestamp":"2026-07-11 19:06:17"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000946..pdf","timestamp":"2026-07-11 19:06:17"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000947.doc","timestamp":"2026-07-11 19:06:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000947.doc","timestamp":"2026-07-11 19:06:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000947.doc","timestamp":"2026-07-11 19:06:19"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00000975.doc","timestamp":"2026-07-11 19:06:20"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000975.doc","timestamp":"2026-07-11 19:06:20"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000975.doc","timestamp":"2026-07-11 19:06:20"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00001059.doc","timestamp":"2026-07-11 19:06:20"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00001059.doc","timestamp":"2026-07-11 19:06:20"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00001059.doc","timestamp":"2026-07-11 19:06:20"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00001117..pdf","timestamp":"2026-07-11 19:06:23"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00001117..pdf","timestamp":"2026-07-11 19:06:23"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00001117..pdf","timestamp":"2026-07-11 19:06:23"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002134..pdf","timestamp":"2026-07-11 19:06:24"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002134..pdf","timestamp":"2026-07-11 19:06:24"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002134..pdf","timestamp":"2026-07-11 19:06:24"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002270..doc","timestamp":"2026-07-11 19:06:24"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002270..doc","timestamp":"2026-07-11 19:06:24"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002270..doc","timestamp":"2026-07-11 19:06:24"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002393..pdf","timestamp":"2026-07-11 19:06:26"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002393..pdf","timestamp":"2026-07-11 19:06:26"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002393..pdf","timestamp":"2026-07-11 19:06:26"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002394..pdf","timestamp":"2026-07-11 19:06:26"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002394..pdf","timestamp":"2026-07-11 19:06:26"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002394..pdf","timestamp":"2026-07-11 19:06:26"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002546..pdf","timestamp":"2026-07-11 19:06:29"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002546..pdf","timestamp":"2026-07-11 19:06:29"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002546..pdf","timestamp":"2026-07-11 19:06:29"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002547..pdf","timestamp":"2026-07-11 19:06:31"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002547..pdf","timestamp":"2026-07-11 19:06:31"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002547..pdf","timestamp":"2026-07-11 19:06:31"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002548..pdf","timestamp":"2026-07-11 19:06:35"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002548..pdf","timestamp":"2026-07-11 19:06:35"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002548..pdf","timestamp":"2026-07-11 19:06:35"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002549..pdf","timestamp":"2026-07-11 19:06:40"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002549..pdf","timestamp":"2026-07-11 19:06:40"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002549..pdf","timestamp":"2026-07-11 19:06:40"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002550..pdf","timestamp":"2026-07-11 19:06:41"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002550..pdf","timestamp":"2026-07-11 19:06:41"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002550..pdf","timestamp":"2026-07-11 19:06:41"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002551..pdf","timestamp":"2026-07-11 19:06:43"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002551..pdf","timestamp":"2026-07-11 19:06:43"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002551..pdf","timestamp":"2026-07-11 19:06:43"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002552..pdf","timestamp":"2026-07-11 19:06:44"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002552..pdf","timestamp":"2026-07-11 19:06:44"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002552..pdf","timestamp":"2026-07-11 19:06:44"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002554..pdf","timestamp":"2026-07-11 19:06:45"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002554..pdf","timestamp":"2026-07-11 19:06:45"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002554..pdf","timestamp":"2026-07-11 19:06:45"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002555..pdf","timestamp":"2026-07-11 19:06:46"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002555..pdf","timestamp":"2026-07-11 19:06:46"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002555..pdf","timestamp":"2026-07-11 19:06:46"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002556..pdf","timestamp":"2026-07-11 19:06:46"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002556..pdf","timestamp":"2026-07-11 19:06:46"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002556..pdf","timestamp":"2026-07-11 19:06:46"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002557..pdf","timestamp":"2026-07-11 19:06:47"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002557..pdf","timestamp":"2026-07-11 19:06:47"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002557..pdf","timestamp":"2026-07-11 19:06:47"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002558..pdf","timestamp":"2026-07-11 19:06:48"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002558..pdf","timestamp":"2026-07-11 19:06:48"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002558..pdf","timestamp":"2026-07-11 19:06:48"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002559..pdf","timestamp":"2026-07-11 19:06:48"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002559..pdf","timestamp":"2026-07-11 19:06:48"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002559..pdf","timestamp":"2026-07-11 19:06:48"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002560..pdf","timestamp":"2026-07-11 19:06:49"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002560..pdf","timestamp":"2026-07-11 19:06:49"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002560..pdf","timestamp":"2026-07-11 19:06:49"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002561..pdf","timestamp":"2026-07-11 19:06:50"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002561..pdf","timestamp":"2026-07-11 19:06:50"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002561..pdf","timestamp":"2026-07-11 19:06:50"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002562..pdf","timestamp":"2026-07-11 19:06:51"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002562..pdf","timestamp":"2026-07-11 19:06:51"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002562..pdf","timestamp":"2026-07-11 19:06:51"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002564..pdf","timestamp":"2026-07-11 19:06:52"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002564..pdf","timestamp":"2026-07-11 19:06:52"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002564..pdf","timestamp":"2026-07-11 19:06:52"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002565..pdf","timestamp":"2026-07-11 19:06:52"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002565..pdf","timestamp":"2026-07-11 19:06:52"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002565..pdf","timestamp":"2026-07-11 19:06:52"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002569..pdf","timestamp":"2026-07-11 19:06:53"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002569..pdf","timestamp":"2026-07-11 19:06:53"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002569..pdf","timestamp":"2026-07-11 19:06:53"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002570..pdf","timestamp":"2026-07-11 19:06:54"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002570..pdf","timestamp":"2026-07-11 19:06:54"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002570..pdf","timestamp":"2026-07-11 19:06:54"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002571..pdf","timestamp":"2026-07-11 19:06:55"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002571..pdf","timestamp":"2026-07-11 19:06:55"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002571..pdf","timestamp":"2026-07-11 19:06:55"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002572..pdf","timestamp":"2026-07-11 19:06:56"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002572..pdf","timestamp":"2026-07-11 19:06:56"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002572..pdf","timestamp":"2026-07-11 19:06:56"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002690..pdf","timestamp":"2026-07-11 19:06:57"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002690..pdf","timestamp":"2026-07-11 19:06:57"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002690..pdf","timestamp":"2026-07-11 19:06:57"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002695..pdf","timestamp":"2026-07-11 19:06:59"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002695..pdf","timestamp":"2026-07-11 19:06:59"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002695..pdf","timestamp":"2026-07-11 19:06:59"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00002736..pdf","timestamp":"2026-07-11 19:07:00"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002736..pdf","timestamp":"2026-07-11 19:07:00"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002736..pdf","timestamp":"2026-07-11 19:07:00"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003082..pdf","timestamp":"2026-07-11 19:07:01"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003082..pdf","timestamp":"2026-07-11 19:07:01"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003082..pdf","timestamp":"2026-07-11 19:07:01"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003084..pdf","timestamp":"2026-07-11 19:07:01"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003084..pdf","timestamp":"2026-07-11 19:07:01"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003084..pdf","timestamp":"2026-07-11 19:07:01"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003189..pdf","timestamp":"2026-07-11 19:07:02"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003189..pdf","timestamp":"2026-07-11 19:07:02"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003189..pdf","timestamp":"2026-07-11 19:07:02"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003190..pdf","timestamp":"2026-07-11 19:07:03"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003190..pdf","timestamp":"2026-07-11 19:07:03"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003190..pdf","timestamp":"2026-07-11 19:07:03"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003224..pdf","timestamp":"2026-07-11 19:07:04"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003224..pdf","timestamp":"2026-07-11 19:07:04"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003224..pdf","timestamp":"2026-07-11 19:07:04"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003362..pdf","timestamp":"2026-07-11 19:07:05"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003362..pdf","timestamp":"2026-07-11 19:07:05"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003362..pdf","timestamp":"2026-07-11 19:07:05"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003546..pdf","timestamp":"2026-07-11 19:07:06"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003546..pdf","timestamp":"2026-07-11 19:07:06"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003546..pdf","timestamp":"2026-07-11 19:07:06"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003547..pdf","timestamp":"2026-07-11 19:07:06"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003547..pdf","timestamp":"2026-07-11 19:07:06"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003547..pdf","timestamp":"2026-07-11 19:07:06"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003597..pdf","timestamp":"2026-07-11 19:07:07"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003597..pdf","timestamp":"2026-07-11 19:07:07"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003597..pdf","timestamp":"2026-07-11 19:07:07"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003621..pdf","timestamp":"2026-07-11 19:07:08"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003621..pdf","timestamp":"2026-07-11 19:07:08"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003621..pdf","timestamp":"2026-07-11 19:07:08"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003622..pdf","timestamp":"2026-07-11 19:07:09"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003622..pdf","timestamp":"2026-07-11 19:07:09"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003622..pdf","timestamp":"2026-07-11 19:07:09"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003627..pdf","timestamp":"2026-07-11 19:07:11"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003627..pdf","timestamp":"2026-07-11 19:07:11"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003627..pdf","timestamp":"2026-07-11 19:07:11"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003740..pdf","timestamp":"2026-07-11 19:07:12"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003740..pdf","timestamp":"2026-07-11 19:07:12"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003740..pdf","timestamp":"2026-07-11 19:07:12"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003741..pdf","timestamp":"2026-07-11 19:07:12"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003741..pdf","timestamp":"2026-07-11 19:07:12"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003741..pdf","timestamp":"2026-07-11 19:07:12"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003783..pdf","timestamp":"2026-07-11 19:07:14"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003783..pdf","timestamp":"2026-07-11 19:07:14"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003783..pdf","timestamp":"2026-07-11 19:07:14"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003861..pdf","timestamp":"2026-07-11 19:07:14"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003861..pdf","timestamp":"2026-07-11 19:07:14"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003861..pdf","timestamp":"2026-07-11 19:07:14"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003921..pdf","timestamp":"2026-07-11 19:07:16"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003921..pdf","timestamp":"2026-07-11 19:07:16"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003921..pdf","timestamp":"2026-07-11 19:07:16"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00003944. (1).pdf","timestamp":"2026-07-11 19:07:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00003944. (1).pdf","timestamp":"2026-07-11 19:07:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00003944. (1).pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":481,"chunkIndex":0,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 0 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:19"}
+{"chunkIndex":0,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 0 pour 00003944..pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":481,"chunkIndex":1,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 1 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:19"}
+{"chunkIndex":1,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 1 pour 00003944..pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":402,"chunkIndex":2,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 2 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:19"}
+{"chunkIndex":2,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 2 pour 00003944..pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":385,"chunkIndex":3,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 3 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:19"}
+{"chunkIndex":3,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 3 pour 00003944..pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":498,"chunkIndex":4,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 4 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:19"}
+{"chunkIndex":4,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 4 pour 00003944..pdf","timestamp":"2026-07-11 19:07:19"}
+{"chunkContentLength":375,"chunkIndex":5,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 5 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:20"}
+{"chunkIndex":5,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 5 pour 00003944..pdf","timestamp":"2026-07-11 19:07:20"}
+{"chunkContentLength":412,"chunkIndex":6,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 6 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:20"}
+{"chunkIndex":6,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 6 pour 00003944..pdf","timestamp":"2026-07-11 19:07:20"}
+{"chunkContentLength":457,"chunkIndex":7,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 7 pour 00003944..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:20"}
+{"chunkIndex":7,"error":"[object Object]","filePath":"00003944..pdf","level":"error","message":"Échec du traitement du chunk 7 pour 00003944..pdf","timestamp":"2026-07-11 19:07:20"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00004188. (1).pdf","timestamp":"2026-07-11 19:07:21"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00004188. (1).pdf","timestamp":"2026-07-11 19:07:21"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00004188. (1).pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":450,"chunkIndex":0,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 0 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":0,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 0 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":435,"chunkIndex":1,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 1 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":1,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 1 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":169,"chunkIndex":2,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 2 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":2,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 2 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":351,"chunkIndex":3,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 3 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":3,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 3 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":427,"chunkIndex":4,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 4 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":4,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 4 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":480,"chunkIndex":5,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 5 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":5,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 5 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":502,"chunkIndex":6,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 6 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":6,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 6 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":270,"chunkIndex":7,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 7 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:21"}
+{"chunkIndex":7,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 7 pour 00004188..pdf","timestamp":"2026-07-11 19:07:21"}
+{"chunkContentLength":469,"chunkIndex":8,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 8 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":8,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 8 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":486,"chunkIndex":9,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 9 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":9,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 9 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":322,"chunkIndex":10,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 10 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":10,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 10 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":154,"chunkIndex":11,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 11 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":11,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 11 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":506,"chunkIndex":12,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 12 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":12,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 12 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":265,"chunkIndex":13,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 13 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":13,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 13 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"chunkContentLength":243,"chunkIndex":14,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 14 pour 00004188..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:22"}
+{"chunkIndex":14,"error":"[object Object]","filePath":"00004188..pdf","level":"error","message":"Échec du traitement du chunk 14 pour 00004188..pdf","timestamp":"2026-07-11 19:07:22"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00004246. (1).pdf","timestamp":"2026-07-11 19:07:23"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00004246. (1).pdf","timestamp":"2026-07-11 19:07:23"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00004246. (1).pdf","timestamp":"2026-07-11 19:07:23"}
+{"chunkContentLength":103,"chunkIndex":0,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 0 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":0,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 0 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":433,"chunkIndex":1,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 1 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":1,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 1 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":484,"chunkIndex":2,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 2 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":2,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 2 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":367,"chunkIndex":3,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 3 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":3,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 3 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":440,"chunkIndex":4,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 4 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":4,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 4 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":367,"chunkIndex":5,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 5 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":5,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 5 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":356,"chunkIndex":6,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 6 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":6,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 6 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":502,"chunkIndex":7,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 7 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":7,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 7 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":432,"chunkIndex":8,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 8 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":8,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 8 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":422,"chunkIndex":9,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 9 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":9,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 9 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":450,"chunkIndex":10,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 10 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":10,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 10 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":147,"chunkIndex":11,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 11 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":11,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 11 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":503,"chunkIndex":12,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 12 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":12,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 12 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":505,"chunkIndex":13,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 13 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":13,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 13 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":431,"chunkIndex":14,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 14 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":14,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 14 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":497,"chunkIndex":15,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 15 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":15,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 15 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":475,"chunkIndex":16,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 16 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:24"}
+{"chunkIndex":16,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 16 pour 00004246..pdf","timestamp":"2026-07-11 19:07:24"}
+{"chunkContentLength":317,"chunkIndex":17,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 17 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":17,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 17 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":495,"chunkIndex":18,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 18 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":18,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 18 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":418,"chunkIndex":19,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 19 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":19,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 19 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":359,"chunkIndex":20,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 20 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":20,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 20 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":454,"chunkIndex":21,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 21 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":21,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 21 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":504,"chunkIndex":22,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 22 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":22,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 22 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":442,"chunkIndex":23,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 23 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":23,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 23 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":457,"chunkIndex":24,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 24 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":24,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 24 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":326,"chunkIndex":25,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 25 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":25,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 25 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":503,"chunkIndex":26,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 26 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":26,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 26 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":487,"chunkIndex":27,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 27 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":27,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 27 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":151,"chunkIndex":28,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 28 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":28,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 28 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":436,"chunkIndex":29,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 29 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":29,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 29 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":503,"chunkIndex":30,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 30 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":30,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 30 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":509,"chunkIndex":31,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 31 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":31,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 31 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":489,"chunkIndex":32,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 32 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":32,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 32 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":126,"chunkIndex":33,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 33 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:25"}
+{"chunkIndex":33,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 33 pour 00004246..pdf","timestamp":"2026-07-11 19:07:25"}
+{"chunkContentLength":464,"chunkIndex":34,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 34 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":34,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 34 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":494,"chunkIndex":35,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 35 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":35,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 35 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":492,"chunkIndex":36,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 36 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":36,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 36 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":500,"chunkIndex":37,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 37 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":37,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 37 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":417,"chunkIndex":38,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 38 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":38,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 38 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":482,"chunkIndex":39,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 39 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":39,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 39 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":464,"chunkIndex":40,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 40 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":40,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 40 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":315,"chunkIndex":41,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 41 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":41,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 41 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":486,"chunkIndex":42,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 42 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":42,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 42 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":426,"chunkIndex":43,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 43 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":43,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 43 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":407,"chunkIndex":44,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 44 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":44,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 44 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":328,"chunkIndex":45,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 45 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":45,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 45 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":476,"chunkIndex":46,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 46 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":46,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 46 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":398,"chunkIndex":47,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 47 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":47,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 47 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":437,"chunkIndex":48,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 48 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":48,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 48 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":449,"chunkIndex":49,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 49 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":49,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 49 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":295,"chunkIndex":50,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 50 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:26"}
+{"chunkIndex":50,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 50 pour 00004246..pdf","timestamp":"2026-07-11 19:07:26"}
+{"chunkContentLength":437,"chunkIndex":51,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 51 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":51,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 51 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":473,"chunkIndex":52,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 52 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":52,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 52 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":501,"chunkIndex":53,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 53 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":53,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 53 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":440,"chunkIndex":54,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 54 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":54,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 54 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":477,"chunkIndex":55,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 55 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":55,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 55 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":202,"chunkIndex":56,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 56 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":56,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 56 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":433,"chunkIndex":57,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 57 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":57,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 57 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":447,"chunkIndex":58,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 58 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":58,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 58 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":441,"chunkIndex":59,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 59 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":59,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 59 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":308,"chunkIndex":60,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 60 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":60,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 60 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":451,"chunkIndex":61,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 61 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":61,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 61 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":463,"chunkIndex":62,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 62 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":62,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 62 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":511,"chunkIndex":63,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 63 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":63,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 63 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":197,"chunkIndex":64,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 64 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":64,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 64 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":457,"chunkIndex":65,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 65 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":65,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 65 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":474,"chunkIndex":66,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 66 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:27"}
+{"chunkIndex":66,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 66 pour 00004246..pdf","timestamp":"2026-07-11 19:07:27"}
+{"chunkContentLength":441,"chunkIndex":67,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 67 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:28"}
+{"chunkIndex":67,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 67 pour 00004246..pdf","timestamp":"2026-07-11 19:07:28"}
+{"chunkContentLength":505,"chunkIndex":68,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 68 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:28"}
+{"chunkIndex":68,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 68 pour 00004246..pdf","timestamp":"2026-07-11 19:07:28"}
+{"chunkContentLength":496,"chunkIndex":69,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 69 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:28"}
+{"chunkIndex":69,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 69 pour 00004246..pdf","timestamp":"2026-07-11 19:07:28"}
+{"chunkContentLength":175,"chunkIndex":70,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 70 pour 00004246..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:28"}
+{"chunkIndex":70,"error":"[object Object]","filePath":"00004246..pdf","level":"error","message":"Échec du traitement du chunk 70 pour 00004246..pdf","timestamp":"2026-07-11 19:07:28"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00004318. (1).pdf","timestamp":"2026-07-11 19:07:29"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00004318. (1).pdf","timestamp":"2026-07-11 19:07:29"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00004318. (1).pdf","timestamp":"2026-07-11 19:07:29"}
+{"chunkContentLength":486,"chunkIndex":0,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 0 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:29"}
+{"chunkIndex":0,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 0 pour 00004318..pdf","timestamp":"2026-07-11 19:07:29"}
+{"chunkContentLength":442,"chunkIndex":1,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 1 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:29"}
+{"chunkIndex":1,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 1 pour 00004318..pdf","timestamp":"2026-07-11 19:07:29"}
+{"chunkContentLength":432,"chunkIndex":2,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 2 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:29"}
+{"chunkIndex":2,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 2 pour 00004318..pdf","timestamp":"2026-07-11 19:07:29"}
+{"chunkContentLength":500,"chunkIndex":3,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 3 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:29"}
+{"chunkIndex":3,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 3 pour 00004318..pdf","timestamp":"2026-07-11 19:07:29"}
+{"chunkContentLength":500,"chunkIndex":4,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 4 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:30"}
+{"chunkIndex":4,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 4 pour 00004318..pdf","timestamp":"2026-07-11 19:07:30"}
+{"chunkContentLength":378,"chunkIndex":5,"details":null,"error":"new row violates row-level security policy for table \"chunks\"","level":"error","message":"Échec de la sauvegarde du chunk 5 pour 00004318..pdf \n new row violates row-level security policy for table \"chunks\"","timestamp":"2026-07-11 19:07:30"}
+{"chunkIndex":5,"error":"[object Object]","filePath":"00004318..pdf","level":"error","message":"Échec du traitement du chunk 5 pour 00004318..pdf","timestamp":"2026-07-11 19:07:30"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de la création du document: 00004502. (1).pdf","timestamp":"2026-07-11 19:07:31"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00004502. (1).pdf","timestamp":"2026-07-11 19:07:31"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00004502. (1).pdf","timestamp":"2026-07-11 19:07:31"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000006..pdf","timestamp":"2026-07-11 19:08:56"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:08:56"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:08:56"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000168..pdf","timestamp":"2026-07-11 19:08:57"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:08:57"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:08:57"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000178.pdf","timestamp":"2026-07-11 19:09:00"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:09:00"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:09:00"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000376..pdf","timestamp":"2026-07-11 19:09:01"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:09:02"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:09:02"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000778.pdf","timestamp":"2026-07-11 19:09:04"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:09:04"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:09:04"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000935.doc","timestamp":"2026-07-11 19:09:06"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000935.doc","timestamp":"2026-07-11 19:09:06"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000935.doc","timestamp":"2026-07-11 19:09:06"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000946..pdf","timestamp":"2026-07-11 19:09:10"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000946..pdf","timestamp":"2026-07-11 19:09:10"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000946..pdf","timestamp":"2026-07-11 19:09:10"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000947.doc","timestamp":"2026-07-11 19:09:11"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000947.doc","timestamp":"2026-07-11 19:09:11"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000947.doc","timestamp":"2026-07-11 19:09:11"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000975.doc","timestamp":"2026-07-11 19:09:11"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000975.doc","timestamp":"2026-07-11 19:09:11"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000975.doc","timestamp":"2026-07-11 19:09:11"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000006..pdf there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:17"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:11:17"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:11:17"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000168..pdf there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:17"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:11:17"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:11:18"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000178.pdf there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:11:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:11:19"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000376..pdf there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:11:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:11:19"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000778.pdf there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:20"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:11:20"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:11:20"}
+{"details":null,"error":"there is no unique or exclusion constraint matching the ON CONFLICT specification","level":"error","message":"Échec de l'upsert du document: 00000935.doc there is no unique or exclusion constraint matching the ON CONFLICT specification  null ","timestamp":"2026-07-11 19:11:21"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000935.doc","timestamp":"2026-07-11 19:11:21"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000935.doc","timestamp":"2026-07-11 19:11:21"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000006..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:13"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:15:13"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:15:13"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000168..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:14"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:15:14"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:15:14"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000178.pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:15"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:15:15"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:15:15"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000376..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:15"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:15:16"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:15:16"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000778.pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:17"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:15:17"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:15:17"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000935.doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000935.doc","timestamp":"2026-07-11 19:15:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000935.doc","timestamp":"2026-07-11 19:15:19"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000946..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:23"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000946..pdf","timestamp":"2026-07-11 19:15:23"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000946..pdf","timestamp":"2026-07-11 19:15:23"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000947.doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:24"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000947.doc","timestamp":"2026-07-11 19:15:24"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000947.doc","timestamp":"2026-07-11 19:15:24"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000975.doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:25"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000975.doc","timestamp":"2026-07-11 19:15:25"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000975.doc","timestamp":"2026-07-11 19:15:25"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00001059.doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:25"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00001059.doc","timestamp":"2026-07-11 19:15:25"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00001059.doc","timestamp":"2026-07-11 19:15:25"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00001117..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:26"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00001117..pdf","timestamp":"2026-07-11 19:15:26"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00001117..pdf","timestamp":"2026-07-11 19:15:26"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00002134..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:26"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002134..pdf","timestamp":"2026-07-11 19:15:26"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002134..pdf","timestamp":"2026-07-11 19:15:26"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00002270..doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:27"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002270..doc","timestamp":"2026-07-11 19:15:27"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002270..doc","timestamp":"2026-07-11 19:15:27"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00002393..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:15:27"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00002393..pdf","timestamp":"2026-07-11 19:15:27"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00002393..pdf","timestamp":"2026-07-11 19:15:27"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000006..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:16"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000006..pdf","timestamp":"2026-07-11 19:18:16"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000006..pdf","timestamp":"2026-07-11 19:18:16"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000168..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:16"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000168..pdf","timestamp":"2026-07-11 19:18:16"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000168..pdf","timestamp":"2026-07-11 19:18:16"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000178.pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:17"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000178.pdf","timestamp":"2026-07-11 19:18:17"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000178.pdf","timestamp":"2026-07-11 19:18:17"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000376..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:18"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000376..pdf","timestamp":"2026-07-11 19:18:18"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000376..pdf","timestamp":"2026-07-11 19:18:18"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000778.pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:18"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000778.pdf","timestamp":"2026-07-11 19:18:18"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000778.pdf","timestamp":"2026-07-11 19:18:18"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000935.doc new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:19"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000935.doc","timestamp":"2026-07-11 19:18:19"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000935.doc","timestamp":"2026-07-11 19:18:19"}
+{"details":null,"error":"new row violates row-level security policy for table \"documents\"","level":"error","message":"Échec de l'upsert du document: 00000946..pdf new row violates row-level security policy for table \"documents\"  null ","timestamp":"2026-07-11 19:18:21"}
+{"error":"[object Object]","level":"error","message":"Échec du traitement du fichier: 00000946..pdf","timestamp":"2026-07-11 19:18:21"}
+{"error":"[object Object]","level":"error","message":"Échec de l'indexation du fichier: 00000946..pdf","timestamp":"2026-07-11 19:18:21"}

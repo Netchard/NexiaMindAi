@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { FilterBar } from '@/components/Filters'
 import { ConversationList } from '@/components/ConversationList'
+import { DictationProvider } from '@/components/Dictation'
 import type { ChatMessageData } from '@/components/Chat'
 import type { ConversationMessage, Conversation, ConversationUIState, Filters } from '@/types/conversations'
 import {
@@ -279,7 +280,7 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
     filters: Partial<FilterState>
   ) => {
     let conversationId = conversationIdParam
-    
+
     if (!conversationId) {
       // Créer une nouvelle conversation si aucun ID
       const newConvId = await onCreateNewConversation()
@@ -288,6 +289,31 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
       }
       conversationId = newConvId
     }
+
+    // Message utilisateur affiché immédiatement (optimistic UI) — voir
+    // EXPERIENCE.md > State Patterns "Envoi en cours". Sans ça, seule la
+    // réponse assistant était ajoutée à l'état local plus bas : la question
+    // de l'utilisateur n'apparaissait jamais avant un rechargement complet
+    // de la page (qui la récupère correctement depuis le serveur).
+    const optimisticId = `optimistic-${Date.now()}`
+    setConversationStates(prev => ({
+      ...prev,
+      [conversationId]: {
+        ...prev[conversationId],
+        messages: [
+          ...(prev[conversationId]?.messages || []),
+          {
+            id: optimisticId,
+            conversationId,
+            role: 'user',
+            content,
+            createdAt: new Date().toISOString(),
+          } as ConversationMessage,
+        ],
+        isLoading: true,
+        error: null,
+      },
+    }))
 
     try {
       // Appliquer les filtres actifs — ne transmettre que les filtres réellement
@@ -299,9 +325,6 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
 
       const response = await sendMessageInConversation(conversationId, content, filtersToUse)
 
-      // Mettre à jour l'état de la conversation
-      const citations = response.sources ? filterAndConvertSources(response.sources) : undefined
-      
       setConversationStates(prev => ({
         ...prev,
         [conversationId]: {
@@ -313,7 +336,10 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
               conversationId: response.conversationId,
               role: response.role,
               content: response.content,
-              citations,
+              // sources (pas citations) : ConversationMessage.sources est ce que
+              // currentMessages relit plus bas pour reconstruire les citations —
+              // stocker autre chose ici les rendait invisibles jusqu'au reload.
+              sources: response.sources,
               createdAt: response.createdAt,
             } as ConversationMessage,
           ],
@@ -333,7 +359,20 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
 
     } catch (e) {
       console.error(`Échec de l'envoi du message dans la conversation ${conversationId}:`, e)
-      throw e
+      const message = e instanceof Error ? e.message : 'Échec de l\'envoi du message. Réessayez.'
+      // Le message utilisateur reste visible (EXPERIENCE.md > State Patterns
+      // "Erreur d'envoi") mais marqué en échec, plutôt que de disparaître.
+      setConversationStates(prev => ({
+        ...prev,
+        [conversationId]: {
+          ...prev[conversationId],
+          messages: (prev[conversationId]?.messages || []).map(m =>
+            m.id === optimisticId ? { ...m, failed: true } : m
+          ),
+          isLoading: false,
+          error: message,
+        },
+      }))
     }
   }, [onCreateNewConversation])
 
@@ -377,6 +416,7 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
       role: msg.role,
       content: msg.content,
       citations: msg.sources ? filterAndConvertSources(msg.sources) : undefined,
+      failed: msg.failed,
     }))
   }, [currentConversationId, conversationStates])
 
@@ -439,22 +479,50 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
   return (
     <ConversationsProvider>
-      {/* h-full (pas h-screen) : remplit l'espace laissé par MainContent sous
-          la Navbar, au lieu de forcer 100vh en plus de celle-ci — voir
-          EXPERIENCE.md > Foundation/Layout & Spacing. */}
-      <div className="flex h-full overflow-hidden">
-        {/* Sidebar des conversations - Desktop only pour l'instant */}
-        <div className="hidden lg:block w-[280px] border-r border-chat-border-panel bg-chat-surface-header h-full overflow-y-auto">
-          <ConversationList />
-        </div>
+      {/* Sidebar (AvatarPanel) et zone de chat (ChatInput) sont frères ici —
+          DictationProvider doit englober les deux pour relier déclencheur et
+          récepteur de la dictée (voir DictationContext.tsx). */}
+      <DictationProvider>
+        {/* h-full (pas h-screen) : remplit l'espace laissé par MainContent sous
+            la Navbar, au lieu de forcer 100vh en plus de celle-ci — voir
+            EXPERIENCE.md > Foundation/Layout & Spacing. flex-col : la rangée
+            sidebar+contenu (flex-1) partage la hauteur avec le footer global
+            (flex-none), qui reste une bande fixe en bas — voir Maquette-structure. */}
+        <div className="flex flex-col h-full overflow-hidden">
+          <div className="flex flex-1 overflow-hidden">
+            {/* Sidebar des conversations - Desktop only pour l'instant.
+                Pas de overflow-y-auto ici : ConversationList possède son propre
+                conteneur de scroll interne (liste) + zone fixe (AvatarPanel) —
+                un second scroll au niveau du wrapper casserait ce découpage. */}
+            <div className="hidden lg:block w-[280px] border-r border-chat-border-panel bg-chat-surface-header h-full overflow-hidden">
+              <ConversationList />
+            </div>
 
-        {/* Zone de chat principale */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
-          {children}
-        </div>
+            {/* Zone de chat principale - pleine largeur, plus de carte centrée
+                (bordure/ombre/max-width retirées le 2026-07-11, voir
+                Maquette-structure-NexiaMind-AI-Chat.html > "echanges"). */}
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-chat-surface-panel" data-testid="chat-panel">
+              {children}
+            </div>
 
-        {/* Overlay pour mobile - sera géré par ConversationList */}
-      </div>
+            {/* Overlay pour mobile - sera géré par ConversationList */}
+          </div>
+
+          {/* Footer global (48px, sombre) — réintroduit le 2026-07-11 selon
+              Maquette-structure-NexiaMind-AI-Chat.html > "footer" ; porte le
+              disclaimer légal, déplacé ici depuis le pied du panneau de chat
+              (une seule instance pour toute la surface /chat au lieu d'une
+              par page/état). */}
+          <footer
+            className="flex-none h-12 flex items-center justify-center px-6 bg-chat-surface-header border-t border-chat-border-header"
+            data-testid="chat-app-footer"
+          >
+            <p className="text-[11.5px] text-chat-ink-faint text-center">
+              NexiaMind peut faire des erreurs. Vérifiez les sources citées.
+            </p>
+          </footer>
+        </div>
+      </DictationProvider>
     </ConversationsProvider>
   )
 }

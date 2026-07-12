@@ -20,3 +20,9 @@
 - Valeurs string pour unités CSS dans style objects [SourceCitation.tsx:133,135] — préférence de style, pas bloquant fonctionnellement
 - Typographie Geist Sans non spécifiée explicitement dans les composants — héritée du parent, pas responsable de ST-305
 - Border radius manquant (8/10/16px) dans les styles inline — style optionnel, pas bloquant pour les acceptance criteria
+
+## Deferred from: code review of 5-401-configurer-les-politiques-de-securite-rls (2026-07-12)
+
+- Accès `consultant` (et pattern réutilisé sur chunks/embeddings) non scopé au client assigné — les politiques vérifient seulement `client_id IS NOT NULL`, jamais comparé au client réel du consultant ; un consultant peut lire les documents/chunks/embeddings de tous les clients. Aucun mapping consultant→client n'existe sur `profiles`. Déférré : faible risque à court terme (peu de consultants actifs), nécessitera l'ajout d'une colonne ou table de mapping.
+- Politique "Project leads can view project documents" tautologique — `(client_id IS NULL OR client_id IS NOT NULL)` est toujours vraie, donc les project_lead ont un accès illimité aux documents au lieu d'un accès scopé à leur(s) projet(s). Même cause racine que le finding consultant ci-dessus (pas de mapping project_lead→client/projet).
+- `documents` n'a aucune politique RLS UPDATE/DELETE — RLS est activé mais aucune politique d'écriture n'existe pour cette table (seul le service role peut modifier/supprimer). Déférré : pas de cas d'usage applicatif actuel ; nécessitera probablement une colonne `owner_id`/`created_by` si un usage self-service est ajouté plus tard.

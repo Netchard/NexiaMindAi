@@ -8,21 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AuthService } from '@/lib/api/auth/service';
 import { reindexSource, RetrievalError } from '@/lib/rag/retriever';
 import { logger } from '@/lib/logger';
-
-// Types pour les requêtes et réponses
-interface RefreshRequest {
-  sourceId: string;
-  client?: string;
-  documentType?: string;
-}
-
-interface RefreshResponse {
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-  taskId: string;
-  message: string;
-  documentsProcessed?: number;
-  errors?: string[];
-}
+import { RefreshRequest, RefreshResponse } from '@/lib/api/chat/refresh';
 
 /**
  * Déclenche la re-indexation d'une source
@@ -193,30 +179,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Fonction utilitaire pour appeler l'endpoint depuis le frontend
-export async function triggerRefresh(
-  sourceId: string,
-  client?: string,
-  documentType?: string
-): Promise<RefreshResponse> {
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
-  const url = new URL('/api/chat/refresh', baseUrl);
-
-  const response = await fetch(url.toString(), {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sourceId, client, documentType }),
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      `Erreur ${response.status}: ${errorData.error || response.statusText}`
-    );
-  }
-
-  return response.json();
 }

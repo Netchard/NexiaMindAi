@@ -1,0 +1,22 @@
+{
+  "name": "nexiamind-vector-benchmark",
+  "version": "1.0.0",
+  "description": "Scripts de benchmark pour l'index vectoriel - ST-402",
+  "main": "benchmark-vector-index.js",
+  "scripts": {
+    "benchmark": "node benchmark-vector-index.js",
+    "benchmark:mock": "node benchmark-vector-index.mock.js"
+  },
+  "keywords": [
+    "supabase",
+    "pgvector",
+    "benchmark",
+    "performance",
+    "vector-index"
+  ],
+  "author": "NexiaMind AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}

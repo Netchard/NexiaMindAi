@@ -1,0 +1,31 @@
+{
+  "optimalConfiguration": {
+    "lists": 400,
+    "avgTime": 680.4,
+    "stdDev": 31.071530377501524,
+    "meetsCriteria": true
+  },
+  "recommendations": [
+    {
+      "type": "optimale",
+      "configuration": 400,
+      "avgTime": 680.4,
+      "stdDev": 31.071530377501524,
+      "compositeScore": 81.235171387849,
+      "meetsCriteria": true,
+      "justification": "Meilleur score composite (81.24)"
+    },
+    {
+      "type": "taille",
+      "configuration": 100,
+      "justification": "Recommandation basée sur la taille estimée (7500 embeddings)"
+    },
+    {
+      "type": "critère",
+      "configuration": 50,
+      "avgTime": 1386.2,
+      "justification": "Respecte le critère < 3s"
+    }
+  ],
+  "analysisDate": "2026-07-12T15:20:14.232Z"
+}

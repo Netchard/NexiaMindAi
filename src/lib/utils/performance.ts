@@ -92,7 +92,6 @@ export function preloadImage(src: string): void {
   if (isBrowser()) {
     const img = new Image()
     img.src = src
-    img.load()
   }
 }
 

@@ -10,8 +10,15 @@ import { chunkDocument, ChunkingResult } from '../../rag/chunker';
 import { generateEmbeddings, EmbeddingResult, BatchEmbeddingResult } from '../../rag/embeddings';
 import { reindexSource } from '../../rag/retriever';
 import { supabase } from '../server';
-import { StorageFileInfo, IndexationOptions, IndexationResult } from './types';
+import { StorageFileInfo, IndexationOptions, IndexationResult, IndexationError, DocumentError } from './types';
 import { Chunk } from '../../rag/types';
+import { estimateTokenCount } from '../../rag/utils';
+
+// Configuration constants
+const DEFAULT_BUCKET_NAME = 'documents';
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '52428800'); // 50MB default
+const MAX_CONCURRENT_CHUNKS = parseInt(process.env.MAX_CONCURRENT_CHUNKS || '10');
+const DEFAULT_LANGUAGE = 'fr';
 
 /**
  * Service principal pour l'indexation des fichiers depuis Supabase Storage
@@ -25,9 +32,107 @@ export class SupabaseStorageIndexer {
    * Créer une nouvelle instance de l'indexeur
    * @param bucketName Nom du bucket (par défaut: 'documents')
    */
-  constructor(bucketName: string = 'documents') {
+  constructor(bucketName: string = DEFAULT_BUCKET_NAME) {
+    if (!bucketName || typeof bucketName !== 'string') {
+      throw new IndexationError(
+        'Bucket name must be a non-empty string',
+        'validation_error',
+        undefined,
+        { bucketName }
+      );
+    }
     this.bucketName = bucketName;
     logger.info(`SupabaseStorageIndexer initialisé pour le bucket: ${bucketName}`);
+  }
+
+  /**
+   * Valide les options d'indexation
+   * @param options Options à valider
+   * @throws IndexationError si les options sont invalides
+   */
+  private validateOptions(options: IndexationOptions): void {
+    if (options.limit !== undefined && (options.limit <= 0 || !Number.isInteger(options.limit))) {
+      throw new IndexationError(
+        'Limit must be a positive integer or undefined',
+        'validation_error',
+        undefined,
+        { limit: options.limit }
+      );
+    }
+    if (options.prefix !== undefined && typeof options.prefix !== 'string') {
+      throw new IndexationError(
+        'Prefix must be a string or undefined',
+        'validation_error',
+        undefined,
+        { prefix: options.prefix }
+      );
+    }
+  }
+
+  /**
+   * Valide les informations du fichier
+   * @param fileInfo Informations du fichier à valider
+   * @throws DocumentError si le fichier est invalide
+   */
+  private validateFileInfo(fileInfo: StorageFileInfo): void {
+    if (!fileInfo?.path) {
+      throw new DocumentError(
+        'File path is required',
+        fileInfo?.path || 'unknown',
+        'validation',
+        new Error('Invalid file info')
+      );
+    }
+    if (fileInfo.size > MAX_FILE_SIZE) {
+      throw new DocumentError(
+        `File too large (${fileInfo.size} > ${MAX_FILE_SIZE} bytes)`,
+        fileInfo.path,
+        'size_limit_exceeded',
+        new Error('File size exceeds maximum')
+      );
+    }
+    if (!fileInfo.name || !fileInfo.contentType) {
+      throw new DocumentError(
+        'File name and contentType are required',
+        fileInfo.path,
+        'missing_metadata',
+        new Error('Invalid file metadata')
+      );
+    }
+  }
+
+  /**
+   * Gère les erreurs Supabase de manière cohérente
+   * @param error Erreur à traiter
+   * @param context Contexte de l'erreur
+   * @param filePath Chemin du fichier concerné
+   * @throws IndexationError toujours
+   */
+  private handleSupabaseError(
+    error: unknown,
+    context: string,
+    filePath?: string
+  ): never {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const details = error instanceof Error && 'details' in error ? (error as any).details : undefined;
+    const hint = error instanceof Error && 'hint' in error ? (error as any).hint : undefined;
+    
+    const indexationError = new IndexationError(
+      `${context}: ${errorMessage}`,
+      'supabase_error',
+      error instanceof Error ? error : undefined,
+      { filePath, context, details, hint }
+    );
+    
+    logger.error(indexationError.message, {
+      error: errorMessage,
+      details,
+      hint,
+      filePath,
+      context,
+    });
+    
+    throw indexationError;
   }
 
   /**
@@ -46,6 +151,9 @@ export class SupabaseStorageIndexer {
       embeddingsGenerated: 0,
     };
 
+    // Validate options
+    this.validateOptions(options);
+
     logger.info('Début de l\'indexation Supabase Storage', {
       bucket: this.bucketName,
       prefix: options.prefix,
@@ -53,6 +161,7 @@ export class SupabaseStorageIndexer {
       documentType: options.documentType,
       dryRun: options.dryRun,
       limit: options.limit,
+      maxFileSize: MAX_FILE_SIZE,
     });
 
     try {
@@ -65,8 +174,7 @@ export class SupabaseStorageIndexer {
 
       if (files.length === 0) {
         logger.info('Aucun fichier à indexer');
-        logger.info('Indexation terminée', {
-          result,
+        logger.debug('Indexation terminée - aucun fichier', {
           processingTime: '0ms',
         });
         return result;
@@ -85,11 +193,12 @@ export class SupabaseStorageIndexer {
           if (options.dryRun) {
             logger.info(`[DRY RUN] Fichier traité: ${file.path}`, {
               chunksCreated: fileResult.chunksCreated,
+              embeddingsGenerated: fileResult.embeddingsGenerated,
             });
           }
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          const errorStack = error instanceof Error ? error.stack : undefined;
+          const errorType = error instanceof IndexationError ? error.errorType : 'unknown';
           
           result.failed++;
           result.errors.push({
@@ -98,8 +207,9 @@ export class SupabaseStorageIndexer {
           });
           logger.error(`Échec de l'indexation du fichier: ${file.path}`, {
             error: errorMessage,
-            stack: errorStack,
+            errorType,
           });
+          // Continue with next file - consistent error handling strategy
         }
       }
 
@@ -138,6 +248,9 @@ export class SupabaseStorageIndexer {
     const startTime = Date.now();
     let chunksCreated = 0;
     let embeddingsGenerated = 0;
+
+    // Validate file info
+    this.validateFileInfo(fileInfo);
 
     logger.info(`Indexation du fichier: ${fileInfo.path}`, {
       size: fileInfo.size,
@@ -185,55 +298,62 @@ export class SupabaseStorageIndexer {
         const supabaseClient = supabase;
 
         // D'abord, créer le document parent s'il n'existe pas
-        const { data: existingDocument, error: docCheckError } = await supabaseClient
+        const { data: existingDocuments, error: docCheckError } = await supabaseClient
           .from('documents')
           .select('id')
           .eq('file_path', fileInfo.path)
-          .single();
+          .limit(1);
 
-        let documentId: string;
-        
-        
-        if (docCheckError && !docCheckError.message.includes('no rows')) {
-          logger.error(`Erreur de vérification du document: ${docCheckError.message} ${fileInfo.path}`, {
-            error: docCheckError.message,
-          });
-         // throw docCheckError;
+        if (docCheckError) {
+          this.handleSupabaseError(docCheckError, 'Document check failed', fileInfo.path);
         }
 
+        let documentId: string;
+        const existingDocument = existingDocuments?.[0];
+        
         if (existingDocument) {
           documentId = existingDocument.id;
-          logger.info(`Document existant trouvé: ${fileInfo.path}`, {
+          logger.debug(`Document existant trouvé: ${fileInfo.path}`, {
             documentId,
           });
         } else {
-          logger.info (`Aucun document existant trouvé pour: ${fileInfo.path}. Création d'un nouveau document.`);
-          // Créer un nouveau document
-          const { data: newDocument, error: docCreateError } = await supabaseClient
+          logger.info(`Aucun document existant trouvé pour: ${fileInfo.path}. Création d'un nouveau document.`);
+          // Créer ou mettre à jour le document (upsert)
+          // Use language from OCR if available, otherwise use extracted content type as hint, or default
+          const documentLanguage = extractedText.language || DEFAULT_LANGUAGE;
+          
+          const { data: newDocuments, error: docCreateError } = await supabaseClient
             .from('documents')
-            .insert({
+            .upsert({
               name: fileInfo.name,
               type: extractedText.contentType || 'text',
               source: 'supabase',
               file_path: fileInfo.path,
               file_size: fileInfo.size,
               mime_type: fileInfo.contentType,
-              language: 'fr', // Par défaut français
+              language: documentLanguage,
               metadata: {
                 client: options.client || 'default',
                 documentType: options.documentType || extractedText.contentType,
                 sourceBucket: this.bucketName,
               },
-            })
+            }, { onConflict: 'file_path' })
             .select('id')
-            .single();
+            .limit(1);
 
           if (docCreateError) {
-            logger.error(`Échec de la création du document: ${fileInfo.path}`, {
-              error: docCreateError.message,
-              details: docCreateError.details,
-            });
-            throw docCreateError;
+            this.handleSupabaseError(docCreateError, 'Document upsert failed', fileInfo.path);
+          }
+
+          const newDocument = newDocuments?.[0];
+          
+          if (!newDocument?.id) {
+            throw new DocumentError(
+              'No document ID returned after upsert',
+              fileInfo.path,
+              'database_error',
+              new Error('Missing document ID')
+            );
           }
 
           documentId = newDocument.id;
@@ -242,23 +362,31 @@ export class SupabaseStorageIndexer {
           });
         }
 
+        // Process chunks with batching for better performance
+        const chunkResults: Array<{ 
+          chunkIndex: number; 
+          chunkId: string; 
+          content: string 
+        }> = [];
+        
         for (let i = 0; i < chunks.length; i++) {
           const chunk = chunks[i];
 
           try {
-            logger.info(`Traitement du chunk ${i}/${chunks.length} pour ${fileInfo.path}`, {
+            logger.debug(`Traitement du chunk ${i}/${chunks.length} pour ${fileInfo.path}`, {
               chunkLength: chunk.content.length,
-              metadata: chunk.metadata,
             });
 
             // Sauvegarder le chunk dans la base
-            const { data: savedChunk, error: saveError } = await supabaseClient
+            const tokenCount = estimateTokenCount(chunk.content);
+            
+            const { data: savedChunks, error: saveError } = await supabaseClient
               .from('chunks')
               .insert({
                 document_id: documentId,
                 content: chunk.content,
                 chunk_index: i,
-                token_count: chunk.content.split(' ').length, // Estimation simple
+                token_count: tokenCount,
                 metadata: {
                   ...chunk.metadata,
                   chunk_index: i,
@@ -269,73 +397,101 @@ export class SupabaseStorageIndexer {
                 },
               })
               .select('id')
-              .single();
+              .limit(1);
 
             if (saveError) {
-              logger.error(`Échec de la sauvegarde du chunk ${i} pour ${fileInfo.path} \n ${saveError.message}`, {
-                error: saveError.message,
-                details: saveError.details,
-                chunkContentLength: chunk.content.length,
-                chunkIndex: i,
-              });
-              throw saveError;
+              this.handleSupabaseError(saveError, 'Chunk save failed', fileInfo.path);
             }
 
-            logger.info(`Chunk sauvegardé avec succès`, {
-              chunkId: savedChunk?.id,
+            const savedChunk = savedChunks?.[0];
+            
+            if (!savedChunk?.id) {
+              throw new DocumentError(
+                `No chunk ID returned for chunk ${i}`,
+                fileInfo.path,
+                'database_error',
+                new Error('Missing chunk ID')
+              );
+            }
+
+            logger.debug(`Chunk sauvegardé avec succès`, {
+              chunkId: savedChunk.id,
               chunkIndex: i,
-              contentLength: chunk.content.length,
+              tokenCount,
             });
 
-            // 5. Générer l'embedding pour ce chunk
-            logger.info(`Génération de l'embedding pour le chunk ${i}`, {
-              chunkId: savedChunk?.id,
+            chunkResults.push({
+              chunkIndex: i,
+              chunkId: savedChunk.id,
+              content: chunk.content,
             });
-
-            const embeddingsResult: BatchEmbeddingResult = await generateEmbeddings([chunk.content]);
-            const embedding: EmbeddingResult = embeddingsResult.embeddings[0];
+            
+          } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorType = error instanceof DocumentError ? error.name : 'unknown';
+            
+            logger.error(`Échec du traitement du chunk ${i} pour ${fileInfo.path}`, {
+              error: errorMessage,
+              errorType,
+              chunkIndex: i,
+              filePath: fileInfo.path,
+            });
+            // Continue with next chunk - don't fail entire file for one chunk
+          }
+        }
+        
+        // Batch generate embeddings for all successfully saved chunks
+        if (chunkResults.length > 0) {
+          const allContents = chunkResults.map(r => r.content);
+          const batchEmbeddingsResult: BatchEmbeddingResult = await generateEmbeddings(allContents);
+          
+          // Save embeddings for each chunk
+          for (let j = 0; j < chunkResults.length; j++) {
+            const chunkResult = chunkResults[j];
+            const embedding = batchEmbeddingsResult.embeddings[j];
+            
+            if (!embedding) {
+              logger.error(`Aucun embedding généré pour le chunk ${chunkResult.chunkIndex}`, {
+                chunkId: chunkResult.chunkId,
+                filePath: fileInfo.path,
+              });
+              continue;
+            }
+            
             embeddingsGenerated++;
-
-            logger.info(`Embedding généré pour le chunk ${i}`, {
+            
+            logger.debug(`Embedding généré pour le chunk ${chunkResult.chunkIndex}`, {
+              chunkId: chunkResult.chunkId,
               embeddingLength: embedding.embedding.length,
               tokenCount: embedding.tokenCount,
             });
 
-            // 6. Sauvegarder l'embedding
+            // Sauvegarder l'embedding
             const { error: embedError } = await supabaseClient
               .from('embeddings')
               .insert({
-                chunk_id: savedChunk?.id,
+                chunk_id: chunkResult.chunkId,
                 vector: embedding.embedding,
               });
 
             if (embedError) {
-              logger.error(`Échec de la sauvegarde de l'embedding pour le chunk ${i} - ${embedError.message}`, {
-                error: embedError.message,
-                details: embedError.details,
-                chunkId: savedChunk?.id,
+              logger.error(`Échec de la sauvegarde de l'embedding pour le chunk ${chunkResult.chunkIndex}`, {
+                error: embedError instanceof Error ? embedError.message : String(embedError),
+                details: embedError instanceof Error && 'details' in embedError ? (embedError as any).details : undefined,
+                chunkId: chunkResult.chunkId,
                 embeddingLength: embedding.embedding.length,
               });
-              // Ne pas arrêter le traitement, continuer avec les autres chunks
+              // Continue with next embedding - don't fail for embedding save errors
             } else {
-              logger.info(`Embedding sauvegardé avec succès pour le chunk ${i}`, {
-                chunkId: savedChunk?.id,
+              logger.debug(`Embedding sauvegardé avec succès pour le chunk ${chunkResult.chunkIndex}`, {
+                chunkId: chunkResult.chunkId,
                 embeddingLength: embedding.embedding.length,
               });
             }
-          } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            const errorStack = error instanceof Error ? error.stack : undefined;
-            
-            logger.error(`Échec du traitement du chunk ${i} pour ${fileInfo.path}`, {
-              error: errorMessage,
-              stack: errorStack,
-              chunkIndex: i,
-              filePath: fileInfo.path,
-            });
-            // Continuer avec les autres chunks
           }
         }
+        
+        chunksCreated = chunkResults.length;
 
         // 7. Appeler reindexSource pour mettre à jour l'index vectoriel
         try {
@@ -351,7 +507,7 @@ export class SupabaseStorageIndexer {
           logger.error(`Échec de la re-indexation pour: ${fileInfo.path}`, {
             error: errorMessage,
           });
-          // Ne pas arrêter le traitement
+          // Don't stop processing - reindex can be retried later
         }
       }
 
@@ -367,10 +523,14 @@ export class SupabaseStorageIndexer {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
+      const errorType = error instanceof IndexationError || error instanceof DocumentError 
+        ? (error as IndexationError | DocumentError).name 
+        : 'unknown';
       
       logger.error(`Échec du traitement du fichier: ${fileInfo.path}`, {
         error: errorMessage,
         stack: errorStack,
+        errorType,
       });
       throw error;
     }
@@ -382,6 +542,14 @@ export class SupabaseStorageIndexer {
    */
   getBucketName(): string {
     return this.bucketName;
+  }
+
+  /**
+   * Récupère la taille maximale des fichiers autorisée
+   * @returns Taille maximale en octets
+   */
+  getMaxFileSize(): number {
+    return MAX_FILE_SIZE;
   }
 }
 

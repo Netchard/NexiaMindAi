@@ -28,14 +28,16 @@
 // Ré-exports
 
 // Client Navigateur (pour les composants React)
-export { supabase as client, supabase } from './client';
+//export { supabase } from './client';
+export { supabase as client } from './client';
 export type { SupabaseClient } from '@supabase/supabase-js';
 
 // Client Serveur (pour les API routes, server components)
 export { supabase as serverClient, supabase as server } from './server';
 
 // Client Admin (pour les opérations sensibles côté serveur)
-export { supabase as adminClient, supabase, createAdminClient, isAdminConfigured } from './admin-client';
+export { supabase, createAdminClient, isAdminConfigured } from './admin-client';
+export { supabase as adminClient } from './admin-client';
 
 // Client Auth Serveur (pour les server components avec gestion des cookies)
 export { createAuthServerClient, createAuthServerClientWithKey } from './auth-server';
