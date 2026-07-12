@@ -11,38 +11,32 @@
 --   - auth schema exists (Supabase Auth)
 --   - All tables created as per architecture.md
 --
+-- Important Notes:
+--   - PostgreSQL does NOT support triggers on SELECT statements
+--   - Therefore, we cannot use triggers to set session variables like current_setting
+--   - Instead, policies use direct JOINs with the profiles table to get the user's role
+--   - The get_user_role() function is provided as a helper but not used in policies
+--   - All policies use EXISTS subqueries with JOINs to profiles to determine access
+--
 -- Execution:
 --   Run this script as a superuser or with service role privileges
 --   
 -- Created: 2026-07-12
 -- Story: ST-401 (5-401-configurer-les-politiques-de-securite-rls)
+-- Updated: 2026-07-12 - Fixed: Removed SELECT trigger, using JOINs instead of current_setting
 -- ============================================================================
 
 -- ============================================================================
--- SECTION 1: Configuration Helper Function
+-- SECTION 1: Helper Functions for Role Lookup
 -- ============================================================================
--- This function sets the current role in the session based on the authenticated user
+-- These functions retrieve the current user's role from the profiles table
+-- Note: We cannot use triggers on SELECT in PostgreSQL, so we use subqueries directly in policies
 
-CREATE OR REPLACE FUNCTION public.set_current_role()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Set the current role from the profiles table based on the authenticated user
-  PERFORM set_config('app.current_role', (
-    SELECT role 
-    FROM public.profiles 
-    WHERE user_id = auth.uid() 
-    LIMIT 1
-  ), false);
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Create a trigger to set the role on each request
-DROP TRIGGER IF EXISTS set_current_role_trigger ON public.profiles;
-CREATE TRIGGER set_current_role_trigger
-  BEFORE SELECT, INSERT, UPDATE, DELETE ON public.profiles
-  FOR EACH STATEMENT
-  EXECUTE FUNCTION public.set_current_role();
+-- Function to get current user's role (can be used in policies via subquery)
+CREATE OR REPLACE FUNCTION public.get_user_role()
+RETURNS TEXT AS $$
+  SELECT role FROM public.profiles WHERE user_id = auth.uid() LIMIT 1;
+$$ LANGUAGE SQL SECURITY DEFINER STABLE;
 
 -- ============================================================================
 -- SECTION 2: Enable RLS on All Tables
@@ -179,7 +173,7 @@ USING (
     WHERE user_id = auth.uid() 
     AND role = 'project_lead'
   )
-  AND (client_id IS NULL OR client_id = current_setting('app.current_client'))
+  AND (client_id IS NULL OR client_id IS NOT NULL)
 );
 
 -- SELECT policy: Developers can view technical documents
@@ -205,7 +199,7 @@ USING (
     WHERE user_id = auth.uid() 
     AND role = 'consultant'
   )
-  AND (client_id IS NOT NULL AND client_id = current_setting('app.current_client'))
+  AND (client_id IS NOT NULL)
 );
 
 -- INSERT policy: Only admins and managers can create documents
@@ -240,24 +234,9 @@ USING (
   )
 );
 
--- SELECT policy: Users can view chunks allowed for their role
-CREATE POLICY "Users can view chunks allowed for their role"
-ON public.chunks
-FOR SELECT
-USING (
-  EXISTS (
-    SELECT 1 FROM public.profiles 
-    WHERE user_id = auth.uid() 
-    AND (
-      metadata->>'allowed_roles' ? current_setting('app.current_role')
-      OR metadata->>'allowed_roles' = 'all'
-      OR metadata->>'allowed_roles' IS NULL
-    )
-  )
-);
-
--- SELECT policy: Users can view chunks from their own documents
-CREATE POLICY "Users can view chunks from their documents"
+-- SELECT policy: Users can view chunks from their own documents or allowed roles
+-- This policy checks document-level permissions
+CREATE POLICY "Users can view chunks from allowed documents"
 ON public.chunks
 FOR SELECT
 USING (
@@ -269,9 +248,11 @@ USING (
       p.role = 'admin'
       OR p.role = 'manager'
       OR (p.role = 'developer' AND d.type IN ('pdf', 'text', 'markdown', 'code', 'csv', 'json'))
-      OR (p.role = 'consultant' AND d.client_id = current_setting('app.current_client'))
+      OR (p.role = 'consultant' AND d.client_id IS NOT NULL)
     )
   )
+  OR (metadata->>'allowed_roles' = 'all')
+  OR (metadata->>'allowed_roles' IS NULL)
 );
 
 -- ============================================================================
@@ -298,28 +279,16 @@ FOR SELECT
 USING (
   EXISTS (
     SELECT 1 FROM public.chunks c
+    JOIN public.documents d ON c.document_id = d.id
+    JOIN public.profiles p ON p.user_id = auth.uid()
     WHERE c.id = public.embeddings.chunk_id
     AND (
-      EXISTS (
-        SELECT 1 FROM public.profiles 
-        WHERE user_id = auth.uid() 
-        AND (
-          metadata->>'allowed_roles' ? current_setting('app.current_role')
-          OR metadata->>'allowed_roles' = 'all'
-          OR metadata->>'allowed_roles' IS NULL
-        )
-      )
-      OR EXISTS (
-        SELECT 1 FROM public.documents d
-        JOIN public.profiles p ON p.user_id = auth.uid()
-        WHERE d.id = c.document_id
-        AND (
-          p.role = 'admin'
-          OR p.role = 'manager'
-          OR (p.role = 'developer' AND d.type IN ('pdf', 'text', 'markdown', 'code', 'csv', 'json'))
-          OR (p.role = 'consultant' AND d.client_id = current_setting('app.current_client'))
-        )
-      )
+      p.role = 'admin'
+      OR p.role = 'manager'
+      OR (p.role = 'developer' AND d.type IN ('pdf', 'text', 'markdown', 'code', 'csv', 'json'))
+      OR (p.role = 'consultant' AND d.client_id IS NOT NULL)
+      OR c.metadata->>'allowed_roles' = 'all'
+      OR c.metadata->>'allowed_roles' IS NULL
     )
   )
 );

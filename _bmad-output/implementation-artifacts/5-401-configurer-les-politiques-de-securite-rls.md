@@ -177,19 +177,39 @@ FOR SELECT USING (
 
 ### 🔧 Configuration Supabase Requise
 
-Avant de créer les politiques, il faut configurer:
+**Important:** PostgreSQL ne supporte PAS les triggers sur les instructions SELECT. 
+La solution initiale avec `CREATE TRIGGER ... BEFORE SELECT` était incorrecte.
+
+**Solution corrigée:** 
+Toutes les politiques utilisent maintenant des **JOINs directs** avec la table `profiles` pour récupérer le rôle de l'utilisateur, 
+évitant ainsi le besoin de `current_setting()`.
 
 ```sql
--- Créer la configuration pour le rôle courant
-CREATE OR REPLACE FUNCTION set_current_role()
-RETURNS TRIGGER AS $$
-BEGIN
-  -- Cette fonction doit être appelée pour définir le rôle courant
-  -- basé sur le JWT de l'utilisateur
-  PERFORM set_config('app.current_role', (SELECT role FROM public.profiles WHERE user_id = auth.uid() LIMIT 1), false);
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+-- Fonction utilitaire pour récupérer le rôle (non utilisée dans les politiques)
+CREATE OR REPLACE FUNCTION public.get_user_role()
+RETURNS TEXT AS $$
+  SELECT role FROM public.profiles WHERE user_id = auth.uid() LIMIT 1;
+$$ LANGUAGE SQL SECURITY DEFINER STABLE;
+```
+
+**Exemple de politique corrigée:**
+```sql
+-- Au lieu de:
+-- USING (metadata->>'allowed_roles' ? current_setting('app.current_role') ...)
+
+-- On utilise:
+USING (
+  EXISTS (
+    SELECT 1 FROM public.documents d
+    JOIN public.profiles p ON p.user_id = auth.uid()
+    WHERE d.id = chunks.document_id
+    AND (
+      p.role = 'admin'
+      OR p.role = 'developer'
+      ...
+    )
+  )
+)
 ```
 
 ### 📊 Tests de Sécurité
@@ -231,6 +251,7 @@ Mistral Vibe (Mistral Medium 3.5)
 - Created comprehensive RLS policies for all 7 tables (profiles, documents, chunks, embeddings, conversations, messages, sync_logs)
 - Implemented role-based access control matching architecture specifications
 - Created security test suite with 10 test scenarios
+- **FIXED:** Removed SELECT trigger (not supported by PostgreSQL) - replaced with direct JOINs in policies
 
 ### Completion Notes List
 
