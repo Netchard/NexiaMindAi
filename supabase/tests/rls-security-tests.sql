@@ -41,41 +41,31 @@
 -- ============================================================================
 
 -- ============================================================================
--- TEST SETUP: Create Test Users and Data
+-- TEST SETUP: Create Test Data
 -- ============================================================================
 
--- IMPORTANT: This test script requires SUPERUSER privileges to:
--- 1. Insert into auth.users (which is normally restricted)
--- 2. Run as different users for testing
+-- IMPORTANT: To properly test RLS, you need authenticated users in auth.users.
+-- 
+-- Option 1: Use existing users (RECOMMENDED)
+--   - Use Supabase Dashboard to create test users
+--   - Note their UUIDs from auth.users
+--   - Replace the user_id values below with those UUIDs
 --
--- Alternative: Run these tests manually as authenticated users in your application
+-- Option 2: Create test users via API (requires service role key)
+--   - Use Supabase Auth API: https://supabase.com/docs/guides/auth/managing-user-data
+--   - Or use: supabase.auth.admin.createUser() in JavaScript
+--
+-- Option 3: Manual testing (SIMPLEST)
+--   - Simply execute the policies from rls-policies.sql
+--   - Test manually in your application with real users
+--   - No need to run this test script
+--
+-- For this script to work, you MUST have users in auth.users with these IDs:
+-- If you don't, the RLS policies using auth.uid() will not work correctly
 
--- Step 1: Create test users in auth.users (REQUIRES SUPERUSER)
--- Note: In production, use Supabase Dashboard or Auth API to create users
--- These UUIDs will be used throughout the test data
-
-DO $$
-DECLARE
-  admin_uuid UUID := 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID;
-  manager_uuid UUID := 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID;
-  lead_uuid UUID := 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID;
-  dev_uuid UUID := 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID;
-  consultant_uuid UUID := 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID;
-BEGIN
-  -- These inserts will fail without superuser privileges
-  -- Comment them out if you don't have superuser access
-  INSERT INTO auth.users (id, email, email_confirmed, created_at, updated_at)
-  VALUES 
-    (admin_uuid, 'admin@nexiamind.ai', true, NOW(), NOW()),
-    (manager_uuid, 'manager@nexiamind.ai', true, NOW(), NOW()),
-    (lead_uuid, 'lead@nexiamind.ai', true, NOW(), NOW()),
-    (dev_uuid, 'dev@nexiamind.ai', true, NOW(), NOW()),
-    (consultant_uuid, 'consultant@nexiamind.ai', true, NOW(), NOW())
-  ON CONFLICT (id) DO NOTHING;
-END $$;
-
--- Step 2: Create test profiles for each role
--- Using the same UUIDs as auth.users
+-- Create test profiles for each role
+-- Note: Replace user_id values with actual UUIDs from your auth.users table
+-- These are example UUIDs - use your own or create users first
 INSERT INTO public.profiles (id, user_id, email, full_name, role, created_at, updated_at)
 VALUES 
   (gen_random_uuid(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', 'Admin User', 'admin', NOW(), NOW()),
@@ -83,7 +73,7 @@ VALUES
   (gen_random_uuid(), 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', 'Project Lead User', 'project_lead', NOW(), NOW()),
   (gen_random_uuid(), 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', 'Developer User', 'developer', NOW(), NOW()),
   (gen_random_uuid(), 'e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', 'Consultant User', 'consultant', NOW(), NOW())
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (user_id) DO NOTHING;
 
 -- Set current client for testing
 -- Note: Without current_setting, client_id filtering is simplified
