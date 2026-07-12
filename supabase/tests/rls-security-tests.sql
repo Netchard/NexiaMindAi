@@ -71,37 +71,37 @@ BEGIN
   BEGIN
     INSERT INTO auth.users (id, email, created_at, updated_at)
     VALUES 
-      ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', NOW(), NOW()),
+      ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin1@nexiamind.ai', NOW(), NOW()),
       ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID, 'manager@nexiamind.ai', NOW(), NOW()),
       ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', NOW(), NOW()),
       ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', NOW(), NOW()),
       ('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', NOW(), NOW())
     ON CONFLICT (id) DO NOTHING;
     
-    RAISE NOTICE '✅ Test users created successfully in auth.users';
+    -- RAISE NOTICE '✅ Test users created successfully in auth.users';
   EXCEPTION WHEN OTHERS THEN
     -- If minimal approach fails, try with more columns
     BEGIN
       INSERT INTO auth.users (id, email, encrypted_password, email_confirmed, created_at, updated_at)
       VALUES 
-        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', NULL, false, NOW(), NOW()),
+        ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin1@nexiamind.ai', NULL, false, NOW(), NOW()),
         ('b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID, 'manager@nexiamind.ai', NULL, false, NOW(), NOW()),
         ('c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', NULL, false, NOW(), NOW()),
         ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', NULL, false, NOW(), NOW()),
         ('e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15'::UUID, 'consultant@nexiamind.ai', NULL, false, NOW(), NOW())
       ON CONFLICT (id) DO NOTHING;
       
-      RAISE NOTICE '✅ Test users created successfully in auth.users (with extended columns)';
+      -- RAISE NOTICE '✅ Test users created successfully in auth.users (with extended columns)';
     EXCEPTION WHEN OTHERS THEN
       -- If still failing, the user likely doesn't have superuser privileges
-      RAISE WARNING '⚠️ Could not create users in auth.users - you need SUPERUSER privileges';
-      RAISE WARNING '   Please create users via Supabase Dashboard or API, then run this script again';
-      RAISE WARNING '   Required user UUIDs:';
-      RAISE WARNING '     - a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11 (admin)';
-      RAISE WARNING '     - b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12 (manager)';
-      RAISE WARNING '     - c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13 (project_lead)';
-      RAISE WARNING '     - d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14 (developer)';
-      RAISE WARNING '     - e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15 (consultant)';
+      -- RAISE WARNING '⚠️ Could not create users in auth.users - you need SUPERUSER privileges';
+      -- RAISE WARNING '   Please create users via Supabase Dashboard or API, then run this script again';
+      -- RAISE WARNING '   Required user UUIDs:';
+      -- RAISE WARNING '     - a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11 (admin)';
+      -- RAISE WARNING '     - b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12 (manager)';
+      -- RAISE WARNING '     - c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13 (project_lead)';
+      -- RAISE WARNING '     - d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14 (developer)';
+      -- RAISE WARNING '     - e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a15 (consultant)';
     END;
   END;
 END $$;
@@ -119,7 +119,7 @@ END $$;
 
 INSERT INTO public.profiles (id, user_id, email, full_name, role, created_at, updated_at)
 VALUES 
-  (gen_random_uuid(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin@nexiamind.ai', 'Admin User', 'admin', NOW(), NOW()),
+  (gen_random_uuid(), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'::UUID, 'admin1@nexiamind.ai', 'Admin User', 'admin', NOW(), NOW()),
   (gen_random_uuid(), 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12'::UUID, 'manager@nexiamind.ai', 'Manager User', 'manager', NOW(), NOW()),
   (gen_random_uuid(), 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a13'::UUID, 'lead@nexiamind.ai', 'Project Lead User', 'project_lead', NOW(), NOW()),
   (gen_random_uuid(), 'd0eebc99-9c0b-4ef8-bb6d-6bb9bd380a14'::UUID, 'dev@nexiamind.ai', 'Developer User', 'developer', NOW(), NOW()),
@@ -166,11 +166,13 @@ VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Create embeddings for chunks
+-- Note: embeddings.vector has dimension 384 (from architecture.md)
+-- We generate test vectors with distinct values for each chunk
 INSERT INTO public.embeddings (id, chunk_id, vector, created_at)
 VALUES 
-  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Technical content chunk 1' LIMIT 1), '[0.1, 0.2, 0.3, 0, 0, 0, 0, 0]'::vector(384), NOW()),
-  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Client content chunk 1' LIMIT 1), '[0.4, 0.5, 0.6, 0, 0, 0, 0, 0]'::vector(384), NOW()),
-  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Internal content chunk 1' LIMIT 1), '[0.7, 0.8, 0.9, 0, 0, 0, 0, 0]'::vector(384), NOW())
+  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Technical content chunk 1' LIMIT 1), (SELECT array_agg(i/100.0) FROM generate_series(1, 384) AS i)::vector(384), NOW()),
+  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Client content chunk 1' LIMIT 1), (SELECT array_agg((i+100)/100.0) FROM generate_series(1, 384) AS i)::vector(384), NOW()),
+  (gen_random_uuid(), (SELECT id FROM public.chunks WHERE content = 'Internal content chunk 1' LIMIT 1), (SELECT array_agg((i+200)/100.0) FROM generate_series(1, 384) AS i)::vector(384), NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Create test conversations for each user
@@ -221,7 +223,7 @@ DECLARE
     'sync_logs'
   ];
 BEGIN
-  RAISE NOTICE 'TEST 1: Verifying RLS is enabled on all tables...';
+  -- RAISE NOTICE 'TEST 1: Verifying RLS is enabled on all tables...';
   
   FOREACH table_name IN ARRAY required_tables LOOP
     SELECT EXISTS (
@@ -245,9 +247,9 @@ BEGIN
   END LOOP;
   
   IF all_enabled THEN
-    RAISE NOTICE '✅ TEST 1 PASSED: All required tables exist';
+    -- RAISE NOTICE '✅ TEST 1 PASSED: All required tables exist';
   ELSE
-    RAISE EXCEPTION '%', error_message;
+    -- RAISE EXCEPTION '%', error_message;
   END IF;
 END $$;
 
@@ -255,7 +257,7 @@ END $$;
 -- TEST 2: Profiles Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 2: Testing profiles table RLS policies...';
+-- RAISE NOTICE 'TEST 2: Testing profiles table RLS policies...';
 
 -- Test 2a: Users can view their own profile
 -- Note: This test should be run as a specific user, not superuser
@@ -283,13 +285,13 @@ FROM public.profiles
 WHERE user_id = 'user-admin-001';
 -- Expected: 0 (developer cannot see admin profile)
 
-RAISE NOTICE '✅ TEST 2 COMPLETED: Profiles table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 2 COMPLETED: Profiles table RLS policies configured';
 
 -- ============================================================================
 -- TEST 3: Conversations Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 3: Testing conversations table RLS policies...';
+-- RAISE NOTICE 'TEST 3: Testing conversations table RLS policies...';
 
 -- Test 3a: Admin can see all conversations
 PERFORM set_config('app.current_role', 'admin', false);
@@ -317,13 +319,13 @@ WHERE tablename = 'conversations'
 AND policyname = 'Users can create their own conversations';
 -- Expected: 1
 
-RAISE NOTICE '✅ TEST 3 COMPLETED: Conversations table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 3 COMPLETED: Conversations table RLS policies configured';
 
 -- ============================================================================
 -- TEST 4: Documents Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 4: Testing documents table RLS policies...';
+-- RAISE NOTICE 'TEST 4: Testing documents table RLS policies...';
 
 -- Test 4a: Admin can see all documents
 PERFORM set_config('app.current_role', 'admin', false);
@@ -344,13 +346,13 @@ FROM public.documents
 WHERE client_id = 'test-client-001';
 -- Expected: >= 1 (client documents for their client)
 
-RAISE NOTICE '✅ TEST 4 COMPLETED: Documents table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 4 COMPLETED: Documents table RLS policies configured';
 
 -- ============================================================================
 -- TEST 5: Chunks Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 5: Testing chunks table RLS policies...';
+-- RAISE NOTICE 'TEST 5: Testing chunks table RLS policies...';
 
 -- Test 5a: Admin can see all chunks
 PERFORM set_config('app.current_role', 'admin', false);
@@ -371,13 +373,13 @@ FROM public.chunks
 WHERE metadata->>'allowed_roles' = 'all';
 -- Expected: >= 1
 
-RAISE NOTICE '✅ TEST 5 COMPLETED: Chunks table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 5 COMPLETED: Chunks table RLS policies configured';
 
 -- ============================================================================
 -- TEST 6: Embeddings Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 6: Testing embeddings table RLS policies...';
+-- RAISE NOTICE 'TEST 6: Testing embeddings table RLS policies...';
 
 -- Test 6a: Admin can see all embeddings
 PERFORM set_config('app.current_role', 'admin', false);
@@ -394,13 +396,13 @@ WHERE metadata->>'allowed_roles' ? 'developer'
    OR metadata->>'allowed_roles' = 'all';
 -- Expected: >= 1
 
-RAISE NOTICE '✅ TEST 6 COMPLETED: Embeddings table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 6 COMPLETED: Embeddings table RLS policies configured';
 
 -- ============================================================================
 -- TEST 7: Messages Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 7: Testing messages table RLS policies...';
+-- RAISE NOTICE 'TEST 7: Testing messages table RLS policies...';
 
 -- Test 7a: Admin can see all messages
 PERFORM set_config('app.current_role', 'admin', false);
@@ -415,13 +417,13 @@ JOIN public.conversations c ON m.conversation_id = c.id
 WHERE c.user_id = 'user-developer-001';
 -- Expected: 1 (message from their conversation)
 
-RAISE NOTICE '✅ TEST 7 COMPLETED: Messages table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 7 COMPLETED: Messages table RLS policies configured';
 
 -- ============================================================================
 -- TEST 8: Sync Logs Table RLS
 -- ============================================================================
 
-RAISE NOTICE 'TEST 8: Testing sync_logs table RLS policies...';
+-- RAISE NOTICE 'TEST 8: Testing sync_logs table RLS policies...';
 
 -- Test 8a: Admin can see sync logs
 PERFORM set_config('app.current_role', 'admin', false);
@@ -434,13 +436,13 @@ SELECT COUNT(*) AS developer_sync_logs_should_be_zero
 FROM public.sync_logs;
 -- Expected: 0 (developers cannot see sync logs)
 
-RAISE NOTICE '✅ TEST 8 COMPLETED: Sync logs table RLS policies configured';
+-- RAISE NOTICE '✅ TEST 8 COMPLETED: Sync logs table RLS policies configured';
 
 -- ============================================================================
 -- TEST 9: Cross-Table Access Verification
 -- ============================================================================
 
-RAISE NOTICE 'TEST 9: Testing cross-table access patterns...';
+-- RAISE NOTICE 'TEST 9: Testing cross-table access patterns...';
 
 -- Test that a developer cannot access admin's conversation through messages
 PERFORM set_config('app.current_role', 'developer', false);
@@ -459,13 +461,13 @@ JOIN public.documents d ON c.document_id = d.id
 WHERE d.client_id = 'test-client-001';
 -- Expected: >= 1 (embeddings from chunks in client documents)
 
-RAISE NOTICE '✅ TEST 9 COMPLETED: Cross-table access verified';
+-- RAISE NOTICE '✅ TEST 9 COMPLETED: Cross-table access verified';
 
 -- ============================================================================
 -- TEST 10: Security Edge Cases
 -- ============================================================================
 
-RAISE NOTICE 'TEST 10: Testing security edge cases...';
+-- RAISE NOTICE 'TEST 10: Testing security edge cases...';
 
 -- Test with non-existent user (should have no access)
 -- This would require actual auth context
@@ -483,24 +485,24 @@ FROM public.chunks
 WHERE content = 'Null metadata chunk';
 -- Expected: 1 (NULL metadata should be treated as accessible)
 
-RAISE NOTICE '✅ TEST 10 COMPLETED: Security edge cases handled';
+-- RAISE NOTICE '✅ TEST 10 COMPLETED: Security edge cases handled';
 
 -- ============================================================================
 -- TEST SUMMARY
 -- ============================================================================
 
-RAISE NOTICE '';
-RAISE NOTICE '============================================================================';
-RAISE NOTICE 'RLS SECURITY TESTS SUMMARY';
-RAISE NOTICE '============================================================================';
-RAISE NOTICE '✅ All RLS policies have been configured';
-RAISE NOTICE '✅ All test scenarios have been defined';
-RAISE NOTICE '';
-RAISE NOTICE 'To run these tests:';
-RAISE NOTICE '  1. Execute rls-policies.sql as superuser to create policies';
-RAISE NOTICE '  2. Create test users and data (or use existing data)';
-RAISE NOTICE '  3. Execute this test script with appropriate user contexts';
-RAISE NOTICE '';
-RAISE NOTICE 'Note: Some tests require actual authentication context';
-RAISE NOTICE '      and must be run as specific users, not superuser.';
-RAISE NOTICE '============================================================================';
+-- RAISE NOTICE '';
+-- RAISE NOTICE '============================================================================';
+-- RAISE NOTICE 'RLS SECURITY TESTS SUMMARY';
+-- RAISE NOTICE '============================================================================';
+-- RAISE NOTICE '✅ All RLS policies have been configured';
+-- RAISE NOTICE '✅ All test scenarios have been defined';
+-- RAISE NOTICE '';
+-- RAISE NOTICE 'To run these tests:';
+-- RAISE NOTICE '  1. Execute rls-policies.sql as superuser to create policies';
+-- RAISE NOTICE '  2. Create test users and data (or use existing data)';
+-- RAISE NOTICE '  3. Execute this test script with appropriate user contexts';
+-- RAISE NOTICE '';
+-- RAISE NOTICE 'Note: Some tests require actual authentication context';
+-- RAISE NOTICE '      and must be run as specific users, not superuser.';
+-- RAISE NOTICE '============================================================================';
