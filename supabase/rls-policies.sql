@@ -243,7 +243,7 @@ USING (
   EXISTS (
     SELECT 1 FROM public.documents d
     JOIN public.profiles p ON p.user_id = auth.uid()
-    WHERE d.id = public.chunks.document_id
+    WHERE d.id = chunks.document_id
     AND (
       p.role = 'admin'
       OR p.role = 'manager'
@@ -281,7 +281,7 @@ USING (
     SELECT 1 FROM public.chunks c
     JOIN public.documents d ON c.document_id = d.id
     JOIN public.profiles p ON p.user_id = auth.uid()
-    WHERE c.id = public.embeddings.chunk_id
+    WHERE c.id = embeddings.chunk_id
     AND (
       p.role = 'admin'
       OR p.role = 'manager'
@@ -306,7 +306,7 @@ USING (
   EXISTS (
     SELECT 1 FROM public.conversations c
     JOIN public.profiles p ON p.user_id = auth.uid()
-    WHERE c.id = public.messages.conversation_id
+    WHERE c.id = messages.conversation_id
     AND (
       p.user_id = c.user_id
       OR p.role = 'admin'
