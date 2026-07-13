@@ -30,12 +30,14 @@ END $$;
 -- Après benchmark: mettre à jour avec la valeur optimale
 
 -- Configuration actuelle: 100 (d'après l'architecture initiale)
--- Configuration recommandée: À déterminer par ST-402
+-- Configuration recommandée: 200 (résultat du benchmark ST-402)
 
--- Pour l'instant, on garde la configuration existante
--- Après exécution du benchmark, mettre à jour cette variable
-
-\set OPTIMAL_LISTS 200  -- ⬅️ MISE À JOUR AVEC LA VALEUR OPTIMALE TROUVÉE PAR BENCHMARK
+-- ⬅️ MISE À JOUR AVEC LA VALEUR OPTIMALE TROUVÉE PAR BENCHMARK : 200
+-- NOTE: `\set` est une méta-commande propre au client psql interactif ; elle
+-- n'est pas comprise par le moteur de migration/exécution Supabase (db push,
+-- Studio SQL Editor, ou tout driver Postgres classique), qui envoie ce
+-- fichier tel quel au serveur. La valeur est donc codée en dur ci-dessous
+-- plutôt que référencée via :OPTIMAL_LISTS.
 
 -- ============================================================================
 -- SUPPRESSION DE L'INDEX EXISTANT (si nécessaire)
@@ -62,19 +64,27 @@ END $$;
 -- ============================================================================
 
 -- Créer le nouvel index avec la configuration optimale
-CREATE INDEX idx_embeddings_vector 
-ON public.embeddings 
-USING ivfflat (vector vector_l2_ops) 
-WITH (lists = :OPTIMAL_LISTS);
+-- La construction d'un index ivfflat avec un nombre élevé de listes peut
+-- dépasser le maintenance_work_mem par défaut (souvent 32-64 MB sur
+-- Supabase). On l'augmente pour la durée de la session (GUC user-level,
+-- pas besoin de privilèges superuser).
+SET maintenance_work_mem = '256MB';
+
+CREATE INDEX idx_embeddings_vector
+ON public.embeddings
+USING ivfflat (vector vector_l2_ops)
+WITH (lists = 200);
+
+RESET maintenance_work_mem;
 
 -- Vérifier que l'index a été créé
 DO $$
 BEGIN
   IF EXISTS (
-    SELECT 1 FROM pg_indexes 
+    SELECT 1 FROM pg_indexes
     WHERE indexname = 'idx_embeddings_vector'
   ) THEN
-    RAISE NOTICE '✅ Index idx_embeddings_vector créé avec succès avec lists=:OPTIMAL_LISTS';
+    RAISE NOTICE '✅ Index idx_embeddings_vector créé avec succès avec lists=%', 200;
   ELSE
     RAISE EXCEPTION '❌ ÉCHEC: Index non créé';
   END IF;
@@ -98,16 +108,15 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM embeddings LIMIT 1) THEN
     RAISE NOTICE 'Test de l''index avec une requête de similarité...';
-    
-    -- Créer un vecteur de test (384 dimensions, valeurs aléatoires)
-    -- En pratique, utiliser un vrai embedding de la table
-    PERFORM (
-      SELECT chunk_id, vector <=> '[0.1, 0.2, 0.3, ...]'::vector(384) as distance
-      FROM embeddings
-      ORDER BY distance ASC
-      LIMIT 10
-    );
-    
+
+    -- Utiliser un vrai embedding de la table pour le test
+    -- (PERFORM sans parenthèses : une sous-requête entre parenthèses serait
+    -- traitée comme une expression scalaire, qui exige une seule colonne)
+    PERFORM chunk_id, vector <=> (SELECT vector FROM embeddings LIMIT 1) as distance
+    FROM embeddings
+    ORDER BY distance ASC
+    LIMIT 10;
+
     RAISE NOTICE '✅ Test de requête exécuté avec succès';
   ELSE
     RAISE NOTICE '⚠️ Aucune donnée dans la table embeddings, test impossible';
@@ -119,9 +128,9 @@ END $$;
 -- ============================================================================
 
 -- Afficher la configuration finale
-SELECT 
+SELECT
   'idx_embeddings_vector' as index_name,
-  :OPTIMAL_LISTS as lists,
+  200 as lists,
   'ivfflat' as index_type,
   'vector_l2_ops' as operator,
   'public.embeddings' as table_name;
@@ -132,7 +141,8 @@ SELECT
 
 -- 1. Ce script DOIT être exécuté avec la SERVICE ROLE KEY pour contourner RLS
 -- 2. L'index existant sera SUPPRIMÉ avant la création du nouveau
--- 3. La valeur :OPTIMAL_LISTS doit être mise à jour avec les résultats du benchmark
+-- 3. La valeur 200 (lists) a été déterminée par les résultats du benchmark ;
+--    mettre à jour la constante ci-dessus si elle change
 -- 4. Pour les gros datasets (>100K documents), envisagez d'augmenter le nombre de listes
 -- 5. Les politiques RLS ne sont PAS affectées par ce script
 
@@ -149,9 +159,9 @@ SELECT
 
 -- 2026-07-12: Création initiale (ST-402)
 --   - Suppression de l'index existant (lists=100)
---   - Création avec lists=:OPTIMAL_LISTS (à déterminer)
---   - Configuration optimale: À définir par le benchmark
+--   - Création avec lists=200 (résultat du benchmark)
+--   - Configuration optimale: 200
 
 COMMENT ON INDEX idx_embeddings_vector IS 'Index vectoriel optimisé pour la recherche de similarité.
 Créé par ST-402: Optimiser l''Index Vectoriel.
-Configuration: ivfflat avec lists=:OPTIMAL_LISTS';
+Configuration: ivfflat avec lists=200';

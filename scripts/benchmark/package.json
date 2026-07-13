@@ -5,7 +5,10 @@
   "main": "benchmark-vector-index.js",
   "scripts": {
     "benchmark": "node benchmark-vector-index.js",
-    "benchmark:mock": "node benchmark-vector-index.mock.js"
+    "benchmark:mock": "node benchmark-vector-index.mock.js",
+    "test": "jest benchmark-vector-index.test.js --detectOpenHandles",
+    "test:watch": "jest benchmark-vector-index.test.js --watch",
+    "test:coverage": "jest benchmark-vector-index.test.js --coverage"
   },
   "keywords": [
     "supabase",
@@ -17,6 +20,11 @@
   "author": "NexiaMind AI Team",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@jest/globals": "^29.7.0"
   }
 }

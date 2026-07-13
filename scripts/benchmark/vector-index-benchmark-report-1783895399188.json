@@ -1,0 +1,214 @@
+{
+  "benchmarkDate": "2026-07-12T22:29:59.215Z",
+  "configuration": {
+    "listConfigurations": [
+      50,
+      100,
+      200,
+      400
+    ],
+    "testIterations": 5,
+    "queryLimit": 10,
+    "warmupQueries": 3
+  },
+  "environment": {
+    "nodeVersion": "v22.18.0",
+    "platform": "win32",
+    "arch": "x64",
+    "mock": true
+  },
+  "results": [
+    {
+      "lists": 50,
+      "indexName": "idx_embeddings_vector_bench_50",
+      "results": [
+        {
+          "success": true,
+          "time": 1492,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1324,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1347,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1529,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1516,
+          "results": 10
+        }
+      ],
+      "statistics": {
+        "avgTime": 1441.6,
+        "minTime": 1324,
+        "maxTime": 1529,
+        "totalQueries": 5,
+        "failedQueries": 0,
+        "totalTime": 7208
+      }
+    },
+    {
+      "lists": 100,
+      "indexName": "idx_embeddings_vector_bench_100",
+      "results": [
+        {
+          "success": true,
+          "time": 1273,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1119,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1182,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1112,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1293,
+          "results": 10
+        }
+      ],
+      "statistics": {
+        "avgTime": 1195.8,
+        "minTime": 1112,
+        "maxTime": 1293,
+        "totalQueries": 5,
+        "failedQueries": 0,
+        "totalTime": 5979
+      }
+    },
+    {
+      "lists": 200,
+      "indexName": "idx_embeddings_vector_bench_200",
+      "results": [
+        {
+          "success": true,
+          "time": 1127,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1064,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1103,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1204,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1148,
+          "results": 10
+        }
+      ],
+      "statistics": {
+        "avgTime": 1129.2,
+        "minTime": 1064,
+        "maxTime": 1204,
+        "totalQueries": 5,
+        "failedQueries": 0,
+        "totalTime": 5646
+      }
+    },
+    {
+      "lists": 400,
+      "indexName": "idx_embeddings_vector_bench_400",
+      "results": [
+        {
+          "success": true,
+          "time": 1280,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1307,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1411,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1320,
+          "results": 10
+        },
+        {
+          "success": true,
+          "time": 1180,
+          "results": 10
+        }
+      ],
+      "statistics": {
+        "avgTime": 1299.6,
+        "minTime": 1180,
+        "maxTime": 1411,
+        "totalQueries": 5,
+        "failedQueries": 0,
+        "totalTime": 6498
+      }
+    }
+  ],
+  "summary": {
+    "totalConfigurations": 4,
+    "successfulConfigurations": 4,
+    "failedConfigurations": 0,
+    "bestConfiguration": {
+      "lists": 200,
+      "avgTime": 1129.2,
+      "description": "Configuration la plus rapide"
+    },
+    "recommendations": [
+      {
+        "type": "vitesse",
+        "configuration": 200,
+        "avgTime": 1129.2,
+        "description": "Configuration la plus rapide"
+      },
+      {
+        "type": "stabilité",
+        "configuration": 200,
+        "stdDev": 46.67076172508866,
+        "description": "Configuration la plus stable"
+      },
+      {
+        "type": "compromis",
+        "configuration": 200,
+        "compositeScore": 0.006912525051268556,
+        "description": "Meilleur compromis vitesse/stabilité"
+      },
+      {
+        "type": "critère",
+        "configuration": 50,
+        "avgTime": 1441.6,
+        "description": "Respecte le critère < 3s"
+      }
+    ]
+  }
+}

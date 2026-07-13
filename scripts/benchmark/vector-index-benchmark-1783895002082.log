@@ -1,0 +1,51 @@
+
+========================================
+Benchmark de l'Index Vectoriel - ST-402
+Date: 2026-07-12T22:23:22.082Z
+========================================
+
+Configuration:
+- Itérations par config: 5
+- Requêtes de réchauffement: 3
+- Limite de résultats: 10
+- Configurations testées: [50, 100, 200, 400]
+
+[2026-07-12T22:23:22.084Z] 🔍 Démarrage du benchmark pour ST-402
+{}
+
+[2026-07-12T22:23:22.090Z] Tâche 2: Créer le script de benchmark
+{}
+
+[2026-07-12T22:23:22.091Z] ✅ Configuration BENCHMARK_CONFIG validée
+{
+  "listConfigurations": [
+    50,
+    100,
+    200,
+    400
+  ],
+  "testIterations": 5,
+  "queryLimit": 10,
+  "warmupQueries": 3
+}
+
+[2026-07-12T22:23:22.093Z] ❌ ERREUR fatale: [BENCHMARK] SUPABASE_URL non défini
+Solution: Copiez .env.example en .env et configurez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY
+       ou passez les variables en ligne de commande: SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node benchmark-vector-index.js
+{}
+
+[2026-07-12T22:23:22.095Z] Stack: Error: [BENCHMARK] SUPABASE_URL non défini
+Solution: Copiez .env.example en .env et configurez SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY
+       ou passez les variables en ligne de commande: SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node benchmark-vector-index.js
+    at initAdminClient (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:169:11)
+    at runVectorIndexBenchmark (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:610:20)
+    at Object.<anonymous> (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:653:3)
+    at Module._compile (node:internal/modules/cjs/loader:1688:14)
+    at Object..js (node:internal/modules/cjs/loader:1820:10)
+    at Module.load (node:internal/modules/cjs/loader:1423:32)
+    at Function._load (node:internal/modules/cjs/loader:1246:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+{}
+

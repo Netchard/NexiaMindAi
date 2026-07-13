@@ -1,0 +1,47 @@
+
+========================================
+Benchmark de l'Index Vectoriel - ST-402
+Date: 2026-07-12T22:18:12.129Z
+========================================
+
+Configuration:
+- Itérations par config: 5
+- Requêtes de réchauffement: 3
+- Limite de résultats: 10
+- Configurations testées: [50, 100, 200, 400]
+
+[2026-07-12T22:18:12.132Z] 🔍 Démarrage du benchmark pour ST-402
+{}
+
+[2026-07-12T22:18:12.140Z] Tâche 2: Créer le script de benchmark
+{}
+
+[2026-07-12T22:18:12.141Z] ✅ Configuration BENCHMARK_CONFIG validée
+{
+  "listConfigurations": [
+    50,
+    100,
+    200,
+    400
+  ],
+  "testIterations": 5,
+  "queryLimit": 10,
+  "warmupQueries": 3
+}
+
+[2026-07-12T22:18:12.143Z] ❌ ERREUR fatale: [BENCHMARK] SUPABASE_URL non défini
+{}
+
+[2026-07-12T22:18:12.144Z] Stack: Error: [BENCHMARK] SUPABASE_URL non défini
+    at initAdminClient (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:166:11)
+    at runVectorIndexBenchmark (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:604:20)
+    at Object.<anonymous> (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:647:3)
+    at Module._compile (node:internal/modules/cjs/loader:1688:14)
+    at Object..js (node:internal/modules/cjs/loader:1820:10)
+    at Module.load (node:internal/modules/cjs/loader:1423:32)
+    at Function._load (node:internal/modules/cjs/loader:1246:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+{}
+

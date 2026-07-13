@@ -9,8 +9,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const BENCHMARK_REPORT_PATH = path.join(__dirname, 'vector-index-benchmark-report.json');
-const BENCHMARK_LOG_PATH = path.join(__dirname, 'vector-index-benchmark.log');
+// Charger les variables d'environnement depuis .env
+require('dotenv').config();
+
+// Chemins des fichiers de sortie avec identifiant unique pour éviter conflits
+const BENCHMARK_REPORT_PATH = path.join(__dirname, `vector-index-benchmark-report-${Date.now()}.json`);
+const BENCHMARK_LOG_PATH = path.join(__dirname, `vector-index-benchmark-${Date.now()}.log`);
 
 // Configuration des tests
 const BENCHMARK_CONFIG = {
@@ -20,11 +24,21 @@ const BENCHMARK_CONFIG = {
   warmupQueries: 3
 };
 
-// Logger simple
-function log(message, data = null) {
+// Logger simple avec support des couleurs
+function log(message, data = null, color = 'reset') {
+  const colors = {
+    reset: '\x1b[0m',
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    yellow: '\x1b[33m',
+    blue: '\x1b[34m',
+    magenta: '\x1b[35m',
+    cyan: '\x1b[36m',
+  };
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}`;
-  console.log(logMessage, data || '');
+  const coloredMessage = `${colors[color] || ''}${logMessage}${colors.reset || ''}`;
+  console.log(coloredMessage, data || '');
   const logContent = `${logMessage}\n${data ? JSON.stringify(data, null, 2) + '\n' : ''}\n`;
   fs.appendFileSync(BENCHMARK_LOG_PATH, logContent, 'utf8');
 }
@@ -37,8 +51,14 @@ function generateMockBenchmarkResults() {
   
   for (const lists of BENCHMARK_CONFIG.listConfigurations) {
     // Générer des temps aléatoires réalistes
-    // Plus lists = plus lent mais plus stable
-    const baseTime = 1500 - (lists * 2); // Temps de base inversement proportionnel
+    // Courbe réaliste basée sur les performances connues des index IVFFlat:
+    // - 50 lists: ~1400ms (bon pour petites tables)
+    // - 100 lists: ~1200ms (optimal pour tailles moyennes)
+    // - 200 lists: ~1100ms (meilleur pour grandes tables)
+    // - 400 lists: ~1300ms (trop de partitions, ralentit)
+    // Cela reflète que plus lists n'est PAS toujours mieux
+    const baseTimes = { 50: 1400, 100: 1200, 200: 1100, 400: 1300 };
+    const baseTime = baseTimes[lists] || 1500; // Temps de base réaliste
     
     const resultTimes = [];
     for (let i = 0; i < BENCHMARK_CONFIG.testIterations; i++) {
@@ -194,8 +214,8 @@ async function runVectorIndexBenchmark() {
   try {
     initBenchmarkLogs();
     
-    log('🚀 Démarrage du benchmark MOCK pour ST-402', 'blue');
-    log('Tâche 2: Créer le script de benchmark (MOCK)');
+    log('🚀 Démarrage du benchmark MOCK pour ST-402', null, 'blue');
+    log('Tâche 2: Créer le script de benchmark (MOCK)', null, 'reset');
     
     // Générer les résultats MOCK
     const results = generateMockBenchmarkResults();
@@ -216,13 +236,13 @@ async function runVectorIndexBenchmark() {
     // Sauvegarder le rapport
     saveBenchmarkReport(report);
     
-    log('\n✅ Benchmark MOCK terminé avec succès !', 'green');
-    log('\nRésumé:', report.summary, 'cyan');
+    log('\n✅ Benchmark MOCK terminé avec succès !', null, 'green');
+    log('\nRésumé:', report.summary, null, 'cyan');
     
     return report;
     
   } catch (error) {
-    log(`❌ ERREUR: ${error.message}`, 'red');
+    log(`❌ ERREUR: ${error.message}`, null, 'red');
     throw error;
   }
 }

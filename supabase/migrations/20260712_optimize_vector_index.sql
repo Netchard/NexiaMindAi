@@ -70,11 +70,7 @@ BEGIN
       'indexName', current_index.indexname,
       'indexDef', current_index.indexdef,
       'indexType', CASE WHEN current_index.indexdef LIKE '%ivfflat%' THEN 'ivfflat' ELSE 'unknown' END,
-      'lists', CASE 
-        WHEN current_index.indexdef ~ 'lists\\s*=\\s*(\\d+)' THEN 
-          (regexp_matches(current_index.indexdef, 'lists\\s*=\\s*(\\d+)'))[1]::int
-        ELSE NULL 
-      END
+      'lists', substring(current_index.indexdef from 'lists\s*=\s*(\d+)')::int
     );
     
     INSERT INTO vector_index_history (index_name, table_name, old_config, migration_name)
@@ -103,7 +99,11 @@ END $$;
 -- Après exécution de scripts/optimization/determine-optimal-config.js
 -- mettre à jour la valeur ci-dessous avec optimalConfiguration.lists
 
-\set OPTIMAL_LISTS 200  -- ⬅️ CONFIGURATION OPTIMALE (résultat du benchmark)
+-- ⬅️ CONFIGURATION OPTIMALE (résultat du benchmark) : 200
+-- NOTE: `\set` est une méta-commande propre au client psql interactif ; elle
+-- n'est pas comprise par le moteur de migration Supabase (db push / Studio),
+-- qui envoie ce fichier tel quel au serveur Postgres. La valeur est donc
+-- codée en dur ci-dessous (200) plutôt que référencée via :OPTIMAL_LISTS.
 
 -- ============================================================================
 -- ÉTAPE 4: Suppression de l'index existant
@@ -129,10 +129,18 @@ END $$;
 -- ÉTAPE 5: Création de l'index optimisé
 -- ============================================================================
 
-CREATE INDEX idx_embeddings_vector 
-ON public.embeddings 
-USING ivfflat (vector vector_l2_ops) 
-WITH (lists = :OPTIMAL_LISTS);
+-- La construction d'un index ivfflat avec un nombre élevé de listes peut
+-- dépasser le maintenance_work_mem par défaut (souvent 32-64 MB sur Supabase).
+-- On l'augmente pour la durée de la session/migration (GUC user-level, pas
+-- besoin de privilèges superuser).
+SET maintenance_work_mem = '256MB';
+
+CREATE INDEX idx_embeddings_vector
+ON public.embeddings
+USING ivfflat (vector vector_l2_ops)
+WITH (lists = 200);
+
+RESET maintenance_work_mem;
 
 -- ============================================================================
 -- ÉTAPE 6: Vérification de la création
@@ -141,29 +149,29 @@ WITH (lists = :OPTIMAL_LISTS);
 DO $$
 DECLARE
   new_index RECORD;
-  new_config JSONB;
+  v_new_config JSONB;
 BEGIN
-  SELECT indexname, indexdef INTO new_index 
-  FROM pg_indexes 
-  WHERE indexname = 'idx_embeddings_vector' 
+  SELECT indexname, indexdef INTO new_index
+  FROM pg_indexes
+  WHERE indexname = 'idx_embeddings_vector'
   AND tablename = 'embeddings'
   AND schemaname = 'public';
-  
+
   IF new_index IS NOT NULL THEN
-    new_config := jsonb_build_object(
+    v_new_config := jsonb_build_object(
       'indexName', new_index.indexname,
       'indexDef', new_index.indexdef,
       'indexType', CASE WHEN new_index.indexdef LIKE '%ivfflat%' THEN 'ivfflat' ELSE 'unknown' END,
-      'lists', :OPTIMAL_LISTS
+      'lists', 200
     );
-    
-    UPDATE vector_index_history 
-    SET new_config = new_config 
+
+    UPDATE vector_index_history
+    SET new_config = v_new_config
     WHERE migration_name = '20260712_optimize_vector_index'
     AND new_config IS NULL;
-    
+
     RAISE NOTICE '✅ Index idx_embeddings_vector créé avec succès';
-    RAISE NOTICE '   Configuration: lists = :OPTIMAL_LISTS';
+    RAISE NOTICE '   Configuration: lists = %', 200;
     RAISE NOTICE '   Type: ivfflat';
     RAISE NOTICE '   Opérateur: vector_l2_ops';
   ELSE
@@ -179,15 +187,15 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM embeddings LIMIT 1) THEN
     RAISE NOTICE 'Test de l''index avec une requête de similarité...';
-    
+
     -- Utiliser un vrai embedding de la table pour le test
-    PERFORM (
-      SELECT chunk_id, vector <=> (SELECT vector FROM embeddings LIMIT 1) as distance
-      FROM embeddings
-      ORDER BY distance ASC
-      LIMIT 10
-    );
-    
+    -- (PERFORM sans parenthèses : une sous-requête entre parenthèses serait
+    -- traitée comme une expression scalaire, qui exige une seule colonne)
+    PERFORM chunk_id, vector <=> (SELECT vector FROM embeddings LIMIT 1) as distance
+    FROM embeddings
+    ORDER BY distance ASC
+    LIMIT 10;
+
     RAISE NOTICE '✅ Test de requête exécuté avec succès';
     RAISE NOTICE '   L''index est fonctionnel et retourne des résultats';
   ELSE
@@ -205,7 +213,7 @@ Configuration:
 - Type: IVFFlat
 - Opérateur: vector_l2_ops (distance L2 euclidienne)
 - Dimension: 384
-- Lists: :OPTIMAL_LISTS (optimisé par ST-402)
+- Lists: 200 (optimisé par ST-402)
 
 Contexte:
 - Table: public.embeddings
@@ -220,9 +228,9 @@ Projet: NexiaMind AI - Epic 5: Base de Données & Optimisation';
 -- ÉTAPE 9: Résumé
 -- ============================================================================
 
-SELECT 
+SELECT
   'idx_embeddings_vector' as index_name,
-  :OPTIMAL_LISTS as lists,
+  200 as lists,
   'ivfflat' as index_type,
   'vector_l2_ops' as operator,
   'public.embeddings' as table_name,
@@ -239,8 +247,8 @@ SELECT
 --    - Exécuter: DROP INDEX IF EXISTS idx_embeddings_vector;
 --    - Restaurer l'index depuis la sauvegarde dans vector_index_history
 --
--- 3. La valeur :OPTIMAL_LISTS doit être déterminée par l'exécution
---    des scripts de benchmark avant de déployer cette migration
+-- 3. La valeur 200 (lists) a été déterminée par l'exécution des scripts
+--    de benchmark ; mettre à jour la constante ci-dessus si elle change
 --
 -- 4. Pour les environnements de production, tester d'abord sur une
 --    copie de la base de données

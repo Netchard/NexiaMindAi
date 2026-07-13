@@ -1,0 +1,46 @@
+
+========================================
+Benchmark de l'Index Vectoriel - ST-402
+Date: 2026-07-12T22:23:36.289Z
+========================================
+
+Configuration:
+- Itérations par config: 5
+- Requêtes de réchauffement: 3
+- Limite de résultats: 10
+- Configurations testées: [50, 100, 200, 400]
+
+[2026-07-12T22:23:36.291Z] 🔍 Démarrage du benchmark pour ST-402
+{}
+
+[2026-07-12T22:23:36.298Z] Tâche 2: Créer le script de benchmark
+{}
+
+[2026-07-12T22:23:36.299Z] ✅ Configuration BENCHMARK_CONFIG validée
+{
+  "listConfigurations": [
+    50,
+    100,
+    200,
+    400
+  ],
+  "testIterations": 5,
+  "queryLimit": 10,
+  "warmupQueries": 3
+}
+
+[2026-07-12T22:23:36.301Z] Initialisation du client Supabase Admin pour benchmark
+{}
+
+[2026-07-12T22:23:36.348Z] 🔍 Vérification des pré-conditions...
+{}
+
+[2026-07-12T22:23:37.282Z] ❌ ERREUR fatale: Extension pgvector non trouvée. Exécutez: CREATE EXTENSION IF NOT EXISTS vector;
+{}
+
+[2026-07-12T22:23:37.293Z] Stack: Error: Extension pgvector non trouvée. Exécutez: CREATE EXTENSION IF NOT EXISTS vector;
+    at verifyPreconditions (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:104:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runVectorIndexBenchmark (C:\VibeCoding\nexiamind-ai\scripts\benchmark\benchmark-vector-index.js:613:5)
+{}
+
