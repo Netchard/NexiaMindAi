@@ -6,9 +6,13 @@
   "scripts": {
     "benchmark": "node benchmark-vector-index.js",
     "benchmark:mock": "node benchmark-vector-index.mock.js",
+    "benchmark:cache": "node cache-benchmark.js",
+    "benchmark:cache:mock": "node cache-benchmark.mock.js",
     "test": "jest benchmark-vector-index.test.js --detectOpenHandles",
     "test:watch": "jest benchmark-vector-index.test.js --watch",
-    "test:coverage": "jest benchmark-vector-index.test.js --coverage"
+    "test:coverage": "jest benchmark-vector-index.test.js --coverage",
+    "test:cache": "jest __tests__/cache-benchmark.test.js --detectOpenHandles",
+    "test:cache:watch": "jest __tests__/cache-benchmark.test.js --watch"
   },
   "keywords": [
     "supabase",

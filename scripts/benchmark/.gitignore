@@ -1,0 +1,29 @@
+# Ignorer les fichiers de log et de rapport générés par les benchmarks
+embedding-cache-benchmark-*.json
+embedding-cache-benchmark-*.log
+
+# Ignorer les node_modules locaux (s'il y en a)
+node_modules/
+
+# Ignorer les fichiers temporaires
+*.tmp
+*.temp
+
+# Ignorer les fichiers de couverture de test
+coverage/
+
+# Ignorer les fichiers IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignorer les fichiers de dépendances
+package-lock.json
+
+# Ignorer les fichiers de build
+dist/
+build/
+
+# Ignorer les fichiers de cache
+.cache/
