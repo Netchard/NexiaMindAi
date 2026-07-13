@@ -4,7 +4,7 @@
  * Phase GREEN: Implémentation du service Redis
  */
 
-import { createClient, RedisClientType } from '@upstash/redis';
+import { Redis } from '@upstash/redis';
 
 /**
  * Configuration Redis
@@ -27,7 +27,7 @@ export interface SetOptions {
  * Client Redis avec retry logic
  */
 export class RedisCache {
-  private client: RedisClientType | null = null;
+  private client: Redis | null = null;
   private config: RedisConfig;
   private isConnected: boolean = false;
   private isConnecting: boolean = false;
@@ -52,6 +52,8 @@ export class RedisCache {
     
     if (!this.config.url || !this.config.token) {
       console.warn('RedisCache: UPSTASH_REDIS_REST_URL ou UPSTASH_REDIS_REST_TOKEN non configuré. Le cache Redis sera désactivé.');
+    } else if (process.env.NODE_ENV === 'production' && !this.config.url.startsWith('https://')) {
+      console.warn('RedisCache: URL Redis doit utiliser HTTPS en production pour des raisons de sécurité.');
     }
   }
 
@@ -65,25 +67,48 @@ export class RedisCache {
       return;
     }
     
+    // Early return si pas de configuration - évite 10s de retry inutiles
+    if (!this.config.url || !this.config.token) {
+      this.isConnected = false;
+      this.isConnecting = false;
+      console.warn('RedisCache: Impossible de se connecter - URL ou token non configuré.');
+      return;
+    }
+    
     if (this.isConnecting) {
       // Attendre qu'une connexion en cours se termine
       while (this.isConnecting) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      return;
+      // Après attente, vérifier si la connexion a réussi
+      if (this.isConnected) {
+        return;
+      }
+      // Si isConnecting est false mais isConnected est false, c'est qu'il y a eu un échec
+      // On relance une tentative
     }
     
     this.isConnecting = true;
     
     const attempts = maxRetries || this.config.maxRetries || RedisCache.MAX_RETRIES;
     const interval = retryInterval || this.config.retryInterval || RedisCache.RETRY_INTERVAL;
+    const timeoutMs = attempts * interval + 5000; // Timeout total: tentatives * intervalle + buffer
+    const startTime = Date.now();
     
     let lastError: Error | null = null;
     
     for (let attempt = 1; attempt <= attempts; attempt++) {
+      // Vérifier timeout global
+      if (Date.now() - startTime > timeoutMs) {
+        this.isConnected = false;
+        this.isConnecting = false;
+        this.client = null;
+        throw new Error(`RedisCache: Timeout de connexion dépassé (${timeoutMs}ms)`);
+      }
+      
       try {
         // Créer le client Upstash Redis
-        this.client = createClient({
+        this.client = new Redis({
           url: this.config.url,
           token: this.config.token,
         });
@@ -131,8 +156,10 @@ export class RedisCache {
         // mais on peut réinitialiser le client
         this.client = null;
         this.isConnected = false;
+        this.isConnecting = false;
         console.info('RedisCache: Déconnecté');
       } catch (error) {
+        this.isConnecting = false;
         console.error('RedisCache: Erreur lors de la déconnexion', {
           error: error instanceof Error ? error.message : String(error),
         });
@@ -254,6 +281,7 @@ export class RedisCache {
   /**
    * Supprimer toutes les clés du cache (pour les tests)
    * Attention: Cette opération peut être lente sur de grandes bases de données
+   * Utilise le chunking pour éviter de dépasser les limites de payload Upstash
    */
   async clear(): Promise<void> {
     if (!this.isReady()) {
@@ -266,15 +294,25 @@ export class RedisCache {
       const pattern = `${RedisCache.EMBEDDING_PREFIX}*`;
       const keys = await this.client!.keys(pattern);
       
-      if (keys.length > 0) {
-        // Supprimer toutes les clés en une seule opération
-        await this.client!.del(...keys);
-        console.info('RedisCache: Cache vidé', {
-          keysRemoved: keys.length,
-        });
-      } else {
+      if (keys.length === 0) {
         console.info('RedisCache: Aucune clé à supprimer');
+        return;
       }
+      
+      // Chunking: supprimer par lots de 100 clés pour éviter overflow
+      const CHUNK_SIZE = 100;
+      let totalRemoved = 0;
+      
+      for (let i = 0; i < keys.length; i += CHUNK_SIZE) {
+        const chunk = keys.slice(i, i + CHUNK_SIZE);
+        await this.client!.del(...chunk);
+        totalRemoved += chunk.length;
+        console.info(`RedisCache: Suppression de ${chunk.length} clés (total: ${totalRemoved}/${keys.length})`);
+      }
+      
+      console.info('RedisCache: Cache vidé', {
+        keysRemoved: totalRemoved,
+      });
     } catch (error) {
       console.error('RedisCache: Erreur lors du vidage du cache', {
         error: error instanceof Error ? error.message : String(error),
@@ -299,7 +337,7 @@ export class RedisCache {
   /**
    * Obtenir le client Redis (pour usage avancé)
    */
-  getClient(): RedisClientType | null {
+  getClient(): Redis | null {
     return this.client;
   }
 

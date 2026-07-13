@@ -1,10 +1,17 @@
 /**
  * Service d'embeddings pour le pipeline RAG
  * Génère des vecteurs via l'API Mistral Embeddings
+ * Utilise un cache hiérarchique : Redis -> In-Memory Map
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { createHash } from 'crypto';
 import { Chunk } from './types';
+import {
+  RedisEmbeddingCache,
+  getEmbeddingCache,
+  generateEmbeddingCacheKey,
+} from '../cache/embeddingCache';
 // Utilise console au lieu de logger (winston) pour éviter les problèmes
 // avec fs dans Next.js 16 + Turbopack
 
@@ -79,15 +86,31 @@ export interface MistralApiError {
 export class EmbeddingService {
   private client: AxiosInstance;
   private config: MistralConfig;
-  private cache: Map<string, EmbeddingResult>;
-  private cacheTTL: number; // en millisecondes
+  private redisEmbeddingCache: RedisEmbeddingCache;
+  private useCache: boolean;
+  
+  // Métriques de cache
+  private cacheHits: number = 0;
+  private cacheMisses: number = 0;
+  private apiCalls: number = 0;
+  
+  // Cache in-memory comme fallback (optionnel)
+  private inMemoryCache: Map<string, EmbeddingResult> | null = null;
+  private inMemoryTTL: number; // en millisecondes
 
   /**
    * Créer une nouvelle instance du EmbeddingService
    * @param config Configuration de l'API Mistral
-   * @param cacheTTL Durée de vie du cache en millisecondes (défaut: 1 heure)
+   * @param options Options supplémentaires
    */
-  constructor(config: Partial<MistralConfig> = {}, cacheTTL: number = 3600000) {
+  constructor(
+    config: Partial<MistralConfig> = {},
+    options: {
+      cacheTTL?: number;
+      useCache?: boolean;
+      useInMemoryFallback?: boolean;
+    } = {}
+  ) {
     this.config = {
       apiKey: process.env.MISTRAL_API_KEY || config.apiKey || '',
       baseUrl: config.baseUrl || process.env.MISTRAL_API_BASE_URL || 'https://api.mistral.ai/v1/',
@@ -105,8 +128,21 @@ export class EmbeddingService {
       );
     }
 
-    this.cache = new Map();
-    this.cacheTTL = cacheTTL;
+    this.useCache = options.useCache ?? true;
+    this.inMemoryTTL = options.cacheTTL ?? 3600000; // 1 heure par défaut
+    this.redisEmbeddingCache = getEmbeddingCache();
+    
+    // Activer le cache in-memory comme fallback si souhaité
+    if (options.useInMemoryFallback ?? true) {
+      this.inMemoryCache = new Map();
+    }
+
+    // Initialiser le cache Redis (ne bloque pas si Redis n'est pas disponible)
+    this.redisEmbeddingCache.initialize().catch((error) => {
+      console.warn('EmbeddingService: Redis non disponible, utilisation du cache in-memory seulement', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
 
     // Créer le client Axios
     this.client = axios.create({
@@ -123,7 +159,7 @@ export class EmbeddingService {
       baseUrl: this.config.baseUrl,
       apiKeyDefined: !!this.config.apiKey,
       apiKeyLength: this.config.apiKey.length,
-      cacheTTL: `${this.cacheTTL / 1000 / 60} minutes`,
+      cacheTTL: `${this.inMemoryTTL / 1000 / 60} minutes`,
     });
   }
 
@@ -143,31 +179,36 @@ export class EmbeddingService {
       throw new EmbeddingError('Texte vide fourni', 400, 'empty_text', false);
     }
 
-    // Vérifier le cache
+    // Vérifier le cache (async maintenant)
     if (options.useCache) {
-      const cached = this.getFromCache(text);
+      const cached = await this.getFromCache(text);
       if (cached) {
         console.info('Embedding récupéré depuis le cache', {
           textLength: text.length,
           processingTime: `${Date.now() - startTime}ms`,
+          cacheHits: this.cacheHits,
         });
         return cached;
       }
     }
 
     try {
+      // Incrémenter le compteur d'appels API
+      this.apiCalls++;
+      
       const response = await this.callMistralApi(text);
       const embedding = this.formatResponse(response, text);
 
-      // Mettre en cache
+      // Mettre en cache (async maintenant)
       if (options.useCache) {
-        this.addToCache(text, embedding);
+        await this.addToCache(text, embedding);
       }
 
       console.info('Embedding généré avec succès', {
         textLength: text.length,
         embeddingLength: embedding.embedding.length,
         processingTime: `${Date.now() - startTime}ms`,
+        apiCalls: this.apiCalls,
       });
 
       return embedding;
@@ -177,6 +218,7 @@ export class EmbeddingService {
         error: embeddingError.message,
         errorType: embeddingError.errorType,
         textLength: text.length,
+        apiCalls: this.apiCalls,
       });
       throw embeddingError;
     }
@@ -212,13 +254,20 @@ export class EmbeddingService {
     for (let i = 0; i < validTexts.length; i += batchSize) {
       const batch = validTexts.slice(i, i + batchSize);
       
-      // Vérifier le cache pour chaque texte du batch
+      // Vérifier le cache pour chaque texte du batch (async)
       const batchFromCache: EmbeddingResult[] = [];
       const textsToProcess: string[] = [];
       const cacheIndices: number[] = [];
 
+      // Exécuter toutes les vérifications de cache en parallèle
+      const cachePromises = batch.map(async (text) => {
+        return options.useCache ? await this.getFromCache(text) : null;
+      });
+      
+      const cachedResults = await Promise.all(cachePromises);
+      
       for (let j = 0; j < batch.length; j++) {
-        const cached = options.useCache ? this.getFromCache(batch[j]) : null;
+        const cached = cachedResults[j];
         if (cached) {
           batchFromCache.push(cached);
           cacheIndices.push(j + i);
@@ -243,12 +292,19 @@ export class EmbeddingService {
             const index = i + textsToProcess.indexOf(textsToProcess[j]);
             embeddings[index] = batchResults[j];
             totalTokens += batchResults[j].tokenCount || 0;
-
-            // Mettre en cache
-            if (options.useCache) {
-              this.addToCache(textsToProcess[j], batchResults[j]);
-            }
           }
+          
+          // Mettre en cache tous les nouveaux résultats en parallèle
+          if (options.useCache) {
+            await Promise.all(
+              batchResults.map((result, j) => {
+                return this.addToCache(textsToProcess[j], result);
+              })
+            );
+          }
+          
+          // Incrémenter le compteur d'appels API (1 appel par batch)
+          this.apiCalls++;
         } catch (error: unknown) {
           const embeddingError = this.handleApiError(error);
           console.error(`Échec de la génération batch d\'embeddings ${embeddingError.message}`, {
@@ -535,79 +591,162 @@ export class EmbeddingService {
 
   /**
    * Ajouter un embedding au cache
+   * Stocke dans Redis ET in-memory (fallback)
    * @param text Texte original
    * @param result Résultat à cache
    */
-  private addToCache(text: string, result: EmbeddingResult): void {
-    const key = this.generateCacheKey(text);
-    this.cache.set(key, {
-      ...result,
-      cachedAt: Date.now(),
-    });
+  private async addToCache(text: string, result: EmbeddingResult): Promise<void> {
+    if (!this.useCache) {
+      return;
+    }
 
-    console.info('Embedding mis en cache', {
-      cacheKey: key.substring(0, 20) + '...',
-      cacheSize: this.cache.size,
-    });
+    try {
+      // Essayer de stocker dans Redis d'abord
+      await this.redisEmbeddingCache.setEmbedding(text, result);
+      
+      console.info('Embedding mis en cache (Redis)', {
+        textPreview: text.substring(0, 20) + '...',
+      });
+    } catch (redisError) {
+      // Si Redis échoue, stocker dans in-memory
+      console.warn('EmbeddingService: Échec de l\'écriture dans Redis, fallback vers in-memory', {
+        error: redisError instanceof Error ? redisError.message : String(redisError),
+      });
+      
+      if (this.inMemoryCache) {
+        const key = this.generateCacheKey(text);
+        this.inMemoryCache.set(key, {
+          ...result,
+          cachedAt: Date.now(),
+        });
+        
+        console.info('Embedding mis en cache (In-Memory)', {
+          cacheKey: key.substring(0, 20) + '...',
+          cacheSize: this.inMemoryCache.size,
+        });
+      }
+    }
   }
 
   /**
    * Récupérer un embedding depuis le cache
+   * Implémente la stratégie hiérarchique : Redis -> In-Memory -> null
    * @param text Texte original
    * @returns Résultat cache ou null
    */
-  private getFromCache(text: string): EmbeddingResult | null {
-    const key = this.generateCacheKey(text);
-    const cached = this.cache.get(key);
-
-    if (!cached) {
+  private async getFromCache(text: string): Promise<EmbeddingResult | null> {
+    if (!this.useCache) {
       return null;
     }
 
-    // Vérifier si le cache a expiré
-    const age = Date.now() - (cached.cachedAt || Date.now());
-    if (age > this.cacheTTL) {
-      this.cache.delete(key);
+    try {
+      // Essayer Redis d'abord
+      const startTime = Date.now();
+      const result = await this.redisEmbeddingCache.getEmbedding(text);
+      
+      if (result) {
+        this.cacheHits++;
+        console.info('Embedding récupéré depuis le cache (Redis)', {
+          textPreview: text.substring(0, 20) + '...',
+          duration: `${Date.now() - startTime}ms`,
+          cacheHits: this.cacheHits,
+        });
+        return result;
+      }
+      
+      // Essayer in-memory si Redis n'a rien trouvé
+      if (this.inMemoryCache) {
+        const key = this.generateCacheKey(text);
+        const cached = this.inMemoryCache.get(key);
+
+        if (cached) {
+          // Vérifier si le cache a expiré
+          const age = Date.now() - (cached.cachedAt || Date.now());
+          if (age <= this.inMemoryTTL) {
+            this.cacheHits++;
+            console.info('Embedding récupéré depuis le cache (In-Memory)', {
+              textPreview: text.substring(0, 20) + '...',
+              duration: `${Date.now() - startTime}ms`,
+              cacheHits: this.cacheHits,
+            });
+            
+            // Retourner une copie sans la date de cache
+            const { cachedAt, ...result } = cached;
+            return result;
+          } else {
+            // Cache expiré, supprimer
+            this.inMemoryCache.delete(key);
+          }
+        }
+      }
+      
+      // Rien trouvé dans le cache
+      this.cacheMisses++;
+      console.info('Cache miss pour embedding', {
+        textPreview: text.substring(0, 20) + '...',
+        cacheMisses: this.cacheMisses,
+      });
+      
+      return null;
+    } catch (error) {
+      console.error('EmbeddingService: Erreur lors de la récupération depuis le cache', {
+        error: error instanceof Error ? error.message : String(error),
+        textPreview: text.substring(0, 20) + '...',
+      });
       return null;
     }
-
-    // Retourner une copie sans la date de cache
-    const { cachedAt, ...result } = cached;
-    return result;
   }
 
   /**
-   * Générer une clé de cache
+   * Générer une clé de cache avec SHA-256
    * @param text Texte à hash
-   * @returns Clé de cache
+   * @returns Clé de cache (hash SHA-256)
    */
   private generateCacheKey(text: string): string {
-    // Simple hash pour la démonstration
-    // En production, utiliser un vrai hash comme SHA-256
-    let hash = 0;
-    for (let i = 0; i < text.length; i++) {
-      const char = text.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convertir en 32 bits
-    }
-    return `embed-${hash}`;
+    return generateEmbeddingCacheKey(text);
   }
 
   /**
    * Vider le cache
    */
-  clearCache(): void {
-    this.cache.clear();
+  async clearCache(): Promise<void> {
+    await this.redisEmbeddingCache.clear();
+    if (this.inMemoryCache) {
+      this.inMemoryCache.clear();
+    }
+    
+    // Réinitialiser les métriques
+    this.cacheHits = 0;
+    this.cacheMisses = 0;
+    this.apiCalls = 0;
+    
     console.info('Cache des embeddings vidé');
   }
 
   /**
    * Obtenir les statistiques du cache
    */
-  getCacheStats(): { size: number; ttl: number } {
+  getCacheStats(): {
+    size: number;
+    ttl: number;
+    hits: number;
+    misses: number;
+    hitRate: number;
+    apiCalls: number;
+  } {
+    const redisStats = this.redisEmbeddingCache.getStats();
+    const inMemorySize = this.inMemoryCache ? this.inMemoryCache.size : 0;
+    const totalSize = inMemorySize + (this.redisEmbeddingCache.isRedisReady() ? 1 : 0);
+    const totalRequests = this.cacheHits + this.cacheMisses;
+    const hitRate = totalRequests > 0 ? (this.cacheHits / totalRequests) * 100 : 0;
+    
     return {
-      size: this.cache.size,
-      ttl: this.cacheTTL,
+      size: totalSize,
+      ttl: this.inMemoryTTL,
+      hits: this.cacheHits,
+      misses: this.cacheMisses,
+      hitRate,
+      apiCalls: this.apiCalls,
     };
   }
 

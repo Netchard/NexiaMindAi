@@ -52,10 +52,14 @@ export interface EmbeddingCacheStats {
  */
 export class RedisEmbeddingCache {
   private redisCache: RedisCache;
-  private inMemoryCache: Map<string, EmbeddingResult>;
+  private inMemoryCache: Map<string, CachedEmbeddingResult>;
   private inMemoryTTL: number; // en millisecondes
   private useRedis: boolean;
   private useInMemory: boolean;
+  private reconnectionAttempts: number = 0;
+  private static readonly MAX_RECONNECTION_ATTEMPTS = 5;
+  private static readonly RECONNECTION_INTERVAL_MS = 30000; // 30 secondes
+  private lastReconnectionTime: number = 0;
   
   // Métriques
   private hits: number = 0;
@@ -66,7 +70,7 @@ export class RedisEmbeddingCache {
   
   // Constantes
   private static readonly DEFAULT_TTL_SECONDS = 3600; // 1 heure
-  private static readonly TTL_MS = RedisEmbeddingCache.DEFAULT_TTL_SECONDS * 1000;
+  private static readonly MAX_IN_MEMORY_SIZE = 1000; // Limite à 1000 entrées
   
   /**
    * Créer une nouvelle instance RedisEmbeddingCache
@@ -81,7 +85,7 @@ export class RedisEmbeddingCache {
     this.useInMemory = options.useInMemory ?? true;
     this.inMemoryTTL = (options.ttlSeconds ?? RedisEmbeddingCache.DEFAULT_TTL_SECONDS) * 1000;
     
-    this.redisCache = getRedisCache();
+    this.redisCache = new RedisCache();
     this.inMemoryCache = new Map();
     
     console.info('RedisEmbeddingCache: Initialisé', {
@@ -99,12 +103,51 @@ export class RedisEmbeddingCache {
       try {
         await this.redisCache.connect();
         console.info('RedisEmbeddingCache: Connexion Redis établie');
+        this.reconnectionAttempts = 0;
+        this.lastReconnectionTime = Date.now();
       } catch (error) {
         console.warn('RedisEmbeddingCache: Échec de la connexion Redis. Utilisation du cache in-memory seulement.', {
           error: error instanceof Error ? error.message : String(error),
         });
-        this.useRedis = false;
+        // Ne pas désactiver définitivement Redis, permettre les reconnexions
+        // this.useRedis = false; // Supprimé pour permettre les reconnexions
       }
+    }
+  }
+
+  /**
+   * Tentative de reconnexion Redis
+   */
+  private async attemptReconnection(): Promise<boolean> {
+    // Vérifier si on a dépassé le nombre max de tentatives
+    if (this.reconnectionAttempts >= RedisEmbeddingCache.MAX_RECONNECTION_ATTEMPTS) {
+      console.warn('RedisEmbeddingCache: Nombre max de tentatives de reconnexion atteint. Utilisation du cache in-memory seulement.');
+      this.useRedis = false;
+      return false;
+    }
+    
+    // Vérifier l'intervalle de temps depuis la dernière tentative
+    const timeSinceLastAttempt = Date.now() - this.lastReconnectionTime;
+    if (timeSinceLastAttempt < RedisEmbeddingCache.RECONNECTION_INTERVAL_MS) {
+      console.warn(`RedisEmbeddingCache: Trop tôt pour une reconnexion (attendre ${RedisEmbeddingCache.RECONNECTION_INTERVAL_MS - timeSinceLastAttempt}ms).`);
+      return false;
+    }
+    
+    try {
+      this.reconnectionAttempts++;
+      this.lastReconnectionTime = Date.now();
+      console.info(`RedisEmbeddingCache: Tentative de reconnexion Redis (#${this.reconnectionAttempts})...`);
+      
+      await this.redisCache.connect();
+      console.info('RedisEmbeddingCache: Reconnecté à Redis avec succès');
+      this.reconnectionAttempts = 0;
+      return true;
+    } catch (error) {
+      console.warn('RedisEmbeddingCache: Échec de la reconnexion Redis', {
+        error: error instanceof Error ? error.message : String(error),
+        attempt: this.reconnectionAttempts,
+      });
+      return false;
     }
   }
 
@@ -121,20 +164,41 @@ export class RedisEmbeddingCache {
     
     try {
       // Stratégie 1: Essayer Redis d'abord
-      if (this.useRedis && this.redisCache.isReady()) {
+      if (this.useRedis) {
         try {
-          const cached = await this.redisCache.get(fullKey);
-          if (cached) {
-            const result: EmbeddingResult = JSON.parse(cached);
-            this.hits++;
-            this.hitTimes.push(Date.now() - startTime);
-            
-            console.info('RedisEmbeddingCache: Cache hit (Redis)', {
-              textPreview: text.substring(0, 50) + '...',
-              duration: `${Date.now() - startTime}ms`,
-            });
-            
-            return result;
+          // Si Redis n'est pas prêt, tenter une reconnexion
+          if (!this.redisCache.isReady()) {
+            const reconnected = await this.attemptReconnection();
+            if (!reconnected && !this.redisCache.isReady()) {
+              // Fallback vers in-memory
+              console.warn('RedisEmbeddingCache: Redis non disponible, fallback vers in-memory');
+            }
+          }
+          
+          if (this.redisCache.isReady()) {
+            const cached = await this.redisCache.get(fullKey);
+            if (cached) {
+              try {
+                const result: EmbeddingResult = JSON.parse(cached);
+                this.hits++;
+                this.hitTimes.push(Date.now() - startTime);
+                
+                console.info('RedisEmbeddingCache: Cache hit (Redis)', {
+                  cacheKey: cacheKey.substring(0, 20) + '...',
+                  duration: `${Date.now() - startTime}ms`,
+                });
+                
+                return result;
+              } catch (parseError) {
+                // JSON corrompu - supprimer la clé et logger
+                console.error('RedisEmbeddingCache: Entrée Redis corrompue, suppression de la clé', {
+                  cacheKey: cacheKey.substring(0, 20) + '...',
+                  error: parseError instanceof Error ? parseError.message : String(parseError),
+                });
+                await this.redisCache.del(fullKey);
+                // Continuer avec in-memory
+              }
+            }
           }
         } catch (redisError) {
           // Si Redis échoue, continuer avec in-memory
@@ -149,18 +213,18 @@ export class RedisEmbeddingCache {
         const cached = this.inMemoryCache.get(cacheKey);
         if (cached) {
           // Vérifier le TTL
-          const age = Date.now() - (cached.cachedAt || Date.now());
+          const age = Date.now() - (cached.cachedAt ?? Date.now());
           if (age <= this.inMemoryTTL) {
             this.hits++;
             this.hitTimes.push(Date.now() - startTime);
             
             console.info('RedisEmbeddingCache: Cache hit (In-Memory)', {
-              textPreview: text.substring(0, 50) + '...',
+              cacheKey: cacheKey.substring(0, 20) + '...',
               duration: `${Date.now() - startTime}ms`,
             });
             
-            // Retourner sans cachedAt
-            const { cachedAt, ...result } = cached;
+            // Retourner sans cachedAt et cacheKey (champs internes)
+            const { cachedAt, cacheKey: storedCacheKey, ...result } = cached;
             return result;
           } else {
             // Cache expiré, supprimer
@@ -174,7 +238,7 @@ export class RedisEmbeddingCache {
       this.missTimes.push(Date.now() - startTime);
       
       console.info('RedisEmbeddingCache: Cache miss', {
-        textPreview: text.substring(0, 50) + '...',
+        cacheKey: cacheKey.substring(0, 20) + '...',
         duration: `${Date.now() - startTime}ms`,
       });
       
@@ -182,7 +246,6 @@ export class RedisEmbeddingCache {
     } catch (error) {
       console.error('RedisEmbeddingCache: Erreur lors de la récupération depuis le cache', {
         error: error instanceof Error ? error.message : String(error),
-        textPreview: text.substring(0, 50) + '...',
       });
       return null;
     }
@@ -201,9 +264,19 @@ export class RedisEmbeddingCache {
     
     // Stocker dans in-memory
     if (this.useInMemory) {
+      // Appliquer la limite de taille LRU simple : supprimer la première entrée si la limite est atteinte
+      if (this.inMemoryCache.size >= RedisEmbeddingCache.MAX_IN_MEMORY_SIZE) {
+        const firstKey = this.inMemoryCache.keys().next().value;
+        if (firstKey) {
+          this.inMemoryCache.delete(firstKey);
+          console.warn('RedisEmbeddingCache: Limite du cache in-memory atteinte, suppression de la plus ancienne entrée');
+        }
+      }
+      
       this.inMemoryCache.set(cacheKey, {
         ...result,
         cachedAt: Date.now(),
+        cacheKey,
       });
       
       console.info('RedisEmbeddingCache: Embedding stocké en in-memory', {
@@ -269,8 +342,11 @@ export class RedisEmbeddingCache {
       try {
         const exists = await this.redisCache.exists(fullKey);
         if (exists) return true;
-      } catch {
+      } catch (redisError) {
         // Si Redis échoue, vérifier in-memory
+        console.warn('RedisEmbeddingCache: Erreur lors de la vérification Redis dans hasEmbedding', {
+          error: redisError instanceof Error ? redisError.message : String(redisError),
+        });
       }
     }
     
@@ -278,7 +354,7 @@ export class RedisEmbeddingCache {
     if (this.useInMemory) {
       const cached = this.inMemoryCache.get(cacheKey);
       if (cached) {
-        const age = Date.now() - (cached.cachedAt || Date.now());
+        const age = Date.now() - (cached.cachedAt ?? Date.now());
         return age <= this.inMemoryTTL;
       }
     }
@@ -395,9 +471,9 @@ export function getEmbeddingCache(): RedisEmbeddingCache {
 /**
  * Réinitialiser l'instance singleton (pour les tests)
  */
-export function resetEmbeddingCache(): void {
+export async function resetEmbeddingCache(): Promise<void> {
   if (embeddingCacheInstance) {
-    embeddingCacheInstance.clear().catch(() => {});
+    await embeddingCacheInstance.clear();
   }
   embeddingCacheInstance = null;
   resetRedisCache();
