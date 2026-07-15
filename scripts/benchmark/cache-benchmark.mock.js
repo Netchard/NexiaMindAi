@@ -47,7 +47,7 @@ function log(message, data = null, color = 'reset') {
   try {
     fs.appendFileSync(BENCHMARK_LOG_PATH, logContent, 'utf8');
   } catch (e) {
-    // Silencieux
+    console.error(`[log] Échec de l'écriture du fichier de log ${BENCHMARK_LOG_PATH}: ${e.message}`);
   }
 }
 

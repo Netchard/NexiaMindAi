@@ -1,0 +1,5 @@
+# Ignore all SQL backup files
+*.sql
+
+# Ignore log files
+*.log

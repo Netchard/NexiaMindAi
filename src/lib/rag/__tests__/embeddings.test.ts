@@ -54,11 +54,18 @@ import {
   EmbeddingError
 } from '../embeddings';
 import { Chunk } from '../types';
+import { resetEmbeddingCache } from '../../cache';
 
 describe('EmbeddingService', () => {
   let service: EmbeddingService;
 
   beforeEach(() => {
+    // EmbeddingService partage un cache Redis/in-memory global en singleton (décision
+    // de revue ST-403) : le réinitialiser avant chaque test pour garantir l'isolation,
+    // sans quoi un embedding mis en cache par un test précédent (même texte 'test',
+    // dimensions différentes) fuiterait vers les tests suivants.
+    resetEmbeddingCache();
+
     // Configurer avec une clé API mock
     process.env.MISTRAL_API_KEY = 'test-api-key';
     service = new EmbeddingService();
@@ -132,8 +139,8 @@ describe('EmbeddingService', () => {
       });
     });
 
-    it('devrait vider le cache', () => {
-      service.clearCache();
+    it('devrait vider le cache', async () => {
+      await service.clearCache();
       expect(service.getCacheStats().size).toBe(0);
     });
 

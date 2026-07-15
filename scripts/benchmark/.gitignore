@@ -18,9 +18,6 @@ coverage/
 *.swp
 *.swo
 
-# Ignorer les fichiers de dépendances
-package-lock.json
-
 # Ignorer les fichiers de build
 dist/
 build/

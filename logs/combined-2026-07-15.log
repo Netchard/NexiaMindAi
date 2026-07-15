@@ -1,0 +1,11 @@
+{"authCheckMs":167,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-15 11:06:00","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":136,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/filters","timestamp":"2026-07-15 11:06:02","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":234,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-15 11:06:02","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-15 11:06:02"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"361ms","timestamp":"2026-07-15 11:06:02","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":108,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/history","timestamp":"2026-07-15 11:06:03","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationId":"toutes","level":"info","limit":50,"message":"Récupération de l'historique pour ed7b0383-e808-4883-8ab2-c892d53bedfd","offset":0,"timestamp":"2026-07-15 11:06:03"}
+{"authCheckMs":144,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-15 11:06:03","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"conversationCount":3,"level":"info","message":"Historique récupéré avec succès","processingTime":"392ms","timestamp":"2026-07-15 11:06:03","total":3,"userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":95,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-15 11:06:03","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}
+{"authCheckMs":114,"level":"info","message":"API_REQUEST","method":"GET","path":"/api/chat/messages","timestamp":"2026-07-15 11:06:06","userId":"ed7b0383-e808-4883-8ab2-c892d53bedfd"}

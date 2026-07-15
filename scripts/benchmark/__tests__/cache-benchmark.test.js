@@ -12,6 +12,19 @@ const path = require('path');
 // Chemins des fichiers
 const BENCHMARK_SCRIPT_PATH = path.join(__dirname, '..', 'cache-benchmark.js');
 const BENCHMARK_MOCK_PATH = path.join(__dirname, '..', 'cache-benchmark.mock.js');
+const BENCHMARK_DIR = path.join(__dirname, '..');
+
+// Ces tests exécutent generateReport()/runCacheBenchmark(), qui écrivent de vrais
+// fichiers de rapport/log sur disque (embedding-cache-benchmark-*.json/.log). On les
+// nettoie après la suite pour éviter une accumulation illimitée sur dev/CI.
+afterAll(() => {
+  const files = fs.readdirSync(BENCHMARK_DIR);
+  for (const file of files) {
+    if (/^embedding-cache-benchmark-(report-)?\d+\.(json|log)$/.test(file)) {
+      fs.unlinkSync(path.join(BENCHMARK_DIR, file));
+    }
+  }
+});
 
 /**
  * GREEN PHASE: Tester le script cache-benchmark.js
@@ -168,7 +181,8 @@ describe('GREEN PHASE: Fonction generateTestData', () => {
     const testData = benchmarkModule.generateTestData();
     
     testData.uniqueTexts.forEach(text => {
-      expect(text.length).toBeCloseTo(100, -50); // entre 50 et 100 caractères
+      expect(text.length).toBeGreaterThanOrEqual(50);
+      expect(text.length).toBeLessThanOrEqual(100);
     });
   });
 });
@@ -212,7 +226,7 @@ describe('GREEN PHASE: Fonction measurePerformance', () => {
     
     // Les cache hits devraient être > 0 pour les requêtes répétées avec cache
     expect(result.repeatedRequests.cacheHits).toBeGreaterThan(0);
-  }, 30000); // Timeout de 30s pour ce test
+  }, 60000); // Timeout de 60s : 100 requêtes uniques avec un délai simulé de 200-500ms chacune
 });
 
 /**

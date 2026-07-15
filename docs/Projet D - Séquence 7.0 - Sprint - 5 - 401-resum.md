@@ -638,3 +638,57 @@ Fichiers modifiés :
 supabase/rls-policies.sql — réécrit : wrapper transactionnel, DROP POLICY IF EXISTS partout, trigger anti-escalade de rôle, correction NEW.conversation_id, fermeture de la faille d'accès par défaut sur chunks/embeddings, sync_logs INSERT restreint aux admins, dédoublonnage des politiques admin, hardening get_user_role()
 supabase/tests/rls-security-tests.sql — réécrit : simulation réelle de auth.uid() par rôle, UUID fixes pour l'idempotence, colonnes sync_logs corrigées, opérateur jsonb ? corrigé
 Story et sprint-status.yaml synchronisés sur done
+
+✅ **Tag ST-401 créé avec succès !**
+
+---
+
+## **Résumé Final**
+
+### **Actions Réalisées**
+
+| Action | Élément | Commit/Tag | Statut |
+|--------|---------|------------|--------|
+| 📝 **Story Créée** | ST-402: Optimiser l'Index Vectoriel | `c3c327b` | ✅ ready-for-dev |
+| 🏷️ **Tag Créé** | ST-401: Configurer RLS | `st-401-done` (sur `39bb301`) | ✅ DONE |
+| 📊 **Sprint Mise à Jour** | sprint-status.yaml | `c3c327b` | ✅ 5-402: ready-for-dev |
+
+---
+
+## **Détails du Tag ST-401**
+
+```
+Tag: st-401-done
+Commit: 39bb301 (fix(ST-401): Correction dimension vectorielle - 384 au lieu de 8)
+Message: ST-401: Configurer les Politiques de Sécurité (RLS) - DONE
+
+- Toutes les politiques RLS configurées sur les tables
+- Dimension vectorielle corrigée: 384
+- Tests de sécurité validés
+- Documentation complète
+```
+
+---
+
+## **État Actuel du Projet**
+
+### **Epic 5: Base de Données & Optimisation**
+
+| Story | Statut | Tag/Commit |
+|-------|--------|------------|
+| 5-401 | **DONE** ✅ | `st-401-done` |
+| **5-402** | **ready-for-dev** ✅ | `c3c327b` |
+| 5-403 | backlog | - |
+| 5-404 | backlog | - |
+| 5-405 | backlog | - |
+
+---
+
+## **Prochaines Étapes Recommandées**
+
+1. **Pour ST-402** : Exécuter `bmad-dev-story` pour implémenter
+2. **Pour ST-401** : Le tag `st-401-done` marque officiellement la fin
+3. **Vérification** : `git log --oneline st-401-done..HEAD` pour voir les changements depuis ST-401
+
+---
+**✨ Les deux stories sont maintenant correctement versionnées et prêtes pour la suite !**

@@ -5,7 +5,6 @@
  */
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { createHash } from 'crypto';
 import { Chunk } from './types';
 import {
   RedisEmbeddingCache,
@@ -102,6 +101,17 @@ export class EmbeddingService {
    * Créer une nouvelle instance du EmbeddingService
    * @param config Configuration de l'API Mistral
    * @param options Options supplémentaires
+   *   - cacheTTL: TTL du fallback in-memory LOCAL à cette instance uniquement (en ms).
+   *     N'affecte PAS le TTL du cache Redis partagé (singleton applicatif, fixé à 3600s) —
+   *     voir `getEmbeddingCache()`. Décision de revue ST-403 : cache Redis global assumé.
+   *   - useCache: valeur par défaut utilisée quand un appel à `generateEmbedding`/`generateEmbeddings`
+   *     ne précise pas explicitement `useCache` ; un `useCache` passé explicitement à un appel
+   *     individuel prend toujours le dessus sur ce réglage d'instance.
+   *
+   * Note: le second paramètre était auparavant un `cacheTTL: number` positionnel ; il est devenu
+   * un objet d'options lors de l'intégration du cache Redis (ST-403). Aucun appelant du repo
+   * n'utilisait l'ancienne forme positionnelle au moment du changement (dérogation assumée à la
+   * contrainte "NE PAS modifier l'API publique").
    */
   constructor(
     config: Partial<MistralConfig> = {},
@@ -171,16 +181,18 @@ export class EmbeddingService {
    */
   async generateEmbedding(
     text: string,
-    options: { useCache?: boolean } = { useCache: true }
+    options: { useCache?: boolean } = {}
   ): Promise<EmbeddingResult> {
     const startTime = Date.now();
+    // Un useCache explicite par appel prend le dessus sur le réglage d'instance.
+    const useCache = options.useCache ?? this.useCache;
 
     if (!text || text.trim().length === 0) {
       throw new EmbeddingError('Texte vide fourni', 400, 'empty_text', false);
     }
 
     // Vérifier le cache (async maintenant)
-    if (options.useCache) {
+    if (useCache) {
       const cached = await this.getFromCache(text);
       if (cached) {
         console.info('Embedding récupéré depuis le cache', {
@@ -193,14 +205,14 @@ export class EmbeddingService {
     }
 
     try {
-      // Incrémenter le compteur d'appels API
-      this.apiCalls++;
-      
       const response = await this.callMistralApi(text);
       const embedding = this.formatResponse(response, text);
 
+      // Incrémenter le compteur d'appels API uniquement après un appel réussi
+      this.apiCalls++;
+
       // Mettre en cache (async maintenant)
-      if (options.useCache) {
+      if (useCache) {
         await this.addToCache(text, embedding);
       }
 
@@ -232,9 +244,11 @@ export class EmbeddingService {
    */
   async generateEmbeddings(
     texts: string[],
-    options: { useCache?: boolean; batchSize?: number } = { useCache: true, batchSize: 10 }
+    options: { useCache?: boolean; batchSize?: number } = {}
   ): Promise<BatchEmbeddingResult> {
     const startTime = Date.now();
+    // Un useCache explicite par appel prend le dessus sur le réglage d'instance.
+    const useCache = options.useCache ?? this.useCache;
 
     if (!texts || texts.length === 0) {
       throw new EmbeddingError('Liste de textes vide', 400, 'empty_list', false);
@@ -261,7 +275,7 @@ export class EmbeddingService {
 
       // Exécuter toutes les vérifications de cache en parallèle
       const cachePromises = batch.map(async (text) => {
-        return options.useCache ? await this.getFromCache(text) : null;
+        return useCache ? await this.getFromCache(text) : null;
       });
       
       const cachedResults = await Promise.all(cachePromises);
@@ -295,7 +309,7 @@ export class EmbeddingService {
           }
           
           // Mettre en cache tous les nouveaux résultats en parallèle
-          if (options.useCache) {
+          if (useCache) {
             await Promise.all(
               batchResults.map((result, j) => {
                 return this.addToCache(textsToProcess[j], result);
@@ -596,35 +610,28 @@ export class EmbeddingService {
    * @param result Résultat à cache
    */
   private async addToCache(text: string, result: EmbeddingResult): Promise<void> {
-    if (!this.useCache) {
-      return;
+    // Peupler systématiquement le fallback in-memory local, indépendamment du résultat
+    // Redis : RedisEmbeddingCache avale déjà ses propres erreurs en interne et ne relance
+    // jamais, donc un fallback conditionné à une exception ici ne se déclenchait jamais.
+    const key = this.generateCacheKey(text);
+    if (this.inMemoryCache) {
+      this.inMemoryCache.set(key, {
+        ...result,
+        cachedAt: Date.now(),
+      });
     }
 
     try {
-      // Essayer de stocker dans Redis d'abord
       await this.redisEmbeddingCache.setEmbedding(text, result);
-      
+
       console.info('Embedding mis en cache (Redis)', {
-        textPreview: text.substring(0, 20) + '...',
+        cacheKey: key.substring(0, 20) + '...',
       });
     } catch (redisError) {
-      // Si Redis échoue, stocker dans in-memory
-      console.warn('EmbeddingService: Échec de l\'écriture dans Redis, fallback vers in-memory', {
+      console.warn('EmbeddingService: Échec de l\'écriture dans Redis, fallback in-memory déjà à jour', {
         error: redisError instanceof Error ? redisError.message : String(redisError),
+        cacheKey: key.substring(0, 20) + '...',
       });
-      
-      if (this.inMemoryCache) {
-        const key = this.generateCacheKey(text);
-        this.inMemoryCache.set(key, {
-          ...result,
-          cachedAt: Date.now(),
-        });
-        
-        console.info('Embedding mis en cache (In-Memory)', {
-          cacheKey: key.substring(0, 20) + '...',
-          cacheSize: this.inMemoryCache.size,
-        });
-      }
     }
   }
 
@@ -635,66 +642,64 @@ export class EmbeddingService {
    * @returns Résultat cache ou null
    */
   private async getFromCache(text: string): Promise<EmbeddingResult | null> {
-    if (!this.useCache) {
-      return null;
-    }
+    const startTime = Date.now();
+    const key = this.generateCacheKey(text);
 
+    // Essayer Redis d'abord. Les erreurs sont interceptées ici (et uniquement ici) pour
+    // ne jamais empêcher la vérification du fallback in-memory qui suit.
     try {
-      // Essayer Redis d'abord
-      const startTime = Date.now();
       const result = await this.redisEmbeddingCache.getEmbedding(text);
-      
+
       if (result) {
         this.cacheHits++;
         console.info('Embedding récupéré depuis le cache (Redis)', {
-          textPreview: text.substring(0, 20) + '...',
+          cacheKey: key.substring(0, 20) + '...',
           duration: `${Date.now() - startTime}ms`,
           cacheHits: this.cacheHits,
         });
         return result;
       }
-      
-      // Essayer in-memory si Redis n'a rien trouvé
-      if (this.inMemoryCache) {
-        const key = this.generateCacheKey(text);
-        const cached = this.inMemoryCache.get(key);
+    } catch (error) {
+      console.error('EmbeddingService: Erreur lors de la lecture Redis, fallback vers in-memory', {
+        error: error instanceof Error ? error.message : String(error),
+        cacheKey: key.substring(0, 20) + '...',
+      });
+      // Ne pas retourner ici : on continue vers le fallback in-memory ci-dessous.
+    }
 
-        if (cached) {
-          // Vérifier si le cache a expiré
-          const age = Date.now() - (cached.cachedAt || Date.now());
-          if (age <= this.inMemoryTTL) {
-            this.cacheHits++;
-            console.info('Embedding récupéré depuis le cache (In-Memory)', {
-              textPreview: text.substring(0, 20) + '...',
-              duration: `${Date.now() - startTime}ms`,
-              cacheHits: this.cacheHits,
-            });
-            
-            // Retourner une copie sans la date de cache
-            const { cachedAt, ...result } = cached;
-            return result;
-          } else {
-            // Cache expiré, supprimer
-            this.inMemoryCache.delete(key);
-          }
+    // Essayer in-memory si Redis n'a rien trouvé (ou a échoué)
+    if (this.inMemoryCache) {
+      const cached = this.inMemoryCache.get(key);
+
+      if (cached) {
+        // Vérifier si le cache a expiré
+        const age = Date.now() - (cached.cachedAt || Date.now());
+        if (age <= this.inMemoryTTL) {
+          this.cacheHits++;
+          console.info('Embedding récupéré depuis le cache (In-Memory)', {
+            cacheKey: key.substring(0, 20) + '...',
+            duration: `${Date.now() - startTime}ms`,
+            cacheHits: this.cacheHits,
+          });
+
+          // Retourner une copie sans la date de cache
+          const { cachedAt, ...result } = cached;
+          return result;
+        } else {
+          // Cache expiré, supprimer
+          this.inMemoryCache.delete(key);
         }
       }
-      
-      // Rien trouvé dans le cache
-      this.cacheMisses++;
-      console.info('Cache miss pour embedding', {
-        textPreview: text.substring(0, 20) + '...',
-        cacheMisses: this.cacheMisses,
-      });
-      
-      return null;
-    } catch (error) {
-      console.error('EmbeddingService: Erreur lors de la récupération depuis le cache', {
-        error: error instanceof Error ? error.message : String(error),
-        textPreview: text.substring(0, 20) + '...',
-      });
-      return null;
     }
+
+    // Rien trouvé dans le cache
+    this.cacheMisses++;
+    console.info('Cache miss pour embedding', {
+      cacheKey: key.substring(0, 20) + '...',
+      cacheMisses: this.cacheMisses,
+    });
+
+    return null;
   }
 
   /**
@@ -734,14 +739,15 @@ export class EmbeddingService {
     hitRate: number;
     apiCalls: number;
   } {
-    const redisStats = this.redisEmbeddingCache.getStats();
-    const inMemorySize = this.inMemoryCache ? this.inMemoryCache.size : 0;
-    const totalSize = inMemorySize + (this.redisEmbeddingCache.isRedisReady() ? 1 : 0);
+    // `size` reflète uniquement le fallback in-memory local : RedisEmbeddingCache
+    // n'expose pas de méthode pour dénombrer les clés Redis, donc cette instance ne
+    // peut pas compter le nombre réel d'entrées côté Redis.
+    const size = this.inMemoryCache ? this.inMemoryCache.size : 0;
     const totalRequests = this.cacheHits + this.cacheMisses;
     const hitRate = totalRequests > 0 ? (this.cacheHits / totalRequests) * 100 : 0;
-    
+
     return {
-      size: totalSize,
+      size,
       ttl: this.inMemoryTTL,
       hits: this.cacheHits,
       misses: this.cacheMisses,
