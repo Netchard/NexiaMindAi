@@ -1,0 +1,75 @@
+# =============================================================================
+# .vercelignore - Fichiers à ignorer lors du déploiement Vercel
+# =============================================================================
+# Ce fichier spécifie les fichiers et dossiers qui ne doivent PAS être
+# déployés sur Vercel
+# =============================================================================
+
+# Environnement local et secrets
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules/
+
+# Dossiers de build locaux (Next.js génère .next automatiquement)
+# .next/
+
+# Dossiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers de log
+*.log
+logs/
+
+# Fichiers temporaires et cache
+*.tmp
+*.temp
+temp/
+.cache/
+
+# Fichiers IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Fichiers Git
+.git/
+.gitignore
+.gitmodules
+
+# Fichiers de dépendances locales (sauf package-lock.json qui est nécessaire)
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
+
+# Documentation source (à déployer si nécessaire pour référence)
+# docs/
+
+# Configuration BMAD (ne pas déployer)
+_bmad/
+_bmad-output/
+
+# Fichiers de build de développement
+build/
+dist/
+
+# Fichiers de test
+coverage/
+.nyc_output/
+
+# Fichiers spéciaux OS
+*~  
+\#*  
+
+# =============================================================================
+# NOTES:
+# =============================================================================
+# - .env.example est déployé pour référence
+# - vercel.json est nécessaire pour la configuration
+# - package-lock.json doit être déployé pour des builds reproductibles
+# - Les fichiers .env.* locaux ne doivent JAMAIS être déployés
