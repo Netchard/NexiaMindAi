@@ -2,6 +2,12 @@ import { format, createLogger, transports as winstonTransports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 const { combine, timestamp, printf, json, colorize, errors } = format;
 
+// Système de fichiers en lecture seule sur les plateformes serverless (Vercel, AWS Lambda, ...)
+// -> on n'active les transports fichiers qu'en environnement local/dev.
+const isServerless = Boolean(
+  process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NETLIFY
+);
+
 // Format personnalisé pour la console
 const consoleFormat = combine(
   colorize(),
@@ -11,51 +17,56 @@ const consoleFormat = combine(
   })
 );
 
-// Format JSON pour les fichiers
-const fileFormat = combine(
-  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  errors({ stack: true }),
-  json()
-);
-
 // Configuration des transports
-const transportList = [
-  // Console transport (pour développement)
+const transportList: (winstonTransports.ConsoleTransportInstance | DailyRotateFile)[] = [
+  // Console transport (toujours actif - capturé par Vercel/plateformes serverless)
   new winstonTransports.Console({
     level: 'info',
     format: consoleFormat,
   }),
-  
-  // Fichier pour les erreurs
-  new DailyRotateFile({
-    filename: 'logs/error-%DATE%.log',
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '20m',
-    maxFiles: '30d',
-    level: 'error',
-    format: fileFormat,
-  }),
-  
-  // Fichier pour toutes les logs
-  new DailyRotateFile({
-    filename: 'logs/combined-%DATE%.log',
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '20m',
-    maxFiles: '30d',
-    level: 'info',
-    format: fileFormat,
-  }),
-  
-  // Fichier dédié aux requêtes API
-  new DailyRotateFile({
-    filename: 'logs/api-%DATE%.log',
-    datePattern: 'YYYY-MM-DD',
-    maxSize: '20m',
-    maxFiles: '30d',
-    level: 'http',
-    format: fileFormat,
-  }),
 ];
+
+// Fichiers de logs locaux (non disponibles en environnement serverless)
+if (!isServerless) {
+  // Format JSON pour les fichiers
+  const fileFormat = combine(
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    errors({ stack: true }),
+    json()
+  );
+
+  transportList.push(
+    // Fichier pour les erreurs
+    new DailyRotateFile({
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'error',
+      format: fileFormat,
+    }),
+
+    // Fichier pour toutes les logs
+    new DailyRotateFile({
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'info',
+      format: fileFormat,
+    }),
+
+    // Fichier dédié aux requêtes API
+    new DailyRotateFile({
+      filename: 'logs/api-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'http',
+      format: fileFormat,
+    })
+  );
+}
 
 // Créer le logger
 const logger = createLogger({
