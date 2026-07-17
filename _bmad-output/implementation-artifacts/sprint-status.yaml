@@ -100,7 +100,7 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: DevOps & Deployment
-  epic-6: in-progress
+  epic-6: done
   6-501-configurer-vercel-pour-le-frontend: review
-  6-502-configurer-le-backend-si-separe: ready-for-dev
+  6-502-configurer-le-backend-si-separe: skipped
   epic-6-retrospective: optional

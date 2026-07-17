@@ -54,3 +54,5 @@ next-env.d.ts
 
 SUPABASE_SECURITY_AUDIT.md
 docs/Projet D - Séquence 0.0 - debug copy.md
+logs/*
+

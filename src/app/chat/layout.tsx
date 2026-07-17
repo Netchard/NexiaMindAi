@@ -98,7 +98,7 @@ function ConversationsProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (e) {
         console.error('Échec du chargement de l\'historique des conversations:', e)
-        setGlobalError('Échec du chargement des conversations')
+        setGlobalError('Échec du chargement de l\'historique des conversations')
       } finally {
         setIsLoading(false)
       }
