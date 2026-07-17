@@ -1,6 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { logger } from '@/lib/logger'
+// Utilise console au lieu de logger (winston) pour éviter les problèmes
+// avec fs dans Next.js 16 + Turbopack (même raison que src/lib/supabase/server.ts).
+// Le proxy s'exécute sur chaque requête protégée ; une exception ici casse
+// silencieusement l'injection de x-user-id et fait échouer l'auth en aval.
 
 /**
  * Proxy (anciennement "middleware", renommé en Next.js 16 — voir le guide de
@@ -51,7 +54,7 @@ export async function proxy(request: NextRequest) {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || ''
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    logger.error('Proxy: NEXT_PUBLIC_SUPABASE_URL/ANON_KEY manquants — auth désactivée pour cette requête', { path: pathname })
+    console.error('Proxy: NEXT_PUBLIC_SUPABASE_URL/ANON_KEY manquants — auth désactivée pour cette requête', { path: pathname })
     return NextResponse.next({ request })
   }
 
@@ -79,14 +82,14 @@ export async function proxy(request: NextRequest) {
     const userResult = await supabase.auth.getUser()
     user = userResult.data.user
   } catch (error) {
-    logger.error('Proxy: échec de la vérification de session Supabase', {
+    console.error('Proxy: échec de la vérification de session Supabase', {
       path: pathname,
       error: error instanceof Error ? error.message : String(error),
     })
   }
 
   if (isApiRoute) {
-    logger.info('API_REQUEST', {
+    console.info('API_REQUEST', {
       method: request.method,
       path: pathname,
       userId: user?.id,
