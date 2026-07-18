@@ -37,6 +37,10 @@ interface StatsResponse {
 /**
  * Récupère les statistiques pour une période donnée
  */
+interface MessageWithTokens {
+  tokensUsed?: string | null;
+}
+
 async function getPeriodStats(startDate: string, endDate: string): Promise<UsageStats> {
   const [conversations, messages, tokens] = await Promise.all([
     supabaseServer
@@ -56,7 +60,7 @@ async function getPeriodStats(startDate: string, endDate: string): Promise<Usage
       .lte('created_at', endDate),
   ]);
 
-  const tokensUsed = (tokens.data as any[])?.reduce((sum, m) => {
+  const tokensUsed = (tokens.data as MessageWithTokens[])?.reduce((sum, m) => {
     return sum + (parseInt(m.tokensUsed || '0') || 0);
   }, 0) || 0;
 
@@ -119,13 +123,13 @@ export async function GET(request: NextRequest) {
         supabaseServer.from('profiles').select('id', { head: true, count: 'exact' }),
         supabaseServer.from('conversations').select('id', { head: true, count: 'exact' }),
         supabaseServer.from('messages').select('id', { head: true, count: 'exact' }),
-        supabaseServer.from('messages').select('metadata->>tokensUsed', { head: true, count: 'exact' }),
+        supabaseServer.from('messages').select('metadata->>tokensUsed'),
       ]);
 
       const totalUsers = usersResult.count || 0;
       const totalConversations = conversationsResult.count || 0;
       const totalMessages = messagesResult.count || 0;
-      const totalTokensUsed = (tokensResult.data as any[])?.reduce((sum, m) => {
+      const totalTokensUsed = (tokensResult.data as MessageWithTokens[])?.reduce((sum, m) => {
         return sum + (parseInt(m.tokensUsed || '0') || 0);
       }, 0) || 0;
 
@@ -140,6 +144,10 @@ export async function GET(request: NextRequest) {
         getPeriodStats(thirtyDaysAgo, today),
       ]);
 
+      interface MessageWithClient {
+        client?: string | null;
+      }
+
       // Stats par client (optionnel)
       // Stats par client - En Supabase v2, on utilise une requête RPC ou on utilise count
       // sans group pour éviter l'erreur TypeScript. On utilise une approche alternative.
@@ -148,7 +156,7 @@ export async function GET(request: NextRequest) {
       .select('metadata->>client')
 
       const byClientStats: Record<string, UsageStats> = {}
-      allMessages?.forEach((msg: any) => {
+      allMessages?.forEach((msg: MessageWithClient) => {
         const client = msg.client || 'unknown'
         if (!byClientStats[client]) {
           byClientStats[client] = { conversations: 0, messages: 0, tokensUsed: 0 }

@@ -1,30 +1,37 @@
 ---
-title: Epics & Stories Techniques - NexiaMind AI V1
+title: Epics & Stories - NexiaMind AI V1
 status: draft
 created: 2026-06-21
-updated: 2026-06-21
+updated: 2026-07-17
 author: Dday
 project: NexiaMind AI
-version: 1.0
+version: 1.1
 type: epics-and-stories
 related_to: ../brief-nexiamind-ai/brief.md,../prd-nexiamind-ai/prd.md,../architecture-nexiamind-ai/architecture.md
 ---
 
-# 📋 Epics & Stories Techniques - NexiaMind AI V1
-*Découpage technique basé sur le PRD et l'Architecture validés*
+# 📋 Epics & Stories - NexiaMind AI V1
+*Découpage orienté valeur utilisateur basé sur le PRD et l'Architecture validés*
 
 ---
 
 ## 🎯 Introduction
 
-Ce document **découpe les exigences du PRD** en **Epics et Stories Techniques** actionnables pour l'équipe de développement.
+Ce document **découpe les exigences du PRD** en **Epics et Stories** actionnables pour l'équipe de développement.
 
 **Basé sur :**
 - [Product Brief](../brief-nexiamind-ai/brief.md)
 - [PRD](../prd-nexiamind-ai/prd.md)
 - [Architecture Technique](../architecture-nexiamind-ai/architecture.md)
 
-**Objectif :** Préparer le développement en **sprints agiles** avec des tâches claires et estimées.
+**Objectif :** Préparer le développement en **sprints agiles** avec des tâches claires, estimées et orientées valeur utilisateur.
+
+**Statut des corrections:**
+- ✅ CRIT-001: Épics orientés valeur utilisateur (corrigé 2026-07-17)
+- ✅ CRIT-002: Création des tables redistribuée (corrigé 2026-07-17)
+- ✅ MAJ-001: CI/CD déplacé vers Epic 1 (corrigé 2026-07-17)
+- ✅ MAJ-002: Statut ST-308 corrigé (corrigé 2026-07-17)
+- ✅ MAJ-003: Dépendances documentées (corrigé 2026-07-17)
 
 ---
 
@@ -35,7 +42,7 @@ Ce document **découpe les exigences du PRD** en **Epics et Stories Techniques**
 |------|-------|-----------|-------------|-------------|
 | **Epics** | 6 | 6 | 0 | 0 |
 | **User Stories** | 28 | 20 | 6 | 2 |
-| **Estimation Totale** | **~120-140 heures** | ~90h | ~25h | ~5h |
+| **Estimation Totale** | **~126-146 heures** *(+6h pour CI/CD déplacé)* | ~90h | ~25h | ~5h |
 
 ### Répartition par Domaine
 | Domaine | Epics | Stories | Estimation | Priorité |
@@ -48,13 +55,13 @@ Ce document **découpe les exigences du PRD** en **Epics et Stories Techniques**
 
 ---
 
-## 🏆 Epic 1: Configuration & Infrastructure
+## 🏆 Epic 1: Préparer l'environnement de recherche pour les utilisateurs
 
-**Description :** Mise en place de l'infrastructure de base nécessaire pour le développement.
+**Description :** Mise en place de l'infrastructure de base permettant aux utilisateurs d'accéder au système de recherche.
 
-**Objectif :** Avoir un environnement de développement fonctionnel avec toutes les dépendances configurées.
+**Objectif :** Offrir aux utilisateurs un environnement fonctionnel pour effectuer des recherches sémantiques.
 
-**Durée estimée :** ~15 heures
+**Durée estimée :** ~21 heures *(+6h pour CI/CD)*
 
 **Responsable :** DevOps / Full-Stack
 
@@ -89,21 +96,21 @@ Ce document **découpe les exigences du PRD** en **Epics et Stories Techniques**
 
 #### ST-002: Configurer Supabase
 **En tant que** Développeur Backend  
-**Je veux** un projet Supabase configuré avec pgvector, les tables RAG et l'authentification  
-**Afin de** avoir la base de données prête pour le pipeline RAG.
+**Je veux** un projet Supabase configuré avec pgvector, les tables d'authentification et l'authentification  
+**Afin de** permettre aux utilisateurs de s'authentifier et d'accéder au système.
 
 **Critères d'Acceptation :**
 - [ ] Projet Supabase créé
 - [ ] Extension pgvector activée
-- [ ] Toutes les tables du schéma créées (profiles, conversations, messages, chunks, embeddings, documents, sync_logs)
-- [ ] Index vectoriel créé
+- [ ] Tables d'authentification créées (profiles, users)
+- [ ] Index vectoriel créé (pour les futurs embeddings)
 - [ ] RBAC configuré (rôles: admin, manager, project_lead, developer, consultant)
 - [ ] Variables d'environnement configurées
 
 **Tâches Techniques :**
 - [ ] Créer le projet Supabase
-- [ ] Exécuter le SQL de création des tables (depuis architecture.md)
-- [ ] Configurer les politiques de sécurité (RLS)
+- [ ] Exécuter le SQL de création des tables profiles et users
+- [ ] Configurer les politiques de sécurité (RLS) pour les tables existantes
 - [ ] Créer un utilisateur admin
 - [ ] Tester les connexions
 
@@ -176,11 +183,61 @@ NEXT_PUBLIC_APP_URL=...
 
 ---
 
-## 🏆 Epic 2: Pipeline RAG Backend
+#### ST-501: Configurer Vercel pour le Frontend
+**En tant que** DevOps  
+**Je veux** le frontend Next.js déployé sur Vercel avec les variables d'environnement  
+**Afin de** rendre l'application accessible pour le développement et les tests.
 
-**Description :** Implémentation du cœur du système : le pipeline RAG (Retrieval-Augmented Generation).
+**Critères d'Acceptation :**
+- [ ] Projet Vercel créé
+- [ ] Déploiement automatique depuis GitHub/GitLab
+- [ ] Variables d'environnement configurées
+- [ ] Domaine personnalisé (optionnel : nexiamind.ai)
+- [ ] HTTPS activé
 
-**Objectif :** Avoir un backend capable de traiter les requêtes utilisateurs, récupérer le contexte pertinent et générer des réponses via Mistral AI.
+**Tâches Techniques :**
+- [ ] Lier le repo GitHub/GitLab à Vercel
+- [ ] Configurer `vercel.json`
+- [ ] Définir les variables d'environnement dans Vercel
+- [ ] Tester le déploiement
+
+**Estimation :** 3 heures  
+**Priorité :** ⭐⭐⭐⭐⭐  
+**Difficulté :** Faible
+
+---
+
+#### ST-502: Configurer le Backend (si séparé)
+**En tant que** DevOps  
+**Je veux** le backend déployé sur un service adapté (Vercel, Railway, etc.)  
+**Afin de** traiter les requêtes API pendant le développement.
+
+**Critères d'Acceptation :**
+- [ ] Service backend déployé
+- [ ] Connexion à Supabase fonctionnelle
+- [ ] Variables d'environnement sécurisées
+- [ ] Scalabilité configurée
+
+**Options de déploiement :**
+| Service | Avantages | Coût |
+|---------|-----------|------|
+| **Vercel** | Intégration facile avec Next.js | Gratuit → $20/mois |
+| **Railway** | Bon pour les APIs Node.js | Gratuit → $5/mois |
+| **Fly.io** | Très scalable | Gratuit → $10/mois |
+
+**Recommandation :** Vercel (si backend dans les API Routes de Next.js) ou Railway
+
+**Estimation :** 3 heures  
+**Priorité :** ⭐⭐⭐⭐⭐  
+**Difficulté :** Moyenne
+
+---
+
+## 🏆 Epic 2: Permettre aux utilisateurs d'effectuer des recherches sémantiques intelligentes
+
+**Description :** Implémentation du cœur du système : le pipeline RAG (Retrieval-Augmented Generation) pour permettre aux utilisateurs de trouver des informations pertinentes.
+
+**Objectif :** Offrir aux utilisateurs la capacité d'effectuer des recherches sémantiques et de recevoir des réponses contextuelles et pertinentes.
 
 **Durée estimée :** ~45 heures
 
@@ -323,12 +380,16 @@ export async function generateEmbedding(text) {
 - [ ] Support des filtres (client, type, langage, rôle)
 - [ ] Retourne les top 5 chunks les plus pertinents
 - [ ] Tests unitaires
+- [ ] Tables de base de données créées (chunks, embeddings, documents)
+- [ ] Index vectoriel configuré pour les embeddings
 
 **Tâches Techniques :**
 - [ ] Implémenter `lib/rag/retriever.js`
 - [ ] Configuration de l'index vectoriel dans Supabase
 - [ ] Intégrer les filtres metadata
 - [ ] Optimiser la requête SQL
+- [ ] Créer les tables chunks, embeddings, documents (si non existantes)
+- [ ] Exécuter le SQL de création des tables RAG
 
 **Code de référence :**
 ```javascript
@@ -358,6 +419,11 @@ export async function retrieveRelevantChunks(query, filters = {}) {
 **Estimation :** 8 heures  
 **Priorité :** ⭐⭐⭐⭐⭐  
 **Difficulté :** Élevée
+
+**Dépendances:**
+- ST-002: Supabase configuré (tables chunks, embeddings, documents créées dans cette story)
+- ST-102: Service de Chunking implémenté
+- ST-103: Service d'Embeddings implémenté
 
 ---
 
@@ -413,6 +479,11 @@ export async function generateResponse(query, contextChunks, userRole) {
 **Priorité :** ⭐⭐⭐⭐⭐  
 **Difficulté :** Élevée
 
+**Dépendances:**
+- ST-002: Supabase configuré
+- ST-103: Service d'Embeddings implémenté
+- ST-104: Service de Retrieval implémenté
+
 ---
 
 #### ST-106: Implémenter le Formatage des Réponses
@@ -465,6 +536,9 @@ export function formatResponse(rawResponse, chunks) {
 **Priorité :** ⭐⭐⭐⭐  
 **Difficulté :** Moyenne
 
+**Dépendances:**
+- ST-105: Service de Generation implémenté
+
 ---
 
 #### ST-107: Implémenter l'Endpoint /api/chat/message
@@ -480,6 +554,13 @@ export function formatResponse(rawResponse, chunks) {
 - [ ] Retourne la réponse formatée avec sources
 - [ ] Stockage de la conversation en base de données
 - [ ] Tests d'intégration
+- [ ] Tables de base de données créées (conversations, messages)
+
+**Dépendances:**
+- ST-002: Supabase configuré
+- ST-104: Service de Retrieval implémenté
+- ST-105: Service de Generation implémenté
+- ST-106: Formatage des Réponses implémenté
 
 **Flow de l'endpoint :**
 ```
@@ -521,11 +602,11 @@ export function formatResponse(rawResponse, chunks) {
 
 ---
 
-## 🏆 Epic 3: Intégration des Sources
+## 🏆 Epic 3: Donner accès aux utilisateurs à toutes les sources de connaissances
 
-**Description :** Connexion et indexation des 3 sources de données (Supabase, GitLab, Nexia).
+**Description :** Connexion et indexation des 3 sources de données (Supabase, GitLab, Nexia) pour que les utilisateurs puissent accéder à toutes les informations disponibles.
 
-**Objectif :** Pouvoir rechercher et récupérer des informations depuis toutes les sources configurées.
+**Objectif :** Permettre aux utilisateurs de rechercher et retrouver des informations depuis toutes les sources de données configurées.
 
 **Durée estimée :** ~25 heures
 
@@ -557,6 +638,12 @@ export function formatResponse(rawResponse, chunks) {
 **Priorité :** ⭐⭐⭐⭐⭐  
 **Difficulté :** Élevée
 
+**Dépendances:**
+- ST-002: Supabase configuré
+- ST-102: Service de Chunking implémenté
+- ST-103: Service d'Embeddings implémenté
+- ST-104: Service de Retrieval implémenté
+
 ---
 
 #### ST-202: Intégrer GitLab API
@@ -582,6 +669,12 @@ export function formatResponse(rawResponse, chunks) {
 **Priorité :** ⭐⭐⭐⭐⭐  
 **Difficulté :** Élevée
 
+**Dépendances:**
+- ST-002: Supabase configuré
+- ST-102: Service de Chunking implémenté
+- ST-103: Service d'Embeddings implémenté
+- ST-104: Service de Retrieval implémenté
+
 ---
 
 #### ST-203: Intégrer Nexia GED API
@@ -606,6 +699,12 @@ export function formatResponse(rawResponse, chunks) {
 **Priorité :** ⭐⭐⭐⭐⭐  
 **Difficulté :** Moyenne
 
+**Dépendances:**
+- ST-002: Supabase configuré
+- ST-102: Service de Chunking implémenté
+- ST-103: Service d'Embeddings implémenté
+- ST-104: Service de Retrieval implémenté
+
 ---
 
 #### ST-204: Créer le Script d'Indexation Complète
@@ -619,12 +718,14 @@ export function formatResponse(rawResponse, chunks) {
 - [ ] Gestion des erreurs par source
 - [ ] Logging des progrès
 - [ ] Statistiques de l'indexation (nombre de documents, chunks créés)
+- [ ] Table de base de données créée (sync_logs)
 
 **Tâches Techniques :**
 - [ ] Créer `scripts/index-all.js`
 - [ ] Orchestrer les 3 scripts d'indexation
 - [ ] Gérer les dépendances entre sources
 - [ ] Afficher un rapport d'indexation
+- [ ] Créer la table sync_logs pour le suivi des synchronisations
 
 **Estimation :** 2 heures  
 **Priorité :** ⭐⭐⭐⭐  
@@ -656,11 +757,11 @@ export function formatResponse(rawResponse, chunks) {
 
 ---
 
-## 🏆 Epic 4: Frontend (Interface Utilisateur)
+## 🏆 Epic 4: Permettre aux utilisateurs d'interagir avec le système
 
 **Description :** Développement de l'interface utilisateur pour NexiaMind AI.
 
-**Objectif :** Offrir une expérience utilisateur intuitive et performante pour interagir avec le système RAG.
+**Objectif :** Offrir aux utilisateurs une expérience intuitive et performante pour interagir avec le système RAG et obtenir des réponses à leurs questions.
 
 **Durée estimée :** ~40 heures
 
@@ -872,7 +973,7 @@ export function formatResponse(rawResponse, chunks) {
 **Estimation :** 3 heures  
 **Priorité :** ⭐⭐⭐  
 **Difficulté :** Faible
-**Statut :** Implémentation en cours (11/07/2026)
+**Statut :** Done (11/07/2026) - Toutes les tâches complétées
 
 ---
 
@@ -900,11 +1001,11 @@ export function formatResponse(rawResponse, chunks) {
 
 ---
 
-## 🏆 Epic 5: Base de Données & Optimisation
+## 🏆 Epic 5: Garantir des performances de recherche optimales pour les utilisateurs
 
 **Description :** Optimisation de la base de données et préparation pour la production.
 
-**Objectif :** Garantir que la base de données est performante, sécurisée et scalable.
+**Objectif :** Garantir aux utilisateurs que la base de données est performante, sécurisée et scalable pour offrir une expérience de recherche fluide.
 
 **Durée estimée :** ~15 heures
 
@@ -1043,13 +1144,13 @@ CREATE INDEX idx_messages_created_at ON messages(created_at);
 
 ---
 
-## 🏆 Epic 6: DevOps & Déploiement
+## 🏆 Epic 6: Rendre l'application accessible aux utilisateurs finaux
 
-**Description :** Configuration de l'infrastructure et déploiement de l'application.
+**Description :** Configuration finale et déploiement de l'application en production.
 
-**Objectif :** Avoir NexiaMind AI déployé et accessible aux utilisateurs.
+**Objectif :** Rendre NexiaMind AI déployé en production et accessible aux utilisateurs finaux pour qu'ils puissent commencer à utiliser le système de recherche.
 
-**Durée estimée :** ~10 heures
+**Durée estimée :** ~4 heures *(réduit de 10h, ST-501/502 déplacés vers Epic 1)*
 
 **Responsable :** DevOps
 
@@ -1057,55 +1158,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at);
 
 ### User Stories
 
-#### ST-501: Configurer Vercel pour le Frontend
-**En tant que** DevOps  
-**Je veux** le frontend Next.js déployé sur Vercel avec les variables d'environnement  
-**Afin de** rendre l'application accessible.
-
-**Critères d'Acceptation :**
-- [ ] Projet Vercel créé
-- [ ] Déploiement automatique depuis GitHub/GitLab
-- [ ] Variables d'environnement configurées
-- [ ] Domaine personnalisé (optionnel : nexiamind.ai)
-- [ ] HTTPS activé
-
-**Tâches Techniques :**
-- [ ] Lier le repo GitHub/GitLab à Vercel
-- [ ] Configurer `vercel.json`
-- [ ] Définir les variables d'environnement dans Vercel
-- [ ] Tester le déploiement
-
-**Estimation :** 3 heures  
-**Priorité :** ⭐⭐⭐⭐⭐  
-**Difficulté :** Faible
-
----
-
-#### ST-502: Configurer le Backend (si séparé)
-**En tant que** DevOps  
-**Je veux** le backend déployé sur un service adapté (Vercel, Railway, etc.)  
-**Afin de** traiter les requêtes API.
-
-**Critères d'Acceptation :**
-- [ ] Service backend déployé
-- [ ] Connexion à Supabase fonctionnelle
-- [ ] Variables d'environnement sécurisées
-- [ ] Scalabilité configurée
-
-**Options de déploiement :**
-| Service | Avantages | Coût |
-|---------|-----------|------|
-| **Vercel** | Intégration facile avec Next.js | Gratuit → $20/mois |
-| **Railway** | Bon pour les APIs Node.js | Gratuit → $5/mois |
-| **Fly.io** | Très scalable | Gratuit → $10/mois |
-
-**Recommandation :** Vercel (si backend dans les API Routes de Next.js) ou Railway
-
-**Estimation :** 3 heures  
-**Priorité :** ⭐⭐⭐⭐⭐  
-**Difficulté :** Moyenne
-
----
+*Aucune story dans cet epic - toutes les tâches de déploiement ont été déplacées vers Epic 1 pour un CI/CD précoce.*
 
 ## 📊 Récapitulatif par Sprint
 
@@ -1120,7 +1173,9 @@ CREATE INDEX idx_messages_created_at ON messages(created_at);
 | ST-101: Structure API Backend | 5h | Backend |
 | ST-102: Service de Chunking | 4h | Backend |
 | ST-103: Service d'Embeddings | 5h | Backend |
-| **Total** | **26h** | |
+| ST-501: Configurer Vercel | 3h | DevOps |
+| ST-502: Configurer Backend | 3h | DevOps |
+| **Total** | **32h** | |
 
 ---
 

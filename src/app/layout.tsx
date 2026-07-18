@@ -10,11 +10,13 @@ import { QueryClientProvider } from '@/providers/QueryClientProvider';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 // Newsreader (serif) — réservé aux titres `hero`/`display` des surfaces Auth/Chat
@@ -23,6 +25,7 @@ const newsreader = Newsreader({
   variable: "--font-newsreader",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -41,6 +44,20 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
     >
+      <head>
+        {/* Preconnect to Google Fonts for better performance - reduces LCP */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Preload critical Google Fonts files */}
+        <link
+          rel="preload"
+          href="/_next/static/media/geist-latin-400-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       {/* h-full (pas min-h-screen) : borne le body à la hauteur du viewport
           (comme html ci-dessus) plutôt qu'un plancher sans plafond — sans ça,
           le flex-1/overflow-hidden de MainContent (voir MainContent.tsx) n'a

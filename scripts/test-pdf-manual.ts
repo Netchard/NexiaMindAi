@@ -14,9 +14,9 @@
  */
 
 import 'dotenv/config';
-import { OCRService, ocrService } from '../src/lib/supabase/storage/ocr';
-import { SupabaseStorageIndexer } from '../src/lib/supabase/storage/indexer';
-import { logger } from '../src/lib/logger';
+import { OCRService, ocrService } from '@/lib/supabase/storage/ocr';
+import { SupabaseStorageIndexer } from '@/lib/supabase/storage/indexer';
+import { logger } from '@/lib/logger';
 import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 
@@ -232,7 +232,7 @@ async function testFullIndexation(pdfPath: string): Promise<void> {
 
     console.log('\n🧩 Étape 2: Chunking du document');
     // Importer dynamiquement le chunker
-    const { chunkDocument } = await import('../src/lib/rag/chunker');
+    const { chunkDocument } = await import('@/lib/rag/chunker');
     
     const chunkResult = await chunkDocument({
       content: extractedText.text,
@@ -253,7 +253,7 @@ async function testFullIndexation(pdfPath: string): Promise<void> {
     console.log(`   📊 Tokens totaux: ${chunkResult.totalTokens}`);
 
     console.log('\n🎯 Étape 3: Génération des embeddings (simulée)');
-    const { generateEmbeddings } = await import('../src/lib/rag/embeddings');
+    const { generateEmbeddings } = await import('@/lib/rag/embeddings');
     
     const embeddingsResult = await generateEmbeddings(
       chunkResult.chunks.map(chunk => chunk.content)

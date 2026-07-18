@@ -3,12 +3,12 @@ story_id: ST-201
 epic: Epic 3
 title: Intégrer Supabase Storage
 description: Pouvoir indexer et rechercher les documents de Supabase Storage afin d'offrir l'accès à la base documentaire centrale.
-status: review
+status: done
 priority: ⭐⭐⭐⭐⭐
 estimation: 8 heures
 assigned_to: Dday
 start_date: 2026-06-28 18:00:00
-end_date: "2026-06-28 23:00:00"
+end_date: "2026-07-16 11:00:00"
 user_skill_level: intermediate
 baseline_commit: 2cfaed7293d7052fc4a7e1debffabe900a2a8a01
 workflow: dev-story
@@ -61,38 +61,38 @@ Supabase Storage (bucket documents) → Récupération fichiers → Extraction t
 ## ✅ Critères d'Acceptation
 
 ### Fonctionnalité de Base
-- [ ] Connexion à Supabase Storage fonctionnelle
-- [ ] Récupération des fichiers du bucket `documents`
-- [ ] Extraction du texte (OCR si nécessaire via service externe)
-- [ ] Chunking et stockage dans la base de données
-- [ ] Synchronisation manuelle via endpoint
-- [ ] Gestion des erreurs et logging complet
+- [x] Connexion à Supabase Storage fonctionnelle
+- [x] Récupération des fichiers du bucket `documents`
+- [x] Extraction du texte (OCR si nécessaire via service externe)
+- [x] Chunking et stockage dans la base de données
+- [x] Synchronisation manuelle via endpoint
+- [x] Gestion des erreurs et logging complet
 
 ### Qualité du Code
-- [ ] Code propre et bien commenté
-- [ ] Respect des conventions TypeScript/Next.js
-- [ ] Gestion des erreurs appropriée
-- [ ] Typage fort avec interfaces TypeScript
-- [ ] Intégration avec le logger existant
-- [ ] Sécurité: Validation des inputs, gestion des tokens
+- [x] Code propre et bien commenté
+- [x] Respect des conventions TypeScript/Next.js
+- [x] Gestion des erreurs appropriée
+- [x] Typage fort avec interfaces TypeScript
+- [x] Intégration avec le logger existant
+- [x] Sécurité: Validation des inputs, gestion des tokens
 
 ### Intégration
-- [ ] Intégration avec ST-102 (Service de Chunking)
-- [ ] Intégration avec ST-103 (Service d'Embeddings)
-- [ ] Intégration avec ST-104 (Service de Retrieval - reindexSource)
-- [ ] Export via le module `lib/supabase/storage/`
+- [x] Intégration avec ST-102 (Service de Chunking)
+- [x] Intégration avec ST-103 (Service d'Embeddings)
+- [x] Intégration avec ST-104 (Service de Retrieval - reindexSource)
+- [x] Export via le module `lib/supabase/storage/`
 
 ### Tests
-- [ ] Tests unitaires pour le client Supabase Storage
-- [ ] Tests unitaires pour le service d'indexation
-- [ ] Tests d'intégration pour le flux complet
-- [ ] Tests des cas d'erreur (fichiers corrompus, accès refusés, etc.)
-- [ ] Tests des fonctions exportées
+- [x] Tests unitaires pour le client Supabase Storage
+- [x] Tests unitaires pour le service d'indexation
+- [x] Tests d'intégration pour le flux complet
+- [x] Tests des cas d'erreur (fichiers corrompus, accès refusés, etc.)
+- [x] Tests des fonctions exportées
 
 ### Performance
-- [ ] Traitement efficace des fichiers volumineux
-- [ ] Gestion de la mémoire pour l'OCR
-- [ ] Temps d'indexation raisonnable
+- [x] Traitement efficace des fichiers volumineux
+- [x] Gestion de la mémoire pour l'OCR
+- [x] Temps d'indexation raisonnable
 
 ---
 
@@ -1130,16 +1130,16 @@ try {
 
 ### Checklist de Validation
 
-- [ ] Tous les critères d'acceptation sont remplis
-- [ ] Tous les tests unitaires passent
-- [ ] Intégration avec ST-102 (Chunking) validée
-- [ ] Intégration avec ST-103 (Embeddings) validée
-- [ ] Intégration avec ST-104 (Retrieval - reindexSource) validée
-- [ ] Export via lib/supabase/storage/ fonctionnel
-- [ ] Endpoint API /api/sources/supabase/sync fonctionnel
-- [ ] Documentation complète et à jour
-- [ ] Code revu et approuvé
-- [ ] Merge dans la branche principale
+- [x] Tous les critères d'acceptation sont remplis
+- [x] Tous les tests unitaires passent
+- [x] Intégration avec ST-102 (Chunking) validée
+- [x] Intégration avec ST-103 (Embeddings) validée
+- [x] Intégration avec ST-104 (Retrieval - reindexSource) validée
+- [x] Export via lib/supabase/storage/ fonctionnel
+- [x] Endpoint API /api/sources/supabase/sync fonctionnel
+- [x] Documentation complète et à jour
+- [x] Code revu et approuvé
+- [x] Merge dans la branche principale
 
 ---
 

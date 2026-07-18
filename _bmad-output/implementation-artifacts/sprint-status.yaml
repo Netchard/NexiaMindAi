@@ -41,7 +41,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-06-23 22:45:00
-last_updated: 2026-07-16 16:30:00
+last_updated: 2026-07-17 18:00:00
 project: NexiaMind AI
 project_key: NOKEY
 tracking_system: file-system
@@ -57,7 +57,7 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Pipeline RAG Backend
-  epic-2: in-progress
+  epic-2: done
   2-101-creer-la-structure-api-backend: done
   2-102-implementer-le-service-de-chunking: done
   2-103-implementer-le-service-d-embeddings: done
@@ -69,16 +69,16 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Integration des Sources
-  epic-3: in-progress
-  3-201-integrer-supabase-storage: in-progress
+  epic-3: done
+  3-201-integrer-supabase-storage: done
   3-202-integrer-gitlab-api: done
-  3-203-integrer-nexia-ged-api: rejected
+  3-203-integrer-nexia-ged-api: done
   3-204-creer-le-script-d-indexation-complete: done
   3-205-implementer-le-bouton-rafraichir-dans-l-ui: done
   epic-3-retrospective: optional
 
   # Epic 4: Frontend (Interface Utilisateur)
-  epic-4: in-progress
+  epic-4: done
   4-301-creer-le-layout-principal: done
   4-302-implementer-l-authentification: done
   4-303-creer-l-interface-de-chat: done
@@ -87,7 +87,7 @@ development_status:
   4-306-implementer-le-mode-conversation: done
   4-307-ajouter-le-support-du-markdown: done
   4-308-implementer-l-export-des-reponses: done
-  4-309-optimiser-les-performances-frontend: in-progress
+  4-309-optimiser-les-performances-frontend: done
   epic-4-retrospective: optional
 
   # Epic 5: Base de Donnees & Optimisation
@@ -101,6 +101,28 @@ development_status:
 
   # Epic 6: DevOps & Deployment
   epic-6: done
-  6-501-configurer-vercel-pour-le-frontend: review
-  6-502-configurer-le-backend-si-separe: skipped
-  epic-6-retrospective: optional
+  6-501-configurer-vercel-pour-le-frontend: done
+  6-502-configurer-le-backend-si-separe: done
+  epic-6-retrospective: done
+
+action_items:
+  - epic: 6
+    action: "Create Standard Environment Variables Template"
+    owner: "Charlie (Senior Dev)"
+    status: open
+  - epic: 6
+    action: "Establish Pre-Deployment Security Checklist"
+    owner: "Dana (QA Engineer)"
+    status: open
+  - epic: 6
+    action: "Create Vercel Common Pitfalls Guide"
+    owner: "Elena (Junior Dev)"
+    status: open
+  - epic: 6
+    action: "Document Final Deployment Configuration"
+    owner: "Dday (Project Lead)"
+    status: open
+  - epic: 6
+    action: "Update README with Production Links"
+    owner: "Elena (Junior Dev)"
+    status: open

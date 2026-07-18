@@ -17,9 +17,9 @@
  */
 
 import 'dotenv/config';
-import { logger } from '../src/lib/logger';
-import { storageIndexer, SupabaseStorageIndexer } from '../src/lib/supabase/storage/indexer';
-import { IndexationOptions } from '../src/lib/supabase/storage/types';
+import { logger } from '@/lib/logger';
+import { storageIndexer, SupabaseStorageIndexer } from '@/lib/supabase/storage/indexer';
+import { IndexationOptions } from '@/lib/supabase/storage/types';
 
 /**
  * Parse les arguments de la ligne de commande

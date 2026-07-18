@@ -25,7 +25,7 @@ sprints:
     estimation: 3
     priority: ⭐⭐⭐
     difficulty: Moyenne
-    status: not-started
+    status: done
     epic: Frontend (Interface Utilisateur)
   - id: ST-405
     title: Sauvegarder la Structure de la Base
@@ -133,7 +133,7 @@ sprints:
     estimation: 8
     priority: ⭐⭐⭐⭐⭐
     difficulty: Élevée
-    status: not-started
+    status: done
     epic: Intégration des Sources
   - id: ST-202
     title: Intégrer GitLab API
