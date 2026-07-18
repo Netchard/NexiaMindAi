@@ -6,11 +6,12 @@
  * Fait partie de ST-306: Implémenter le Mode Conversation
  */
 
-import { use } from 'react'
+import { use, useEffect } from 'react'
 import { useConversations } from '@/components/Conversations'
 import { ChatInput, ChatMessageList } from '@/components/Chat'
 import { ConversationHeader } from '@/components/Conversation'
 import type { ChatMessageData } from '@/components/Chat'
+import { readAndClearPendingMessage } from '@/lib/utils/pendingMessage'
 
 /**
  * Page de conversation dynamique
@@ -48,6 +49,33 @@ export default function ConversationPage({
   const handleSend = async (content: string) => {
     await onSendMessage(conversationId, content, filters)
   }
+
+  // Consomme un message laissé en attente par l'accueil (`/`, puces de
+  // suggestion — voir src/app/page.tsx) : createNewConversation() y crée la
+  // conversation puis stocke le texte en sessionStorage avant de naviguer ici,
+  // faute d'accès au contexte ConversationsProvider depuis une route hors
+  // /chat/*. On réutilise l'UI optimiste/erreur déjà correcte du contexte
+  // (onSendMessage) plutôt que de la dupliquer sur l'accueil — voir I/O matrix
+  // du spec : onSendMessage(id, texte, {}) une fois au montage, entrée supprimée.
+  //
+  // Attend `!isLoading` avant d'envoyer : loadInitialData (chat/layout.tsx)
+  // appelle loadConversationMessages() en parallèle au montage, qui ÉCRASE
+  // entièrement conversationStates[conversationId] avec la réponse serveur
+  // (liste encore vide pour une conversation tout juste créée). Envoyer avant
+  // que ce chargement initial soit réglé ferait disparaître le message
+  // optimiste sous l'écrasement — isLoading ne repasse à false qu'une fois ce
+  // chargement terminé (voir finally de loadInitialData).
+  useEffect(() => {
+    if (isLoading) return
+    const pendingMessage = readAndClearPendingMessage(conversationId)
+    if (!pendingMessage) return
+    onSendMessage(conversationId, pendingMessage, {})
+    // Ne doit s'exécuter qu'une fois par arrivée sur cette conversation — pas
+    // à chaque changement de onSendMessage (identité stable côté contexte, mais
+    // volontairement omis pour éviter tout risque de second envoi ; la clé
+    // sessionStorage est de toute façon retirée dès la première exécution).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, isLoading])
 
   // Gérer le renommage
   const handleRename = async (newTitle: string) => {
