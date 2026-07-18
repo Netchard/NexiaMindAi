@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>UX Design Validation: NexiaMind AI — Accueil</title>
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --text: #1c1917;
+    --muted: #78716c;
+
+    --verdict-strong: #16a34a;
+    --verdict-adequate: #65a30d;
+    --verdict-thin: #d97706;
+    --verdict-broken: #dc2626;
+
+    --sev-low: #64748b;
+    --sev-medium: #ca8a04;
+    --sev-high: #ea580c;
+    --sev-critical: #dc2626;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+  header.report-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .title h1 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  .title .subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .synthesis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--muted);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    font-size: 15.5px;
+  }
+  .synthesis p { margin: 0 0 10px; }
+  .synthesis p:last-child { margin-bottom: 0; }
+
+  .dimension-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dim-card .dim-name { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .dim-card .dim-verdict { font-size: 14px; font-weight: 600; }
+
+  section.dimension, section.reviewer-section { margin-bottom: 14px; }
+  section.dimension details, section.reviewer-section details {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  section summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  section summary::-webkit-details-marker { display: none; }
+  section summary::before {
+    content: "▸";
+    display: inline-block;
+    color: var(--muted);
+    transition: transform 0.15s ease;
+  }
+  section details[open] summary::before { transform: rotate(90deg); }
+  section summary h2 {
+    display: inline;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    flex: 1;
+  }
+  .verdict-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: white;
+  }
+  .verdict-strong { background: var(--verdict-strong); }
+  .verdict-adequate { background: var(--verdict-adequate); }
+  .verdict-thin { background: var(--verdict-thin); }
+  .verdict-broken { background: var(--verdict-broken); }
+
+  .dim-body { padding: 4px 20px 18px; }
+  .dim-judgment { color: var(--text); font-size: 14.5px; }
+  .dim-judgment p { margin: 0 0 10px; }
+
+  .findings-list { padding: 0 20px 4px; }
+  article.finding {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+  article.finding:first-child { border-top: none; }
+  article.finding header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+  }
+  .badge-sev-low { background: rgba(100, 116, 139, 0.12); color: var(--sev-low); }
+  .badge-sev-medium { background: rgba(202, 138, 4, 0.14); color: var(--sev-medium); }
+  .badge-sev-high { background: rgba(234, 88, 12, 0.14); color: var(--sev-high); }
+  .badge-sev-critical { background: rgba(220, 38, 38, 0.14); color: var(--sev-critical); }
+  .finding-title { margin: 0; font-size: 15px; font-weight: 500; flex: 1; min-width: 200px; }
+  .finding-location { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12.5px; color: var(--muted); }
+  .finding-note, .finding-fix { margin-top: 6px; font-size: 14px; }
+  .finding-fix strong { color: var(--muted); font-weight: 500; }
+  .finding-resolved { margin-top: 6px; font-size: 13px; color: var(--verdict-strong); font-weight: 600; }
+
+  .reviewer-source {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  .mechanical {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+  }
+  .mechanical h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .mechanical ul { margin: 0; padding-left: 20px; }
+  .mechanical li { margin-bottom: 4px; color: var(--text); }
+
+  footer.report-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  footer .meta { display: flex; gap: 24px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="report-header">
+      <div class="title">
+        <h1>NexiaMind AI — Accueil — UX Design Validation Report</h1>
+        <div class="subtitle">_bmad-output/planning-artifacts/ux-designs/ux-nexiamind-ai-2026-07-18-accueil/</div>
+      </div>
+    </header>
+
+    <div class="synthesis">
+      <p>La paire de spines (DESIGN.md + EXPERIENCE.md) est solide et proche d'être prête pour l'implémentation. Ancrage inhabituellement rigoureux : héritage colors/rounded octet-identique avec le chat, et chaque citation de code (<code>Navbar.tsx:31</code>, <code>chat/page.tsx:48</code>, <code>useAuth.ts</code>, <code>AuthProvider.getSafeRedirect</code>, exports de <code>conversations.ts</code>, <code>PUBLIC_PAGE_ROUTES</code> de <code>proxy.ts</code>) vérifiée exacte. Deux défauts mécaniques (rubrique) et plusieurs défauts d'accessibilité réels ont été trouvés — tous ont été corrigés directement dans les spines à l'exception d'une dette technique pré-existante, hors périmètre, explicitement actée avec le produit.</p>
+      <p><strong>Revue accessibilité :</strong> non conforme AA tel qu'initialement rédigé — un échec de contraste critique sur les CTA (texte blanc sur dégradé orange, ~3.0–3.8:1) et un échec sur le libellé au-dessus des puces (~4.08:1), plus plusieurs lacunes comportementales (persistance de tooltip, activation d'un <code>aria-disabled</code>, annonce de navigation SPA, sémantique de titres, mouvement réduit). Toutes ont été résolues dans les spines, sauf le défaut de contraste du dégradé lui-même sur les bulles de message du chat déjà en production — accepté comme dette technique connue par décision produit du 2026-07-18, hors périmètre de cette session.</p>
+    </div>
+
+    <div class="dimension-summary">
+      <div class="dim-card"><div class="dim-name">Flow coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Token completeness</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate → resolved</div></div>
+      <div class="dim-card"><div class="dim-name">Component coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">State coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Visual reference coverage</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Bloat &amp; overspecification</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+      <div class="dim-card"><div class="dim-name">Inheritance discipline</div><div class="dim-verdict" style="color: var(--verdict-adequate)">adequate → resolved</div></div>
+      <div class="dim-card"><div class="dim-name">Shape fit</div><div class="dim-verdict" style="color: var(--verdict-strong)">strong</div></div>
+    </div>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>1. Flow coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Chaque décision de <code>.memlog.md</code> a un Key Flow avec protagoniste nommé, étapes numérotées, un temps fort (<strong>Climax</strong>) et un chemin d'échec ou une variante appropriée.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Aucun Key Flow ne couvre le clic CTA direct sans puce</h3><span class="finding-location">EXPERIENCE.md § Key Flows</span></header>
+            <div class="finding-note">Couvert seulement par une règle d'une ligne renvoyant vers le Flow 1 du chat.</div>
+            <div class="finding-fix"><strong>Fix:</strong> optionnel — non appliqué, jugé suffisant tel quel.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">.memlog.md décrit la page comme "authentifiée" — imprécis</h3><span class="finding-location">.memlog.md ligne 7 vs EXPERIENCE.md § Foundation</span></header>
+            <div class="finding-note">EXPERIENCE.md corrige déjà correctement (spine gagne en cas de conflit).</div>
+            <div class="finding-fix"><strong>Fix:</strong> aucun requis dans la spine.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary><h2>2. Token completeness</h2><span class="verdict-pill verdict-adequate">adequate → resolved</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Tous les tokens couleur portent une valeur hex/rgba. Deux défauts bloquants trouvés et corrigés ; un défaut mineur documenté.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">{colors.ring} référencé mais jamais défini</h3><span class="finding-location">EXPERIENCE.md § Interaction Primitives</span></header>
+            <div class="finding-note">Référence cassée héritée telle quelle des EXPERIENCE.md du chat et de l'auth (seul <code>ring-glow</code> existe, un token distinct).</div>
+            <div class="finding-fix"><strong>Fix:</strong> référence remplacée par <code>{colors.primary}</code>, un token existant déjà utilisé comme couleur d'action.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session (accueil uniquement — le bug source dans chat/auth status:final reste, signalé, hors périmètre).</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Valeurs d'ombre obsolètes (pré-override)</h3><span class="finding-location">DESIGN.md § Elevation &amp; Depth, § Components (closing-cta)</span></header>
+            <div class="finding-note"><code>rgba(193,78,47,.4)</code>/<code>.35</code> contredisaient la valeur corrigée déjà présente en § Colors et en frontmatter.</div>
+            <div class="finding-fix"><strong>Fix:</strong> remplacées par <code>rgba(244,105,63,.55)</code>/<code>.4</code>.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Auto-suffisance partielle (colors/rounded seulement)</h3><span class="finding-location">DESIGN.md frontmatter description</span></header>
+            <div class="finding-note">La description promettait l'auto-suffisance complète mais typography/spacing hérités n'étaient que nommés, sans valeurs.</div>
+            <div class="finding-fix"><strong>Fix:</strong> description nuancée pour ne revendiquer l'auto-suffisance que sur colors/rounded.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Quelques tailles/paddings en prose uniquement</h3><span class="finding-location">DESIGN.md § Components</span></header>
+            <div class="finding-note">step-number-badge (46×46px), halo du badge eyebrow, padding cta/closing-cta — non répétés en frontmatter <code>components:</code>.</div>
+            <div class="finding-fix"><strong>Fix:</strong> non appliqué (cosmétique, valeurs déjà présentes en prose).</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>3. Component coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Chaque composant du frontmatter DESIGN.md a une couverture comportementale réelle dans EXPERIENCE.md § Component Patterns.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Légère redondance dans la ligne "Hero"</h3><span class="finding-location">EXPERIENCE.md § Component Patterns</span></header>
+            <div class="finding-note">Pas un défaut de couverture.</div>
+            <div class="finding-fix"><strong>Fix:</strong> aucun requis.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>4. State coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Tous les états applicables à la surface unique (<code>/</code>) sont couverts, avec tags <code>[ASSUMPTION]</code> où <code>.memlog.md</code> ne précisait pas. Aucun finding.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>5. Visual reference coverage</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Le seul asset visuel (<code>imports/maquette-nexiamind-ai-accueil-2026-07-18.html</code>) est référencé spécifiquement partout où c'est pertinent, avec les divergences nommées. Aucun orphelin. Aucun finding.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>6. Bloat &amp; overspecification</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Pas de restatement de pixels, pas de prose là où un tableau ferait mieux, tags <code>[ASSUMPTION]</code>/<code>[NOTE FOR UX]</code> utilisés avec parcimonie sur des lacunes réelles. Aucun finding.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details open>
+        <summary><h2>7. Inheritance discipline</h2><span class="verdict-pill verdict-adequate">adequate → resolved</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Mêmes deux findings que Token completeness (§2) — un bris de référence hérité et une propagation incomplète de l'override de dégradé. Les deux corrigés.</p></div></div>
+      </details>
+    </section>
+
+    <section class="dimension">
+      <details>
+        <summary><h2>8. Shape fit</h2><span class="verdict-pill verdict-strong">strong</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>DESIGN.md et EXPERIENCE.md suivent l'ordre canonique des sections, toutes les sections requises présentes.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Pas de table Responsive &amp; Platform dédiée</h3><span class="finding-location">EXPERIENCE.md</span></header>
+            <div class="finding-note">Comportement de breakpoint couvert en prose dans § Layout &amp; Spacing (DESIGN.md), suffisamment précis.</div>
+            <div class="finding-fix"><strong>Fix:</strong> optionnel, non appliqué.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <section class="reviewer-section">
+      <details open>
+        <summary><h2>Accessibility review</h2><span class="reviewer-source">review-accessibility.md</span></summary>
+        <div class="dim-body"><div class="dim-judgment"><p>Non conforme AA tel qu'initialement rédigé. L'intention était bonne à plusieurs endroits (aria-disabled focusable, tooltip hover+focus, ring de focus visible, boutons sémantiques) mais un échec de contraste dur touchait les deux CTA de conversion, un second touchait un libellé porteur de sens, et plusieurs lacunes comportementales restaient non spécifiées. Toutes corrigées sauf une, actée comme dette technique par décision produit.</p></div></div>
+        <div class="findings-list">
+          <article class="finding">
+            <header><span class="badge badge-sev-critical">critical</span><h3 class="finding-title">Texte blanc sur dégradé CTA sous le seuil AA</h3><span class="finding-location">DESIGN.md § Colors, § Components (cta-primary/closing-cta)</span></header>
+            <div class="finding-note">~3.03:1 à l'extrémité #F4693F, ~3.81:1 à l'extrémité #E64F2B — sous les 4.5:1 requis pour du texte normal (15.5px/600 ne se qualifiait pas "grand texte"). Ce même dégradé+texte blanc est déjà en production sur les bulles de message du chat (<code>ChatMessage.tsx</code>).</div>
+            <div class="finding-fix"><strong>Fix:</strong> cta-label passé à 19px/700 (qualifie "grand texte", seuil AA 3:1) — corrige les CTA de l'accueil sans toucher au dégradé partagé ni aux bulles de chat déjà en prod.</div>
+            <div class="finding-resolved">✓ Corrigé pour l'accueil. Décision produit (2026-07-18) : le même défaut sur les bulles de chat en production est accepté comme dette technique connue, non traité ici (chat déjà status:final, hors périmètre).</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">chips-eyebrow-text sous le seuil AA</h3><span class="finding-location">DESIGN.md § Colors, § Typography (chips-eyebrow)</span></header>
+            <div class="finding-note">#6F7789 sur {colors.surface} ≈ 4.08:1, sous 4.5:1 — libellé instructionnel non décoratif.</div>
+            <div class="finding-fix"><strong>Fix:</strong> remplacé par #8D9CB5 (= {colors.ink-subtle}) ≈ 6.6:1.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">aria-disabled n'empêche pas nativement l'activation</h3><span class="finding-location">EXPERIENCE.md § Component Patterns, § Accessibility Floor</span></header>
+            <div class="finding-note">Le choix d'élément était laissé ouvert (<code>&lt;button&gt;</code>/<code>&lt;a&gt;</code>), risquant un <code>&lt;a&gt;</code> sans <code>href</code> non focusable — contradictoire avec l'exigence de rester atteignable au clavier.</div>
+            <div class="finding-fix"><strong>Fix:</strong> <code>&lt;button type="button" aria-disabled="true"&gt;</code> mandaté explicitement, gestionnaire clic/keydown no-op précisé.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-high">high</span><h3 class="finding-title">Aucune annonce/gestion du focus sur la navigation SPA</h3><span class="finding-location">EXPERIENCE.md § State Patterns</span></header>
+            <div class="finding-note">La navigation client-side vers /chat ne déclenche pas nativement l'annonce "nouvelle page" pour un lecteur d'écran.</div>
+            <div class="finding-fix"><strong>Fix:</strong> note ajoutée ; la gestion du focus d'entrée de route est déléguée à chat/EXPERIENCE.md (concerne toute arrivée sur /chat, pas seulement depuis l'accueil).</div>
+            <div class="finding-resolved">✓ Signalé et cross-référencé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">cta-secondary-disabled : contraste dépendant de l'implémentation de l'opacité</h3><span class="finding-location">DESIGN.md § Components (cta-secondary-disabled)</span></header>
+            <div class="finding-note">Un <code>opacity: 0.55</code> global composite le texte avec l'arrière-plan de page, ramenant le contraste effectif à ~5:1 — proche du seuil et sensible au rendu réel.</div>
+            <div class="finding-fix"><strong>Fix:</strong> non appliqué — recommandation de spécifier des tokens solides dédiés à l'état désactivé plutôt qu'une opacité globale, à trancher en implémentation.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Tooltip non conforme WCAG 1.4.13 (persistance/dismissal)</h3><span class="finding-location">EXPERIENCE.md § State Patterns, § Accessibility Floor</span></header>
+            <div class="finding-note">Ni la dismissal par Échap, ni la persistance sans minuteur n'étaient spécifiées.</div>
+            <div class="finding-fix"><strong>Fix:</strong> règle ajoutée — dismissible par Échap sans perte de focus, persistante tant que survol/focus actif.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Montage DOM du texte de tooltip non spécifié</h3><span class="finding-location">EXPERIENCE.md § Accessibility Floor</span></header>
+            <div class="finding-note">Si le texte n'est monté qu'au survol, l'id référencé par aria-describedby peut ne pas exister au premier focus.</div>
+            <div class="finding-fix"><strong>Fix:</strong> précision ajoutée — le nœud doit être présent en permanence dans le DOM (masqué visuellement, pas démonté).</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Latence de la garde d'auth au clic non traitée</h3><span class="finding-location">EXPERIENCE.md § Foundation, § State Patterns</span></header>
+            <div class="finding-note">Aucun comportement spécifié si useAuth() n'a pas encore résolu au moment du clic.</div>
+            <div class="finding-fix"><strong>Fix:</strong> ligne ajoutée — traité comme non connecté par défaut tant que l'état n'est pas résolu.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-medium">medium</span><h3 class="finding-title">Sémantique des titres non spécifiée</h3><span class="finding-location">DESIGN.md § Components, EXPERIENCE.md</span></header>
+            <div class="finding-note">Aucun niveau de titre (h1/h2/h3) n'était assigné aux éléments hero-heading/section-display/step-title.</div>
+            <div class="finding-fix"><strong>Fix:</strong> hiérarchie explicitée dans EXPERIENCE.md § Accessibility Floor.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">prefers-reduced-motion non traité</h3><span class="finding-location">DESIGN.md § Components (badge), EXPERIENCE.md</span></header>
+            <div class="finding-note">Le point pulsant du badge et les transitions de survol n'avaient pas de règle de mouvement réduit.</div>
+            <div class="finding-fix"><strong>Fix:</strong> règle ajoutée dans EXPERIENCE.md § Accessibility Floor.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+          <article class="finding">
+            <header><span class="badge badge-sev-low">low</span><h3 class="finding-title">Règle clavier générique sans exception pour le CTA désactivé</h3><span class="finding-location">EXPERIENCE.md § Interaction Primitives</span></header>
+            <div class="finding-note">Résoluble par lecture croisée, mais risque d'implémentation incorrecte.</div>
+            <div class="finding-fix"><strong>Fix:</strong> exception explicite ajoutée.</div>
+            <div class="finding-resolved">✓ Corrigé dans cette session.</div>
+          </article>
+        </div>
+      </details>
+    </section>
+
+    <div class="mechanical">
+      <h3>Mechanical notes</h3>
+      <ul>
+        <li>Aucune incohérence de nommage restante au-delà de l'écart mineur chips-eyebrow/section-display absents du frontmatter <code>components:</code> (non bloquant, non corrigé).</li>
+        <li>Toutes les citations de code spot-checkées par la revue rubrique sont exactes (Navbar.tsx:31, chat/page.tsx:48, useAuth.ts, AuthProvider.getSafeRedirect, conversations.ts, proxy.ts PUBLIC_PAGE_ROUTES, layout.tsx polices chargées).</li>
+        <li>Aucun diagramme Mermaid dans les deux fichiers — n/a.</li>
+      </ul>
+    </div>
+
+    <footer class="report-footer">
+      <div class="meta">
+        <span>Rubric: review-rubric.md</span>
+        <span>Accessibility: review-accessibility.md</span>
+        <span>Generated: 2026-07-18</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
