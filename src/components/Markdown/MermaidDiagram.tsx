@@ -146,8 +146,8 @@ export function MermaidDiagram({ code, className = '' }: MermaidDiagramProps) {
         setValidationStatus('valid')
         
         return () => {
-          if (bindFunctions) {
-            bindFunctions()
+          if (bindFunctions && containerRef.current) {
+            bindFunctions(containerRef.current)
           }
         }
       } catch (err) {
