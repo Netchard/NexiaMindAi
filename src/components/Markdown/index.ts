@@ -7,6 +7,7 @@
 
 export { MarkdownRenderer, type MarkdownRendererProps } from './MarkdownRenderer'
 export { CodeBlock, type CodeBlockProps } from './CodeBlock'
+export { MermaidDiagram, type MermaidDiagramProps } from './MermaidDiagram'
 export {
   MarkdownErrorBoundary,
   type MarkdownErrorBoundaryProps,

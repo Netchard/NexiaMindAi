@@ -42,6 +42,7 @@ const SUPPORTED_LANGUAGES = [
   'nginx',
   'makefile',
   'vim',
+  'mermaid',
 ]
 
 /**

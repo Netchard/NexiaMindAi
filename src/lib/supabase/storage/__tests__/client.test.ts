@@ -117,7 +117,10 @@ describe('SupabaseStorageClient', () => {
 
       expect(files).toHaveLength(2);
       expect(files[0].name).toBe('test-file.pdf');
-      expect(files[0].path).toBe('documents/test-file.pdf');
+      // Sans prefix (listing à la racine), le chemin complet est le nom du
+      // fichier tel quel — l'API Supabase Storage ne renvoie jamais
+      // `metadata.full_path` en réalité, voir la note dans listFiles().
+      expect(files[0].path).toBe('test-file.pdf');
       expect(files[0].contentType).toBe('application/pdf');
       expect(files[0].size).toBe(1024);
     });
@@ -358,7 +361,7 @@ describe('SupabaseStorageClient', () => {
 
       const files = await client.listFiles();
       expect(files[0].name).toBe('file with spaces & special chars.txt');
-      expect(files[0].path).toBe('documents/file with spaces & special chars.txt');
+      expect(files[0].path).toBe('file with spaces & special chars.txt');
     });
 
     it('Devrait gérer les chemins avec des sous-dossiers imbriqués', async () => {

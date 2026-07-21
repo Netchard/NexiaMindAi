@@ -39,13 +39,18 @@ export function DictationProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<DictationMode>(null)
   const [transcript, setTranscript] = useState('')
   const [permissionDenied, setPermissionDenied] = useState(false)
+  const [isSupported, setIsSupported] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const modeRef = useRef<DictationMode>(null)
   const finalTranscriptRef = useRef('')
 
-  const isSupported =
-    typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+  // Déterminer si la dictée est supportée (côté client uniquement)
+  useEffect(() => {
+    const supported =
+      typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition)
+    setIsSupported(supported)
+  }, [])
 
   const ensureRecognition = useCallback(() => {
     if (recognitionRef.current || !isSupported) return recognitionRef.current

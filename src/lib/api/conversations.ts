@@ -34,8 +34,8 @@ export function setConversationsCache(cache: typeof cacheContainer.conversations
   cacheContainer.conversationsCache = cache;
 }
 
-const CACHE_TTL = 60 * 1000; // 1 minute
-const API_TIMEOUT = 10 * 1000; // 10 secondes
+const CACHE_TTL = 120 * 1000; // 1 minute
+const API_TIMEOUT = 60 * 1000; // 10 secondes
 
 /**
  * Invalide le cache des conversations

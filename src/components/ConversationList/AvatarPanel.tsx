@@ -40,7 +40,7 @@ export default function AvatarPanel() {
   const isPttActive = isListening && mode === 'ptt'
 
   return (
-    <div className="p-4 border-t border-chat-border-panel" data-testid="avatar-panel">
+    <div className="p-4 border-t border-chat-border-panel" data-testid="avatar-panel" suppressHydrationWarning>
       <div className="flex flex-col items-center gap-4">
         {/* Zone réservée pour l'avatar 3D — voir DESIGN.md > avatar-panel-avatar */}
         <div

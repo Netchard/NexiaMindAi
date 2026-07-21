@@ -1,0 +1,334 @@
+/* ===================================================================
+   STYLES GLOBAUX POUR MARKDOWN - Appliqués à tous les messages
+   =================================================================== */
+
+/* Conteneur principal markdown */
+.markdown-content {
+  width: 100%;
+  max-width: 100%;
+  font-size: 16px !important;
+  line-height: 1.75 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Paragraphes */
+.markdown-paragraph {
+  margin: 1.2em 0 !important;
+}
+
+/* Textes forts */
+.markdown-strong {
+  font-weight: 600 !important;
+  color: #f7fafc !important;
+}
+
+/* Emphase */
+.markdown-em {
+  font-style: italic !important;
+  color: #cbd5e0 !important;
+}
+
+/* Code inline */
+.markdown-code-inline {
+  background-color: rgba(244, 105, 63, 0.15) !important;
+  color: #ef6c4d !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important;
+  font-size: 0.9em !important;
+}
+
+/* ==================== TITRES ==================== */
+
+.markdown-h1,
+.markdown-h2,
+.markdown-h3,
+.markdown-h4,
+.markdown-h5,
+.markdown-h6 {
+  margin-top: 1.5em !important;
+  margin-bottom: 0.8em !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+}
+
+.markdown-h1 {
+  font-size: 2.5em !important;
+  color: #f7fafc !important;
+  border-bottom: 2px solid #ef6c4d !important;
+  padding-bottom: 10px !important;
+}
+
+.markdown-h2 {
+  font-size: 2.0em !important;
+  color: #f7fafc !important;
+  border-bottom: 1px solid #4a5568 !important;
+  padding-bottom: 8px !important;
+}
+
+.markdown-h3 {
+  font-size: 1.75em !important;
+  color: #f7fafc !important;
+}
+
+.markdown-h4 {
+  font-size: 1.4em !important;
+  color: #e2e8f0 !important;
+}
+
+.markdown-h5 {
+  font-size: 1.25em !important;
+  color: #cbd5e0 !important;
+}
+
+.markdown-h6 {
+  font-size: 1.1em !important;
+  color: #a0aec0 !important;
+}
+
+/* ==================== LISTES ==================== */
+
+.markdown-ul,
+.markdown-ol {
+  margin: 1.5em 0 !important;
+  padding-left: 2em !important;
+}
+
+.markdown-ul {
+  list-style-type: disc !important;
+}
+
+.markdown-ol {
+  list-style-type: decimal !important;
+}
+
+.markdown-li {
+  margin: 0.75em 0 !important;
+  line-height: 1.7 !important;
+}
+
+.markdown-li p {
+  margin: 0.75em 0 !important;
+}
+
+/* Listes imbriquées */
+.markdown-ul .markdown-ul,
+.markdown-ol .markdown-ol {
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+}
+
+/* ==================== AUTRES ==================== */
+
+/* Blockquotes */
+.markdown-blockquote {
+  margin: 1.5em 0 !important;
+  padding-left: 16px !important;
+  border-left: 4px solid #ef6c4d !important;
+  color: #a0aec0 !important;
+  font-style: italic !important;
+}
+
+.markdown-blockquote p {
+  margin: 0.8em 0 !important;
+}
+
+/* Tableaux */
+.markdown-table {
+  width: 100% !important;
+  margin: 1em 0 !important;
+  border-collapse: collapse !important;
+  font-size: 0.95em !important;
+}
+
+.markdown-table th,
+.markdown-table td {
+  padding: 12px 16px !important;
+  text-align: left !important;
+  border: 1px solid #4a5568 !important;
+}
+
+.markdown-table th {
+  background-color: #2d3748 !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+}
+
+.markdown-table td {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  color: #e2e8f0 !important;
+}
+
+.markdown-table tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.markdown-table tr:hover td {
+  background-color: rgba(244, 105, 63, 0.08) !important;
+}
+
+/* Liens */
+.markdown-link {
+  color: #ef6c4d !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgba(244, 105, 63, 0.4) !important;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease !important;
+}
+
+.markdown-link:hover {
+  color: #f6ad55 !important;
+  text-decoration-color: #ef6c4d !important;
+}
+
+/* Règle horizontale */
+.markdown-hr {
+  border: none !important;
+  border-top: 1px solid #4a5568 !important;
+  margin: 2em 0 !important;
+}
+
+/* Images */
+.markdown-content img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 4px !important;
+  margin: 0.5em 0 !important;
+}
+
+/* Code blocks in lists */
+.markdown-ul .code-block-container,
+.markdown-ol .code-block-container {
+  margin-left: 1.8em !important;
+}
+
+/* ==================== CODE BLOCKS ==================== */
+
+.code-block-container {
+  position: relative !important;
+  margin: 1em 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background-color: #1a202c !important;
+  border: 1px solid #4a5568 !important;
+}
+
+.code-block-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 8px 12px !important;
+  background-color: #2d3748 !important;
+  border-bottom: 1px solid #4a5568 !important;
+  font-size: 0.85em !important;
+}
+
+.language-label {
+  color: #a0aec0 !important;
+  font-family: 'SF Mono', 'Monaco', monospace !important;
+  font-size: 0.9em !important;
+}
+
+.copy-button {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background-color: #4a5568 !important;
+  color: #e2e8f0 !important;
+  border: none !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
+  font-size: 0.85em !important;
+}
+
+.copy-button:hover {
+  background-color: #6366f1 !important;
+}
+
+.copy-button:active {
+  background-color: #4f46e5 !important;
+}
+
+.copy-button svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.code-block-content-wrapper {
+  display: flex !important;
+  position: relative !important;
+}
+
+.code-line-numbers {
+  display: flex !important;
+  flex-direction: column !important;
+  padding-right: 12px !important;
+  border-right: 1px solid #4a5568 !important;
+  margin-right: 12px !important;
+  user-select: none !important;
+  color: #718096 !important;
+  font-family: 'SF Mono', 'Monaco', monospace !important;
+  font-size: 0.9em !important;
+  line-height: 1.5 !important;
+  min-width: 40px !important;
+  text-align: right !important;
+}
+
+.code-line-number {
+  display: inline-block !important;
+  padding: 0 8px 0 0 !important;
+  color: #718096 !important;
+  user-select: none !important;
+}
+
+.code-block-pre {
+  margin: 0 !important;
+  padding: 16px !important;
+  overflow-x: auto !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  background-color: transparent !important;
+  color: #e2e8f0 !important;
+}
+
+.code-block-pre code {
+  background-color: transparent !important;
+  color: inherit !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+/* ==================== MERMAID ==================== */
+
+.mermaid-container {
+  margin: 1em 0 !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  background-color: #1a202c !important;
+  border: 1px solid #4a5568 !important;
+}
+
+.mermaid-diagram {
+  width: 100% !important;
+  padding: 16px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+}
+
+.mermaid-diagram svg {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+}
+
+/* ==================== AUTRES ==================== */
+
+.copy-icon, .check-icon {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.copy-button-text {
+  margin-left: 4px !important;
+}

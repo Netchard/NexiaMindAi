@@ -7,6 +7,8 @@ import hljs from 'highlight.js'
 import Image from 'next/image'
 import { configureHighlighting } from '@/lib/markdown'
 import { CodeBlock } from './CodeBlock'
+import { MermaidDiagram } from './MermaidDiagram'
+import styles from './Markdown.module.css'
 
 // Initialiser highlight.js
 configureHighlighting()
@@ -20,15 +22,27 @@ export interface MarkdownRendererProps {
 }
 
 /**
+ * Traite les sauts de ligne simples pour les convertir en breaks Markdown
+ * En Markdown standard, deux espaces à la fin d'une ligne = <br>
+ */
+function processLineBreaks(content: string): string {
+  // Ajoute deux espaces avant les sauts de ligne simples (non suivis d'un autre saut)
+  // Cela crée des <br> en markdown standard
+  return content.replace(/([^\n])\n([^\n])/g, '$1  \n$2')
+}
+
+/**
  * Composant de rendu Markdown avec support complet
  * - Gras, italique, listes, liens, citations
  * - Tableaux (via remark-gfm)
  * - Blocs de code avec coloration syntaxique (via highlight.js)
+ * - Sauts de ligne simples (via traitement personnalisé)
  * Fait partie de ST-307: Ajouter le Support du Markdown
  */
 export function MarkdownRenderer({ content, className = '' }: MarkdownRendererProps) {
   // Memoizer le contenu pour eviter les re-rendus inutiles
-  const memoizedContent = useMemo(() => content, [content])
+  // Appliquer le traitement des sauts de ligne simples
+  const memoizedContent = useMemo(() => processLineBreaks(content), [content])
 
   // Configuration des composants personnalises
   const components = useMemo(() => ({
@@ -53,7 +67,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
       // Code inline (pas de coloration syntaxique)
       if (isInline) {
         return (
-          <code className={`markdown-code-inline ${className || ''}`.trim()} {...props}>
+          <code className={`${styles['markdown-code-inline']} ${className || ''}`.trim()} {...props}>
             {children}
           </code>
         )
@@ -62,17 +76,40 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
       // Bloc de code avec coloration
       if (match) {
         const language = match[1]
-        const highlighted = hljs.highlight(codeContent, { language }).value
         const lineCount = codeContent.split('\n').length
 
-        return (
-          <CodeBlock
-            language={language}
-            code={codeContent}
-            highlightedHtml={highlighted}
-            lineCount={lineCount}
-          />
-        )
+        // Cas spécial pour Mermaid - rendu visuel du diagramme
+        // Mermaid est un langage de diagramme, pas un langage de programmation
+        if (language.toLowerCase() === 'mermaid') {
+          return (
+            <div className={styles['mermaid-container']}>
+              <MermaidDiagram code={codeContent} />
+            </div>
+          )
+        }
+
+        // Pour les autres langages, appliquer la coloration syntaxique
+        try {
+          const highlighted = hljs.highlight(codeContent, { language }).value
+          return (
+            <CodeBlock
+              language={language}
+              code={codeContent}
+              highlightedHtml={highlighted}
+              lineCount={lineCount}
+            />
+          )
+        } catch (error) {
+          // Si hljs ne supporte pas le langage, afficher sans coloration
+          console.warn(`Langage non supporté par highlight.js: ${language}`)
+          return (
+            <CodeBlock
+              language={language}
+              code={codeContent}
+              lineCount={lineCount}
+            />
+          )
+        }
       }
 
       // Bloc de code sans langage specifie
@@ -88,7 +125,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
 
     // Tableaux
     table({ children }: any) {
-      return <table className="markdown-table">{children}</table>
+      return <table className={styles['markdown-table']}>{children}</table>
     },
 
     th({ children, ...props }: any) {
@@ -110,7 +147,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="markdown-link"
+          className={styles['markdown-link']}
           {...props}
         >
           {children}
@@ -120,7 +157,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
 
     // Citations
     blockquote({ children }: any) {
-      return <blockquote className="markdown-blockquote">{children}</blockquote>
+      return <blockquote className={styles['markdown-blockquote']}>{children}</blockquote>
     },
 
     // Images - Utilisation de Next.js Image pour l'optimisation (ST-309)
@@ -133,7 +170,7 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
       // Pour les images markdown, utiliser Next.js Image avec fill
       // Le conteneur doit avoir position: relative
       return (
-        <div className="markdown-image-container" style={{ position: 'relative', width: '100%', height: 'auto' }}>
+        <div className={styles['markdown-image-container']} style={{ position: 'relative', width: '100%', height: 'auto' }}>
           <Image
             src={src}
             alt={alt || ''}
@@ -149,56 +186,56 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
 
     // Paragraphes
     p({ children }: any) {
-      return <p className="markdown-paragraph">{children}</p>
+      return <p className={styles['markdown-paragraph']}>{children}</p>
     },
 
     // Titres
     h1({ children }: any) {
-      return <h1 className="markdown-h1">{children}</h1>
+      return <h1 className={styles['markdown-h1']}>{children}</h1>
     },
     h2({ children }: any) {
-      return <h2 className="markdown-h2">{children}</h2>
+      return <h2 className={styles['markdown-h2']}>{children}</h2>
     },
     h3({ children }: any) {
-      return <h3 className="markdown-h3">{children}</h3>
+      return <h3 className={styles['markdown-h3']}>{children}</h3>
     },
     h4({ children }: any) {
-      return <h4 className="markdown-h4">{children}</h4>
+      return <h4 className={styles['markdown-h4']}>{children}</h4>
     },
     h5({ children }: any) {
-      return <h5 className="markdown-h5">{children}</h5>
+      return <h5 className={styles['markdown-h5']}>{children}</h5>
     },
     h6({ children }: any) {
-      return <h6 className="markdown-h6">{children}</h6>
+      return <h6 className={styles['markdown-h6']}>{children}</h6>
     },
 
     // Listes
     ul({ children }: any) {
-      return <ul className="markdown-ul">{children}</ul>
+      return <ul className={styles['markdown-ul']}>{children}</ul>
     },
     ol({ children }: any) {
-      return <ol className="markdown-ol">{children}</ol>
+      return <ol className={styles['markdown-ol']}>{children}</ol>
     },
     li({ children }: any) {
-      return <li className="markdown-li">{children}</li>
+      return <li className={styles['markdown-li']}>{children}</li>
     },
 
     // Gras et italique (utilise les balises HTML standard)
     strong({ children }: any) {
-      return <strong className="markdown-strong">{children}</strong>
+      return <strong className={styles['markdown-strong']}>{children}</strong>
     },
     em({ children }: any) {
-      return <em className="markdown-em">{children}</em>
+      return <em className={styles['markdown-em']}>{children}</em>
     },
 
     // Horizontale rule
     hr() {
-      return <hr className="markdown-hr" />
+      return <hr className={styles['markdown-hr']} />
     },
   }), []) // Pas de dependances pour memo
 
   return (
-    <div className={`markdown-content ${className}`.trim()}>
+    <div className={`${styles['markdown-content']} ${className}`.trim()}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={components}

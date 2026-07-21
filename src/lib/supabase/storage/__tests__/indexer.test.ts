@@ -100,7 +100,15 @@ const mockSupabaseClient = {
 };
 
 // Déplacer ce mock AVANT l'import du module
-vi.mock('../../server', () => ({
+// indexer.ts importe `supabase` depuis '../admin-client' (client service-role,
+// bypass RLS pour les écritures documents/chunks/embeddings — voir ST-401).
+// `get supabase()` : accès paresseux, la factory `vi.mock` est hoistée et
+// exécutée avant que `mockSupabaseClient` (défini plus bas dans ce fichier)
+// ne soit initialisé — un accès direct lèverait une TDZ ReferenceError.
+vi.mock('../../admin-client', () => ({
+  get supabase() {
+    return mockSupabaseClient;
+  },
   createClient: vi.fn(() => mockSupabaseClient),
 }));
 

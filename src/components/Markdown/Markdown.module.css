@@ -14,15 +14,15 @@
 .markdown-content {
   width: 100%;
   max-width: 100%;
-  font-size: 14.5px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.7;
   color: #e2e8f0;
 }
 
 /* ==================== TEXTES ==================== */
 
 .markdown-paragraph {
-  margin: 0.8em 0;
+  margin: 1.2em 0;
 }
 
 .markdown-strong {
@@ -218,15 +218,15 @@
 /* ==================== CITATIONS ==================== */
 
 .markdown-blockquote {
-  margin: 1em 0;
-  padding-left: 14px;
+  margin: 1.5em 0;
+  padding-left: 16px;
   border-left: 4px solid #ef6c4d;
   color: #a0aec0;
   font-style: italic;
 }
 
 .markdown-blockquote p {
-  margin: 0.5em 0;
+  margin: 0.8em 0;
 }
 
 /* ==================== TITRES ==================== */
@@ -237,38 +237,38 @@
 .markdown-h4,
 .markdown-h5,
 .markdown-h6 {
-  margin-top: 1.2em;
-  margin-bottom: 0.6em;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
   font-weight: 600;
   line-height: 1.3;
 }
 
 .markdown-h1 {
-  font-size: 1.8em;
+  font-size: 2.2em;
   color: #f7fafc;
   border-bottom: 2px solid #ef6c4d;
-  padding-bottom: 8px;
+  padding-bottom: 10px;
 }
 
 .markdown-h2 {
-  font-size: 1.5em;
+  font-size: 1.8em;
   color: #f7fafc;
   border-bottom: 1px solid #4a5568;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
 }
 
 .markdown-h3 {
-  font-size: 1.3em;
+  font-size: 1.5em;
   color: #f7fafc;
 }
 
 .markdown-h4 {
-  font-size: 1.15em;
+  font-size: 1.25em;
   color: #e2e8f0;
 }
 
 .markdown-h5 {
-  font-size: 1.05em;
+  font-size: 1.1em;
   color: #cbd5e0;
 }
 
@@ -281,8 +281,8 @@
 
 .markdown-ul,
 .markdown-ol {
-  margin: 0.8em 0;
-  padding-left: 1.8em;
+  margin: 1.2em 0;
+  padding-left: 2em;
 }
 
 .markdown-ul {
@@ -294,12 +294,12 @@
 }
 
 .markdown-li {
-  margin: 0.4em 0;
-  line-height: 1.5;
+  margin: 0.6em 0;
+  line-height: 1.6;
 }
 
 .markdown-li p {
-  margin: 0.4em 0;
+  margin: 0.6em 0;
 }
 
 /* Listes imbriquées */
@@ -314,7 +314,7 @@
 .markdown-hr {
   border: none;
   border-top: 1px solid #4a5568;
-  margin: 1.5em 0;
+  margin: 2em 0;
 }
 
 /* Images */
@@ -335,4 +335,64 @@
 .markdown-ul .code-block-container,
 .markdown-ol .code-block-container {
   margin-left: 1.8em;
+}
+
+/* ==================== MERMAID DIAGRAMS ==================== */
+
+.mermaid-container {
+  margin: 1em 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1a202c;
+  border: 1px solid #4a5568;
+}
+
+.mermaid-diagram {
+  width: 100%;
+  padding: 16px;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.mermaid-diagram svg {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* Chargement Mermaid */
+.mermaid-loading {
+  margin: 1em 0;
+  padding: 16px;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #93c5fd;
+  text-align: center;
+}
+
+/* Erreur Mermaid */
+.mermaid-error {
+  margin: 1em 0;
+  padding: 16px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #fca5a5;
+}
+
+.mermaid-error p {
+  margin: 0 0 12px 0;
+  font-weight: 500;
+}
+
+.mermaid-fallback-code {
+  background-color: #2d3748;
+  padding: 12px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Monaco', monospace;
+  font-size: 0.9em;
+  overflow-x: auto;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-all;
 }

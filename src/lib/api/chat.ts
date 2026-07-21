@@ -30,7 +30,7 @@ export interface SendMessageResponse {
 }
 
 // Timeout pour les requêtes API (10 secondes)
-const API_TIMEOUT = 10000
+const API_TIMEOUT = 60000
 
 async function parseErrorMessage(response: Response): Promise<string> {
   const errorData = await response.json().catch(() => ({}))

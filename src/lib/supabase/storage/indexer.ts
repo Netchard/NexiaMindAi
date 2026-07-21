@@ -9,7 +9,11 @@ import { ocrService } from './ocr';
 import { chunkDocument, ChunkingResult } from '../../rag/chunker';
 import { generateEmbeddings, EmbeddingResult, BatchEmbeddingResult } from '../../rag/embeddings';
 import { reindexSource } from '../../rag/retriever';
-import { supabase } from '../server';
+// Client service-role (bypass RLS) : les écritures dans `documents`/`chunks`/
+// `embeddings` sont des opérations système, pas des requêtes au nom d'un
+// utilisateur — RLS n'autorise que le service role en écriture sur ces
+// tables (voir ST-401). Même pattern que src/app/api/chat/message/route.ts.
+import { supabase } from '../admin-client';
 import { StorageFileInfo, IndexationOptions, IndexationResult, IndexationError, DocumentError } from './types';
 import { Chunk } from '../../rag/types';
 import { estimateTokenCount } from '../../rag/utils';
@@ -43,6 +47,50 @@ export class SupabaseStorageIndexer {
     }
     this.bucketName = bucketName;
     logger.info(`SupabaseStorageIndexer initialisé pour le bucket: ${bucketName}`);
+  }
+
+  /**
+   * Mapper un MIME type vers un type de document valide pour la base de données
+   * La contrainte documents_type_check n'accepte que : 'pdf', 'text', 'markdown', 'code', 'csv', 'json', 'other'
+   * @param mimeType - MIME type du fichier (ex: 'application/pdf')
+   * @returns Type de document autorisé
+   */
+  private mapMimeTypeToDocumentType(mimeType: string | undefined): string {
+    if (!mimeType) return 'other';
+
+    const mime = mimeType.toLowerCase();
+
+    // PDF
+    if (mime.includes('pdf')) return 'pdf';
+    
+    // Textes simples
+    if (mime.includes('text/plain') || mime === 'text') return 'text';
+    
+    // Markdown
+    if (mime.includes('text/markdown') || mime.includes('markdown')) return 'markdown';
+    
+    // CSV
+    if (mime.includes('text/csv') || mime.includes('csv')) return 'csv';
+    
+    // JSON
+    if (mime.includes('application/json') || mime.includes('json')) return 'json';
+    
+    // Code source
+    if (mime.includes('text/x-') ||
+        mime.includes('application/x-javascript') ||
+        mime.includes('application/javascript')) return 'code';
+    
+    // Documents Office (Word, Excel, PowerPoint) -> mapper vers 'other'
+    if (mime.includes('openxmlformats-officedocument') ||
+        mime.includes('msword') ||
+        mime.includes('word') ||
+        mime.includes('excel') ||
+        mime.includes('spreadsheet') ||
+        mime.includes('powerpoint') ||
+        mime.includes('presentation')) return 'other';
+    
+    // Default
+    return 'other';
   }
 
   /**
@@ -113,21 +161,31 @@ export class SupabaseStorageIndexer {
     context: string,
     filePath?: string
   ): never {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const details = error instanceof Error && 'details' in error ? (error as any).details : undefined;
-    const hint = error instanceof Error && 'hint' in error ? (error as any).hint : undefined;
-    
+    // Les erreurs Postgrest/Storage de @supabase/supabase-js sont des objets
+    // simples ({message, details, hint, code}), PAS des instances de `Error`
+    // — `error instanceof Error` est donc toujours faux pour elles, et
+    // `String(error)` produit "[object Object]" au lieu du vrai message. On
+    // extrait `.message` par duck-typing plutôt que par `instanceof`.
+    const isErrorLike = (val: unknown): val is { message: string; details?: unknown; hint?: unknown; code?: unknown } =>
+      typeof val === 'object' && val !== null && 'message' in val && typeof (val as { message: unknown }).message === 'string';
+
+    const errorMessage = isErrorLike(error) ? error.message : String(error);
+    const details = isErrorLike(error) ? error.details : undefined;
+    const hint = isErrorLike(error) ? error.hint : undefined;
+    const code = isErrorLike(error) ? error.code : undefined;
+
     const indexationError = new IndexationError(
       `${context}: ${errorMessage}`,
       'supabase_error',
       error instanceof Error ? error : undefined,
-      { filePath, context, details, hint }
+      { filePath, context, details, hint, code }
     );
-    
+
     logger.error(indexationError.message, {
       error: errorMessage,
       details,
       hint,
+      code,
       filePath,
       context,
     });
@@ -282,7 +340,7 @@ export class SupabaseStorageIndexer {
           sourceType: 'supabase_storage',
           sourceBucket: this.bucketName,
           client: options.client || 'default',
-          documentType: options.documentType || extractedText.contentType,
+          documentType: options.documentType || this.mapMimeTypeToDocumentType(extractedText.contentType),
           fileName: fileInfo.name,
           fileSize: fileInfo.size,
           fileContentType: fileInfo.contentType,
@@ -326,7 +384,7 @@ export class SupabaseStorageIndexer {
             .from('documents')
             .upsert({
               name: fileInfo.name,
-              type: extractedText.contentType || 'text',
+              type: this.mapMimeTypeToDocumentType(extractedText.contentType),
               source: 'supabase',
               file_path: fileInfo.path,
               file_size: fileInfo.size,
@@ -334,7 +392,7 @@ export class SupabaseStorageIndexer {
               language: documentLanguage,
               metadata: {
                 client: options.client || 'default',
-                documentType: options.documentType || extractedText.contentType,
+                documentType: options.documentType || this.mapMimeTypeToDocumentType(extractedText.contentType),
                 sourceBucket: this.bucketName,
               },
             }, { onConflict: 'file_path' })

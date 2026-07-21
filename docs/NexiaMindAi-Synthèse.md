@@ -81,14 +81,14 @@ flowchart TD
     C -->|Déploiement| G[Vercel]
     G -->|CI/CD| H[GitHub Actions]
     
-    style A fill:#f9f,stroke:#333
-    style B fill:#bbf,stroke:#333
-    style C fill:#bbf,stroke:#333
-    style D fill:#9f9,stroke:#333
-    style E fill:#9f9,stroke:#333
-    style F fill:#9f9,stroke:#333
-    style G fill:#9cf,stroke:#333
-    style H fill:#9cf,stroke:#333
+    style A fill:#f9f,stroke:#333,color:#000
+    style B fill:#bbf,stroke:#333,color:#000
+    style C fill:#bbf,stroke:#333,color:#000
+    style D fill:#9f9,stroke:#333,color:#000
+    style E fill:#9f9,stroke:#333,color:#000
+    style F fill:#9f9,stroke:#333,color:#000
+    style G fill:#9cf,stroke:#333,color:#000
+    style H fill:#9cf,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -157,13 +157,13 @@ flowchart LR
     end
     
     style A fill:#f9f,stroke:#333,color:#000
-    style H fill:#9f9,stroke:#333
-    style B fill:#bbf,stroke:#333
-    style C fill:#bbf,stroke:#333
-    style D fill:#9cf,stroke:#333
-    style E fill:#bbf,stroke:#333
-    style F fill:#bbf,stroke:#333
-    style G fill:#bbf,stroke:#333
+    style H fill:#9f9,stroke:#333,color:#000
+    style B fill:#bbf,stroke:#333,color:#000
+    style C fill:#bbf,stroke:#333,color:#000
+    style D fill:#9cf,stroke:#333,color:#000
+    style E fill:#bbf,stroke:#333,color:#000
+    style F fill:#bbf,stroke:#333,color:#000
+    style G fill:#bbf,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -230,9 +230,9 @@ flowchart TD
     D
     end
     
-    style A fill:#f9f,stroke:#333
-    style E fill:#bbf,stroke:#333
-    style F fill:#9cf,stroke:#333
+    style A fill:#f9f,stroke:#333,color:#000
+    style E fill:#bbf,stroke:#333,color:#000
+    style F fill:#9cf,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -289,10 +289,10 @@ flowchart TD
     I
     end
     
-    style A fill:#f9f,stroke:#333
-    style B fill:#bbf,stroke:#333
-    style C fill:#9cf,stroke:#333
-    style D fill:#9cf,stroke:#333
+    style A fill:#f9f,stroke:#333,color:#000
+    style B fill:#bbf,stroke:#333,color:#000
+    style C fill:#9cf,stroke:#333,color:#000
+    style D fill:#9cf,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -358,13 +358,13 @@ flowchart TD
     E --> F
     F --> G[Utilisateur]
     
-    style A fill:#9cf,stroke:#333
-    style B fill:#9f9,stroke:#333
-    style C fill:#9f9,stroke:#333
-    style D fill:#9f9,stroke:#333
-    style E fill:#9f9,stroke:#333
-    style F fill:#bbf,stroke:#333
-    style G fill:#f9f,stroke:#333
+    style A fill:#9cf,stroke:#333,color:#000
+    style B fill:#9f9,stroke:#333,color:#000
+    style C fill:#9f9,stroke:#333,color:#000
+    style D fill:#9f9,stroke:#333,color:#000
+    style E fill:#9f9,stroke:#333,color:#000
+    style F fill:#bbf,stroke:#333,color:#000
+    style G fill:#f9f,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -423,11 +423,11 @@ flowchart TD
     C
     end
     
-    style A fill:#9cf,stroke:#333
-    style B fill:#9cf,stroke:#333
-    style C fill:#9cf,stroke:#333
-    style D fill:#bbf,stroke:#333
-    style E fill:#f9f,stroke:#333
+    style A fill:#9cf,stroke:#333,color:#000
+    style B fill:#9cf,stroke:#333,color:#000
+    style C fill:#9cf,stroke:#333,color:#000
+    style D fill:#bbf,stroke:#333,color:#000
+    style E fill:#f9f,stroke:#333,color:#000
 ```
 
 ### 📦 Stories Associées
@@ -591,22 +591,22 @@ flowchart LR
     L -->|Affichage| K
     end
     
-    style A1 fill:#ff9,stroke:#333
-    style A2 fill:#ff9,stroke:#333
-    style A3 fill:#ff9,stroke:#333
-    style A4 fill:#ff9,stroke:#333
-    style A5 fill:#ff9,stroke:#333
-    style B fill:#9f9,stroke:#333
-    style C fill:#bbf,stroke:#333
-    style D fill:#bbf,stroke:#333
-    style E fill:#9cf,stroke:#333
-    style F fill:#f9f,stroke:#333
-    style G fill:#bbf,stroke:#333
-    style H fill:#bbf,stroke:#333
-    style I fill:#f9f,stroke:#333
-    style J fill:#bbf,stroke:#333
-    style K fill:#9f9,stroke:#333
-    style L fill:#bbf,stroke:#333
+    style A1 fill:#ff9,stroke:#333,color:#000
+    style A2 fill:#ff9,stroke:#333,color:#000
+    style A3 fill:#ff9,stroke:#333,color:#000
+    style A4 fill:#ff9,stroke:#333,color:#000
+    style A5 fill:#ff9,stroke:#333,color:#000
+    style B fill:#9f9,stroke:#333,color:#000
+    style C fill:#bbf,stroke:#333,color:#000
+    style D fill:#bbf,stroke:#333,color:#000
+    style E fill:#9cf,stroke:#333,color:#000
+    style F fill:#f9f,stroke:#333,color:#000
+    style G fill:#bbf,stroke:#333,color:#000
+    style H fill:#bbf,stroke:#333,color:#000
+    style I fill:#f9f,stroke:#333,color:#000
+    style J fill:#bbf,stroke:#333,color:#000
+    style K fill:#9f9,stroke:#333,color:#000
+    style L fill:#bbf,stroke:#333,color:#000
 ```
 
 ---

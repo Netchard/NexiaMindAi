@@ -3,18 +3,10 @@
 import { useState, Suspense } from 'react'
 import dynamic from 'next/dynamic'
 import { SourceCitationList } from '@/components/SourceCitation';
+import { MarkdownRenderer } from '@/components/Markdown';
 import { MarkdownLoadingSpinner } from '@/components/common';
 import type { SourceCitation } from '@/types/citations';
 import type { ChatMessageData } from './types'
-
-// Lazy loading des composants lourds pour ST-309
-const MarkdownRenderer = dynamic(
-  () => import('@/components/Markdown').then((mod) => mod.MarkdownRenderer),
-  {
-    loading: () => <MarkdownLoadingSpinner />,
-    ssr: false, // Désactiver SSR pour éviter les erreurs de hydration
-  }
-)
 
 const ExportButton = dynamic(
   () => import('./').then((mod) => mod.ExportButton),
@@ -75,10 +67,12 @@ export default function ChatMessage({ role, content, showAvatar, citations, id =
     return (
       <div className="flex justify-end">
         <div
-          className="max-w-[78%] whitespace-pre-wrap rounded-chat-lg rounded-tr-[5px] bg-gradient-to-br from-chat-primary to-chat-primary-active px-[17px] py-3.5 text-[14.5px] leading-relaxed text-chat-on-primary shadow-[0_8px_22px_-12px_rgba(244,105,63,.55)]"
+          className="max-w-[85%] rounded-chat-lg rounded-tr-[5px] bg-gradient-to-br from-chat-primary to-chat-primary-active px-5 py-4 text-chat-on-primary shadow-[0_8px_22px_-12px_rgba(244,105,63,.55)]"
           data-testid="chat-bubble-user"
         >
-          {content}
+          <div className="max-w-[100%]">
+            <MarkdownRenderer content={content} />
+          </div>
         </div>
       </div>
     )
@@ -97,7 +91,7 @@ export default function ChatMessage({ role, content, showAvatar, citations, id =
       ) : (
         <div className="w-[26px] flex-none" aria-hidden="true" />
       )}
-      <div className="flex max-w-[78%] flex-col gap-2.5">
+      <div className="flex max-w-[80%] flex-col gap-2.5">
         {/* Conteneur du message avec boutons Export/Écouter - ST-308 */}
         <div className="relative">
           {/* Boutons Export + Écouter en haut à droite */}
@@ -108,10 +102,12 @@ export default function ChatMessage({ role, content, showAvatar, citations, id =
 
           {/* Message avec Markdown */}
           <div
-            className="rounded-chat-lg rounded-tl-[5px] bg-chat-assistant-bg px-[17px] py-3.5 pt-8 text-[14.5px] leading-relaxed text-chat-assistant-text overflow-hidden"
+            className="rounded-chat-lg rounded-tl-[5px] bg-chat-assistant-bg px-5 py-4 pt-10 text-chat-assistant-text"
             data-testid="chat-bubble-assistant"
           >
-            <MarkdownRenderer content={content} />
+            <div className="max-w-[100%]">
+              <MarkdownRenderer content={content} />
+            </div>
           </div>
         </div>
         {/* Affichage des citations de sources (ST-305) */}

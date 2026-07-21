@@ -90,7 +90,7 @@ export async function getHistory(limit = 50, offset = 0): Promise<HistoryRespons
 }
 
 // Timeout pour les requêtes API (10 secondes)
-const API_TIMEOUT = 10000;
+const API_TIMEOUT = 60000;
 
 /**
  * Récupère tous les messages d'une conversation spécifique

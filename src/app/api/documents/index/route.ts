@@ -1,42 +1,92 @@
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { storageIndexer } from '@/lib/supabase/storage/indexer';
+import { isValidUploadPrefix } from '@/lib/supabase/storage/upload-prefix';
 
+/**
+ * Lance l'indexation (chunking + embeddings) des fichiers d'un préfixe donné
+ * de Supabase Storage. Fait partie de la spec "Page Documents — upload et
+ * indexation manuelle RAG" (_bmad-output/implementation-artifacts/
+ * spec-documents-upload-indexation.md) : appelée depuis /documents après un
+ * upload réussi, avec le préfixe dédié à la session d'upload courante
+ * (jamais tout le bucket).
+ *
+ * Contrairement à /api/sources/supabase/sync, cette route `await` le
+ * résultat et le retourne de façon synchrone (pas de mode fire-and-forget
+ * 202) : l'utilisateur doit voir le résumé final immédiatement après le clic.
+ *
+ * Protégée par src/proxy.ts (préfixe /api/documents) : x-user-id est déjà
+ * injecté et revalidé côté serveur. On le revérifie ici aussi (défense en
+ * profondeur, même pattern que src/app/api/sources/supabase/sync/route.ts).
+ */
 export async function POST(request: Request) {
+  const startTime = Date.now();
+  const userId = request.headers.get('x-user-id');
+
+  if (!userId) {
+    logger.warn('Tentative d\'accès à /api/documents/index sans utilisateur authentifié', {
+      path: '/api/documents/index',
+    });
+    return NextResponse.json(
+      { error: 'Non autorisé - utilisateur non authentifié' },
+      { status: 401 }
+    );
+  }
+
   try {
-    const { documentId, content, metadata } = await request.json();
-    
-    if (!documentId || !content) {
-      logger.warn('documentId ou content manquant');
+    let body: { prefix?: unknown };
+
+    try {
+      body = await request.json();
+    } catch (parseError: unknown) {
+      const errorMessage = parseError instanceof Error ? parseError.message : String(parseError);
+      logger.error('Échec du parsing du JSON de la requête', {
+        error: errorMessage,
+        userId,
+      });
       return NextResponse.json(
-        { error: 'documentId and content are required' },
+        { error: 'Requête invalide - JSON mal formaté' },
         { status: 400 }
       );
     }
-    
-    logger.info(`Indexation du document: ${documentId}`, {
-      contentLength: content.length,
-      metadata,
+
+    const { prefix } = body;
+
+    // Format strict "uploads/{slug}/" (un seul segment, pas de sous-dossiers,
+    // pas de "..") : sans cette validation, un client pourrait envoyer un
+    // préfixe trop large (ex. "uploads/") et déclencher l'indexation de TOUS
+    // les uploads de TOUS les utilisateurs — interdit par la spec ("jamais
+    // de ré-indexation globale du bucket depuis cette page").
+    if (!isValidUploadPrefix(prefix)) {
+      logger.warn('Prefix manquant ou invalide pour /api/documents/index', { userId, prefix });
+      return NextResponse.json(
+        { error: 'Le champ "prefix" est requis et doit être au format "uploads/{slug}/"' },
+        { status: 400 }
+      );
+    }
+
+    logger.info(`Début de l'indexation pour le préfixe: ${prefix}`, { userId });
+
+    const result = await storageIndexer.indexAll({ prefix });
+
+    logger.info('Indexation terminée', {
+      userId,
+      prefix,
+      result,
+      processingTime: `${Date.now() - startTime}ms`,
     });
-    
-    // TODO: Intégrer avec le service de chunking et embeddings
-    // Pour l'instant, simuler l'indexation
-    const result = {
-      documentId,
-      chunksCreated: Math.ceil(content.length / 512),
-      embeddingsCreated: Math.ceil(content.length / 512),
-      status: 'indexed',
-    };
-    
-    logger.info('Document indexé avec succès', result);
-    
+
     return NextResponse.json(result, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
     logger.error('Erreur dans documents/index', {
-      error: error.message,
-      stack: error.stack,
+      error: errorMessage,
+      stack: errorStack,
+      userId,
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erreur serveur interne', details: errorMessage },
       { status: 500 }
     );
   }

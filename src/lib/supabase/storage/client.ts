@@ -56,9 +56,17 @@ export class SupabaseStorageClient {
       }
 
       // Transformer les données de Supabase en StorageFileInfo
+      // NOTE: l'API Storage de Supabase ne renvoie jamais `metadata.full_path`
+      // (ce champ n'existe pas dans sa réponse) — `file.name` est le nom
+      // RELATIF au dossier listé (`prefix`), pas le chemin complet dans le
+      // bucket. Il faut donc reconstruire le chemin complet nous-mêmes,
+      // sans quoi tout appel avec un `prefix` non-racine (ex. indexation
+      // d'un sous-dossier d'upload) produit des chemins invalides et fait
+      // échouer le téléchargement ultérieur ("Object not found").
+      const normalizedPrefix = prefix ? prefix.replace(/\/+$/, '') : '';
       const files: StorageFileInfo[] = data.map((file: any) => ({
         name: file.name,
-        path: file.metadata?.full_path || file.name,
+        path: normalizedPrefix ? `${normalizedPrefix}/${file.name}` : file.name,
         contentType: file.metadata?.mimetype || '',
         size: file.metadata?.size || 0,
         updatedAt: file.metadata?.last_modified || file.updated_at || '',
@@ -132,6 +140,66 @@ export class SupabaseStorageClient {
       logger.error('Échec du téléchargement du fichier', {
         error: error.message,
         stack: error.stack,
+        path,
+        bucket: this.bucketName,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Télécharge (upload) un fichier vers Supabase Storage
+   * @param path Chemin cible du fichier dans le bucket (ex: "uploads/{slug}/{filename}")
+   * @param buffer Contenu binaire du fichier
+   * @param contentType Type MIME du fichier
+   * @returns Promise avec les informations du fichier uploadé
+   */
+  async uploadFile(path: string, buffer: Buffer, contentType: string): Promise<StorageFileInfo> {
+    const startTime = Date.now();
+    const supabaseClient = supabase;
+
+    try {
+      logger.info(`Upload du fichier: ${path}`, {
+        bucket: this.bucketName,
+        contentType,
+        size: buffer.length,
+      });
+
+      const { data, error } = await supabaseClient
+        .storage
+        .from(this.bucketName)
+        .upload(path, buffer, { contentType, upsert: true });
+
+      if (error) {
+        logger.error('Échec de l\'upload du fichier', {
+          error: error.message,
+          path,
+          bucket: this.bucketName,
+        });
+        throw new Error(`Échec de l'upload: ${error.message}`);
+      }
+
+      logger.info('Fichier uploadé avec succès', {
+        path,
+        size: buffer.length,
+        processingTime: `${Date.now() - startTime}ms`,
+      });
+
+      return {
+        name: path.split('/').pop() || path,
+        path: data?.path || path,
+        contentType,
+        size: buffer.length,
+        updatedAt: new Date().toISOString(),
+        metadata: {},
+      };
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      logger.error('Échec du traitement de l\'upload du fichier', {
+        error: errorMessage,
+        stack: errorStack,
         path,
         bucket: this.bucketName,
       });

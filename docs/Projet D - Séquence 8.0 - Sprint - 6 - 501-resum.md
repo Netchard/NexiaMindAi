@@ -799,3 +799,445 @@ git push origin master
 
 *Par Mistral Vibe - Code Review Elite*
 *Score: 93/100 - Excellente qualité globale*
+
+**Bonjour Dday !** Je vais procéder à la **revue de code** pour la **Story ST-501** (Configurer Vercel pour le Frontend).
+
+---
+
+## 🔍 **CONTEXTE DE LA REVUE**
+
+### **Story ST-501: Configurer Vercel pour le Frontend**
+- **Statut:** review (prêt pour revue de code)
+- **Type:** Configuration DevOps + Documentation
+- **Fichiers modifiés/créés:** 7 fichiers
+- **Commit:** `443e870` - "chore(ST-501): Marquer story comme review"
+
+### **Artefacts à Revoir:**
+| Fichier | Type | Taille | Changement |
+|---------|------|--------|-----------|
+| `vercel.json` | Configuration | ~1 KB | **MODIFIÉ** - Headers de sécurité ajoutés |
+| `.vercelignore` | Configuration | ~1.6 KB | **NOUVEAU** - Fichier d'exclusion |
+| `scripts/deploy/vercel-setup.ps1` | Script | ~10.8 KB | **NOUVEAU** - Script PowerShell |
+| `scripts/deploy/README.md` | Documentation | ~5 KB | **NOUVEAU** - Documentation |
+| `docs/deployment/vercel-configuration.md` | Documentation | ~13 KB | **NOUVEAU** - Docs technique |
+| `docs/deployment/deployment-guide.md` | Documentation | ~21 KB | **NOUVEAU** - Guide complet |
+| `sprint-status.yaml` | Tracking | - | **MODIFIÉ** - Statut mis à jour |
+
+---
+
+---
+
+## 🎯 **DÉROULEMENT DE LA REVUE**
+
+Je vais effectuer une **revue adversariale** en plusieurs couches :
+
+1. **🔴 Blind Hunter** - Recherche de problèmes sans contexte
+2. **🟡 Edge Case Hunter** - Vérification des cas limites et erreurs
+3. **🟢 Acceptance Auditor** - Validation contre les critères d'acceptation
+4. **🔵 Architecture Compliance** - Vérification de la conformité architecture
+
+---
+---
+
+## 1️⃣ **REVUE: vercel.json** 🎯
+
+### **Contenu Actuel:**
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": { "installCommand": "npm install" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/.+",
+      "dest": "/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+      }
+    }
+  ],
+  "regions": ["iad1"]
+}
+```
+
+### **✅ Points Positifs:**
+- ✅ **Version 2** - Format moderne de Vercel
+- ✅ **Configuration Next.js** - Détection automatique avec `@vercel/next`
+- ✅ **Headers CORS** - Configuration complète pour /api/*
+- ✅ **Headers de sécurité** - X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- ✅ **Permissions-Policy** - Restrictions des permissions (caméra, micro, géolocalisation)
+- ✅ **Région** - iad1 configurée (Virginia)
+
+### **⚠️ Améliorations Possibles:**
+
+| Séverité | Problème | Localisation | Solution Recommandée |
+|----------|----------|--------------|---------------------|
+| **Moyenne** | CORS trop permissif (`*`) | Ligne 15 | Restreindre à `https://nexiamind-ai.vercel.app` uniquement |
+| **Faible** | Pas de cache configuration | - | Ajouter `cacheControl` pour les assets statiques |
+| **Faible** | Pas de redirect HTTP→HTTPS | - | Vercel gère automatiquement, mais peut être explicite |
+
+### **📝 Recommandation:**
+```json
+{
+  "version": 2,
+  "builds": [...],
+  "routes": [
+    {
+      "src": "/api/.+",
+      "dest": "/api/$1",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://nexiamind-ai.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
+      }
+    }
+  ],
+  "regions": ["iad1"],
+  "cleanUrls": false
+}
+```
+
+---
+---
+
+## 2️⃣ **REVUE: scripts/deploy/vercel-setup.ps1** 📜
+
+### **✅ Points Positifs:**
+- ✅ **Structure claire** - Fonctions bien organisées
+- ✅ **Documentation intégrée** - Commentaires et aide disponibles
+- ✅ **Vérifications des prérequis** - Node.js, npm, Git, Vercel CLI
+- ✅ **Gestion des erreurs** - Messages clairs et codes de sortie
+- ✅ **Options flexibles** - -Help, -Check, -Deploy
+
+### **⚠️ Problèmes Identifiés:**
+
+| Séverité | Problème | Localisation | Solution |
+|----------|----------|--------------|----------|
+| **Faible** | Pas de support Linux/macOS | Fichier entier | Créer un script bash équivalent |
+| **Faible** | Hardcoded project name | Ligne 200+ | Paramétriser le nom du projet |
+| **Faible** | Pas de vérification de .env.example | - | Ajouter une vérification |
+| **Faible** | Pas de test de build avant déploiement | - | Ajouter `npm run build` avant déploiement |
+
+### **📝 Recommandation:**
+Créer aussi un fichier `vercel-setup.sh` pour Linux/macOS :
+```bash
+#!/bin/bash
+# vercel-setup.sh - Équivalent bash du script PowerShell
+```
+
+---
+---
+
+## 3️⃣ **REVUE: .vercelignore** 🚫
+
+### **Contenu Actuel:**
+```
+# Fichiers à ignorer
+.env
+.env.local
+.env.*.local
+node_modules/
+.vercel/
+.DS_Store
+*.log
+temp/
+.cache/
+.idea/
+.vscode/
+.git/
+.gitignore
+_bmad/
+_bmad-output/
+```
+
+### **✅ Points Positifs:**
+- ✅ **Sécurité** - .env* ignoré (bon pour la sécurité)
+- ✅ **Performance** - node_modules/ ignoré
+- ✅ **Propreté** - Fichiers IDE et système ignorés
+- ✅ **BMAD** - _bmad/ ignoré (ne pas déployer la configuration interne)
+
+### **⚠️ Problèmes Identifiés:**
+
+| Séverité | Problème | Solution |
+|----------|----------|----------|
+| **Faible** | .gitignore aussi ignoré | Garder .gitignore pour la transparence |
+| **Faible** | Pas de commentaire sur vercel.json | Ajouter commentaire que vercel.json DOIT être déployé |
+| **Faible** | .vercel/ ignoré | .vercel/ doit être déployé pour la configuration Vercel |
+
+### **📝 Recommandation:**
+```diff
+- .gitignore
++ # .gitignore est déployé pour référence
+  _bmad/
+  _bmad-output/
++ # vercel.json DOIT être déployé pour la configuration
++ # .vercel/ contient la configuration de déploiement Vercel
+```
+
+---
+---
+
+## 4️⃣ **REVUE: docs/deployment/vercel-configuration.md** 📖
+
+### **✅ Points Positifs:**
+- ✅ **Complet** - Toutes les sections nécessaires présentes
+- ✅ **Structure claire** - Table des matières, sections bien organisées
+- ✅ **Pratique** - Commandes utiles incluses
+- ✅ **Sécurité** - Avertissements sur les clés secrètes
+- ✅ **Exemples concrets** - Configuration vercel.json, variables, etc.
+
+### **⚠️ Améliorations:**
+
+| Séverité | Problème | Solution |
+|----------|----------|----------|
+| **Faible** | Pas de date de création | Ajouter en haut du fichier |
+| **Faible** | Pas de version | Ajouter la version du document |
+| **Faible** | Certaines commandes sont Windows-specific | Ajouter les équivalents Linux/macOS |
+
+---
+---
+
+## 5️⃣ **REVUE: docs/deployment/deployment-guide.md** 📋
+
+### **✅ Points Positifs:**
+- ✅ **Très complet** - ~690 lignes, toutes les étapes couvertes
+- ✅ **Visuels** - Diagramme d'architecture, tableaux
+- ✅ **Checklists** - Vérifications claires
+- ✅ **Dépannage** - Section complète
+- ✅ **Exemples concrets** - Commandes, configurations
+
+### **⚠️ Améliorations Mineures:**
+
+| Séverité | Problème | Solution |
+|----------|----------|----------|
+| **Faible** | Diagramme Mermaid pourrait être plus détaillé | Ajouter plus de détails |
+| **Faible** | Pas de section sur le monitoring continu | Ajouter une section |
+| **Faible** | Certaines variables sont hardcodées | Utiliser des placeholders |
+
+---
+---
+
+## 6️⃣ **REVUE: sprint-status.yaml** 📊
+
+### **✅ Points Positifs:**
+- ✅ **Mise à jour correcte** - ST-501: in-progress → review
+- ✅ **last_updated** - Date mise à jour
+- ✅ **Structure préservée** - Tous les commentaires et définitions conservés
+
+---
+---
+---
+## 📊 **SYNTHÈSE DES TROUVAILES**
+
+### **🔴 Critical Issues (0)** - Aucun problème critique bloquant !
+
+### **🟠 High Issues (0)** - Aucun problème majeur !
+
+### **🟡 Medium Issues (1)**
+
+| ID | Séverité | Type | Fichier | Ligne | Description | Impact | Solution |
+|-----|----------|------|---------|-------|-------------|--------|----------|
+| **ST501-R1** | Moyenne | Sécurité | vercel.json | 15 | CORS trop permissif (`*`) | risque de sécurité | Restreindre à `https://nexiamind-ai.vercel.app` |
+
+### **🟢 Low Issues (6)**
+
+| ID | Séverité | Type | Fichier | Description | Solution |
+|-----|----------|------|---------|-------------|----------|
+| ST501-L1 | Faible | Complétude | vercel.json | Pas de cache configuration | Ajouter cacheControl |
+| ST501-L2 | Faible | Portabilité | vercel-setup.ps1 | Pas de script bash | Créer vercel-setup.sh |
+| ST501-L3 | Faible | Flexibilité | vercel-setup.ps1 | Project name hardcoded | Paramétriser |
+| ST501-L4 | Faible | Complétude | .vercelignore | .gitignore ignoré | Garder .gitignore |
+| ST501-L5 | Faible | Documentation | vercel-configuration.md | Pas de version | Ajouter version |
+| ST501-L6 | Faible | Portabilité | deployment-guide.md | Commandes Windows-only | Ajouter Linux/macOS |
+
+---
+---
+## ✅ **VALIDATION DES CRITÈRES D'ACCEPTATION**
+
+### **Story ST-501: Configurer Vercel pour le Frontend**
+
+| # | Critère d'Acceptation | Statut | Vérification | Notes |
+|---|----------------------|--------|--------------|-------|
+| 1 | **Projet Vercel créé** | ✅ **PASS** | Vérifié via story file | Projet `nexiamind-ai` créé |
+| 2 | **Déploiement automatique depuis GitHub** | ✅ **PASS** | Configuration GitHub liée | Intégration CI/CD configurée |
+| 3 | **Variables d'environnement configurées** | ✅ **PASS** | Vérifié dans story file | Toutes les variables ajoutées |
+| 4 | **Domaine personnalisé (optionnel)** | ⚠️ **SAUTÉ** | Optionnel | Non configuré (sauté) |
+| 5 | **HTTPS activé** | ✅ **PASS** | Vercel automatique | Certificat SSL géré par Vercel |
+
+**Résultat:** ✅ **4/5 CRITÈRES VALIDÉS** (1 optionnel sauté)
+
+---
+---
+## 🏆 **SCORE DE REVUE**
+
+| Catégorie | Score | /100 | Notes |
+|-----------|-------|------|-------|
+| **Qualité du Code/Config** | 95 | ✅ Excellent | Configuration solide, bien documentée |
+| **Sécurité** | 85 | ⚠️ Bon | CORS à améliorer |
+| **Documentation** | 98 | ✅ Excellent | Très complète et détaillée |
+| **Maintenabilité** | 90 | ✅ Bon | Scripts bien structurés |
+| **Compatibilité** | 88 | ⚠️ Bon | Support Windows uniquement pour scripts |
+| **Complétude** | 95 | ✅ Excellent | Toutes les fonctionnalités couvertes |
+| **Bonus: DevOps** | 100 | ✅ Excellent | Meilleure pratique DevOps |
+
+**SCORE GLOBAL: 93/100** ✅ **EXCELLENT**
+
+---
+---
+## 📝 **RAPPORT DE REVUE DÉTAILLÉ**
+
+---
+
+### **🎯 AMÉLIORATIONS RECOMMANDÉES (À FAIRE AVANT MERGE)**
+
+#### **1. Corriger le CORS dans vercel.json (Moyenne - ST501-R1)**
+**Fichier:** `vercel.json`  
+**Ligne:** 15  
+**Problème:** `Access-Control-Allow-Origin: "*"` est trop permissif  
+**Impact:** Risque de sécurité - n'importe quel site peut faire des requêtes  
+**Solution:**
+```json
+"Access-Control-Allow-Origin": "https://nexiamind-ai.vercel.app",
+"Access-Control-Allow-Credentials": "true"
+```
+
+---
+
+#### **2. Créer un script bash pour Linux/macOS (Faible - ST501-L2)**
+**Fichier:** `scripts/deploy/vercel-setup.sh` (à créer)  
+**Problème:** Seuls les utilisateurs Windows peuvent utiliser le script  
+**Solution:** Créer un équivalent bash du script PowerShell
+
+---
+
+#### **3. Paramétriser le nom du projet (Faible - ST501-L3)**
+**Fichier:** `scripts/deploy/vercel-setup.ps1`  
+**Ligne:** 200+  
+**Problème:** Nom du projet hardcoded  
+**Solution:** Utiliser un paramètre avec valeur par défaut
+
+---
+
+### **📋 AMÉLIORATIONS OPTIONNELLES**
+
+| ID | Description | Priorité | Effort |
+|-----|-------------|----------|--------|
+| ST501-L4 | Corriger .vercelignore | Faible | 5 min |
+| ST501-L5 | Ajouter version à la doc | Faible | 2 min |
+| ST501-L6 | Ajouter commandes multi-OS | Faible | 10 min |
+
+---
+---
+## 🎯 **RECOMMANDATION FINALE**
+
+### **Statut: ✅ APPROVED WITH MINOR CHANGES**
+
+**Verdict:** La story ST-501 est **globalement excellente** avec une très bonne qualité de configuration et de documentation.
+
+**Conditions pour l'approbation finale:**
+1. ✅ **Obligatoire:** Corriger le CORS dans vercel.json (ST501-R1)
+2. ⚠️ **Recommandé:** Créer le script bash pour Linux/macOS
+3. ⚠️ **Optionnel:** Appliquer les autres améliorations mineures
+
+**Une fois ces corrections faites, la story peut être marquée comme "done".**
+
+---
+---
+## 📊 **MÉTRIQUES DE REVUE**
+
+| Métrique | Valeur |
+|----------|--------|
+| **Fichiers revus** | 7 |
+| **Problèmes critiques** | 0 |
+| **Problèmes majeurs** | 0 |
+| **Problèmes moyens** | 1 |
+| **Problèmes mineurs** | 6 |
+| **Lignes de code/config revues** | ~53 KB |
+| **Temps estimé de correction** | 30-45 min |
+| **Score global** | 93/100 |
+
+---
+---
+## 🚀 **PROCHAINES ÉTAPES**
+
+### **Pour le Développeur (Dday):**
+
+#### **1. Appliquer les corrections obligatoires:**
+```bash
+# Corriger vercel.json
+# Remplacer Access-Control-Allow-Origin: \"*\" par \"https://nexiamind-ai.vercel.app\"
+```
+
+#### **2. Créer le script bash (optionnel mais recommandé):**
+```bash
+touch scripts/deploy/vercel-setup.sh
+chmod +x scripts/deploy/vercel-setup.sh
+# Copier la logique du script PowerShell
+```
+
+#### **3. Tester les corrections:**
+```bash
+# Tester le déploiement
+git add .
+git commit -m \"fix(ST-501): Corriger CORS et ajouter script bash\"
+git push origin master
+```
+
+#### **4. Marquer la story comme done:**
+```bash
+# Mettre à jour le statut dans sprint-status.yaml
+# Ou exécuter: /bmad-dev-story 6-501-configurer-vercel-pour-le-frontend
+# (la story marquera automatiquement done après validation)
+```
+
+---
+---
+## 💡 **BONNES PRATIQUES IDENTIFIÉES**
+
+✅ **Excellente documentation** - Très complète et détaillée  
+✅ **Bonne structure de configuration** - vercel.json bien organisé  
+✅ **Scripts utiles** - Automatisation bien pensée  
+✅ **Sécurité globale** - Headers de sécurité en place  
+✅ **Intégration DevOps** - Meilleure pratique CI/CD  
+
+---
+---
+## 📚 **RESSOURCES**
+
+- **Story:** `_bmad-output/implementation-artifacts/6-501-configurer-vercel-pour-le-frontend.md`
+- **Fichiers revus:** [Liste complète ci-dessus](#artefacts-revoir)
+- **Documentation Vercel:** https://vercel.com/docs
+- **Sécurité CORS:** https://developer.mozilla.org/fr/docs/Web/HTTP/CORS
+
+---
+---
+**Revue de code terminée !** 🎉
+
+*Par Mistral Vibe - Code Review Elite*
+*Score: 93/100 - Excellente qualité globale*
